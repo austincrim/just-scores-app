@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Just Scores",
+    "slug": "just-scores",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icons/ios/1024.png",
+    "scheme": "justscores",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "platforms": ["ios"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.austincrim.justscores"
+    },
+    "plugins": ["expo-font"]
+  }
+}
