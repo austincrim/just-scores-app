@@ -16,11 +16,11 @@ const POWER_ORDER = new Map(POWER.map((item, index) => [item, index]))
 export function useSchedule(
   sport: "ncaaf" | "ncaab" | "nfl",
   conference?: string,
-  week?: string,
 ) {
   return useQuery({
-    queryKey: [sport, conference, week],
+    queryKey: [sport],
     queryFn: async () => {
+      console.log("useSchedule")
       let [leaguesRes, scheduleRes] = await Promise.all([
         fetch(`${API_URL}/${sport}/events/conferences`),
         fetch(
@@ -56,30 +56,12 @@ export function useSchedule(
         current_group: Season
       }
 
-      let games: Game[] = []
-      let weekToFetch = week
-        ? events.current_season.find((w: any) => w.id === week)
-        : events.current_group
-
-      if (weekToFetch?.event_ids && weekToFetch?.event_ids.length) {
-        let gamesRes = await fetch(
-          `${API_URL}/${sport}/events?id.in=${weekToFetch.event_ids.join(",")}`,
-        )
-
-        games = await gamesRes.json()
-      }
-
       return {
         conferences,
         events,
-        games,
       }
     },
     select: (data) => {
-      data.games.sort(
-        (a, b) =>
-          new Date(a.game_date).valueOf() - new Date(b.game_date).valueOf(),
-      )
       data.conferences.sort((a, b) => {
         const aIndex = POWER_ORDER.get(a)
         const bIndex = POWER_ORDER.get(b)
@@ -100,7 +82,32 @@ export function useSchedule(
       })
       return data
     },
-    refetchInterval: 5000,
+    // refetchInterval: 5000,
+  })
+}
+
+export function useGames(sport: string, events: Array<number>) {
+  return useQuery({
+    queryKey: [sport, events],
+    queryFn: async () => {
+      console.log("useGames")
+      let games: Game[] = []
+      if (events && events.length) {
+        let gamesRes = await fetch(
+          `${API_URL}/${sport}/events?id.in=${events.join(",")}`,
+        )
+
+        games = await gamesRes.json()
+      }
+      return games
+    },
+    select: (data) => {
+      data.sort(
+        (a, b) =>
+          new Date(a.game_date).valueOf() - new Date(b.game_date).valueOf(),
+      )
+      return data
+    },
   })
 }
 

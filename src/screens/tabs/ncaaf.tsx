@@ -1,13 +1,21 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Text, TouchableOpacity, View } from "react-native"
 import { FlashList } from "@shopify/flash-list"
 import { GamePreview } from "@/components/game-preview"
-import { useSchedule } from "@/lib/hooks"
+import { useGames, useSchedule } from "@/lib/hooks"
 
 export function NcaaFB() {
   let [selectedConference, setSelectedConference] = useState("Top 25")
   let [selectedWeek, setSelectedWeek] = useState("2024-1")
-  let { data, status } = useSchedule("ncaaf", selectedConference, selectedWeek)
+  let { data, status } = useSchedule("ncaaf", selectedConference)
+  let events: number[] = useMemo(() => {
+    if (!data) return []
+    return (
+      data.events.current_season.find((w) => w.id === selectedWeek)
+        ?.event_ids ?? data.events.current_group.event_ids
+    )
+  }, [data?.events, selectedConference, selectedWeek])
+  let { data: games } = useGames("ncaaf", events)
 
   if (status !== "success") {
     return <Text className="flex-1 text-center">loading...</Text>
@@ -60,32 +68,36 @@ export function NcaaFB() {
         }}
       />
       <View className="h-6" />
-      <FlashList
-        data={data.games}
-        estimatedItemSize={219}
-        keyExtractor={(item) => String(item.id)}
-        ItemSeparatorComponent={() => <View className="border-b" />}
-        renderItem={({ index, item }) => {
-          let currentGameDate = new Date(item.game_date).toLocaleDateString()
-          let previousGameDate =
-            index > 0
-              ? new Date(data.games[index - 1]?.game_date).toLocaleDateString()
-              : null
+      {games && games.length ? (
+        <FlashList
+          data={games}
+          estimatedItemSize={219}
+          keyExtractor={(item) => String(item.id)}
+          ItemSeparatorComponent={() => <View className="border-b" />}
+          renderItem={({ index, item }) => {
+            let currentGameDate = new Date(item.game_date).toLocaleDateString()
+            let previousGameDate =
+              index > 0
+                ? new Date(games[index - 1]?.game_date).toLocaleDateString()
+                : null
 
-          return (
-            <View className="pl-2 pr-8">
-              {(index === 0 || currentGameDate !== previousGameDate) && (
-                <Text className="mt-4 font-bold">{currentGameDate}</Text>
-              )}
-              <View
-                className={`relative flex flex-col gap-2 ${item.status === "in_progress" ? "active" : ""}`}
-              >
-                <GamePreview game={item} />
+            return (
+              <View className="pl-2 pr-8">
+                {(index === 0 || currentGameDate !== previousGameDate) && (
+                  <Text className="mt-4 font-bold">{currentGameDate}</Text>
+                )}
+                <View
+                  className={`relative flex flex-col gap-2 ${item.status === "in_progress" ? "active" : ""}`}
+                >
+                  <GamePreview game={item} />
+                </View>
               </View>
-            </View>
-          )
-        }}
-      />
+            )
+          }}
+        />
+      ) : (
+        <></>
+      )}
     </View>
   )
 }
