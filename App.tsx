@@ -27,11 +27,15 @@ function App() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Tabs"
+        name="Home"
         component={Tabs}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="GameDetails" component={GameDetails} />
+      <Stack.Screen
+        name="GameDetails"
+        component={GameDetails}
+        options={{ title: "" }}
+      />
     </Stack.Navigator>
   )
 }

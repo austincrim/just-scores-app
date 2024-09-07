@@ -1,5 +1,6 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Image, ScrollView, Text, View } from "react-native"
+import { SymbolView } from "expo-symbols"
 import { useQuery } from "@tanstack/react-query"
 import { BasketballScore } from "@/components/basketball-score"
 import { FootballScore } from "@/components/football-score"
@@ -98,6 +99,9 @@ function TeamLine({ game, type }: { game: Game; type: "away" | "home" }) {
       ? game.box_score?.score?.home?.score
       : game.box_score?.score?.away?.score
   let ranking = type === "home" ? game.home_ranking : game.away_ranking
+  let hasPossession =
+    isFootballEvent(game) &&
+    game.box_score?.team_in_possession?.name === team.name
 
   return (
     <View className="flex flex-row items-center justify-between">
@@ -108,16 +112,23 @@ function TeamLine({ game, type }: { game: Game; type: "away" | "home" }) {
           accessibilityLabel={`${team.name} logo`}
         />
         {ranking && <Text className="text-lg">{ranking}</Text>}
-        <Text
-          className={`text-2xl font-bold ${
-            isFootballEvent(game) &&
-            game.box_score?.team_in_possession?.name === team.name
-              ? "text-amber-700"
-              : ""
-          }`}
-        >
-          {team.name}
-        </Text>
+        <View className="flex flex-row items-center gap-1">
+          <Text
+            className={`text-2xl font-bold ${
+              hasPossession ? "text-amber-800" : ""
+            }`}
+          >
+            {team.name}
+          </Text>
+          {hasPossession && (
+            <SymbolView
+              name="football.fill"
+              size={20}
+              tintColor="#92400e"
+              style={{ transform: "rotate(45deg)" }}
+            />
+          )}
+        </View>
       </View>
       <Text className="text-5xl tabular-nums">{score}</Text>
     </View>

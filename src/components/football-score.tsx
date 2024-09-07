@@ -21,7 +21,7 @@ export function FootballScore({ game }: { game: NcaaFBEvent | NFLEvent }) {
       )}
 
       {game.box_score?.scoring_summary && (
-        <View className="flex gap-6 mt-8 text-xs">
+        <View className="flex gap-6 my-8 text-xs">
           <Text className="text-xl">Scoring Summary</Text>
           {game.box_score.scoring_summary.map((summary, index) => {
             let logo = summary.scorer.teams[0].logos.small

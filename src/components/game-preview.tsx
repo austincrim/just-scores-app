@@ -25,7 +25,7 @@ export function GamePreview({ game }: { game: Game }) {
 
   return (
     <TouchableOpacity
-      className="text-lg active flex flex-row items-center gap-1 py-4"
+      className="text-lg active flex flex-row items-center gap-2 py-4"
       onPress={() =>
         navigation.navigate("GameDetails", {
           sport: route.name,

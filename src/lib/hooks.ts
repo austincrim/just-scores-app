@@ -18,33 +18,13 @@ export function useSchedule(
   conference?: string,
 ) {
   return useQuery({
-    queryKey: [sport],
+    queryKey: [sport, conference],
     queryFn: async () => {
-      console.log("useSchedule")
-      let [leaguesRes, scheduleRes] = await Promise.all([
-        fetch(`${API_URL}/${sport}/events/conferences`),
-        fetch(
-          `${API_URL}/${sport}/schedule?utc_offset=-21600&conference=${
-            conference ?? ""
-          }`,
-        ),
-      ])
-
-      let leagues: League[] | null = null
-      let conferences: string[] = []
-      if (!leaguesRes.ok) {
-        if (leaguesRes.status === 404) {
-          leagues = null
-        } else {
-          let message = await leaguesRes.text()
-          console.error(message)
-          throw new Error(message)
-        }
-      } else {
-        leagues = await leaguesRes.json()
-        conferences = leagues ? leagues.flatMap((l) => l.conferences) : []
-      }
-
+      let scheduleRes = await fetch(
+        `${API_URL}/${sport}/schedule?utc_offset=-21600&conference=${
+          conference ?? ""
+        }`,
+      )
       if (!scheduleRes.ok) {
         let message = await scheduleRes.text()
         console.error(message)
@@ -56,13 +36,17 @@ export function useSchedule(
         current_group: Season
       }
 
-      return {
-        conferences,
-        events,
-      }
+      return events
     },
+    // refetchInterval: 5000,
+  })
+}
+
+export function useConferences(sport: "ncaaf" | "ncaab") {
+  return useQuery({
+    queryKey: [sport, "conferences"],
     select: (data) => {
-      data.conferences.sort((a, b) => {
+      data.sort((a, b) => {
         const aIndex = POWER_ORDER.get(a)
         const bIndex = POWER_ORDER.get(b)
 
@@ -82,7 +66,26 @@ export function useSchedule(
       })
       return data
     },
-    // refetchInterval: 5000,
+    queryFn: async () => {
+      let leaguesRes = await fetch(`${API_URL}/${sport}/events/conferences`)
+
+      let leagues: League[] | null = null
+      let conferences: string[] = []
+      if (!leaguesRes.ok) {
+        if (leaguesRes.status === 404) {
+          leagues = null
+        } else {
+          let message = await leaguesRes.text()
+          console.error(message)
+          throw new Error(message)
+        }
+      } else {
+        leagues = await leaguesRes.json()
+        conferences = leagues ? leagues.flatMap((l) => l.conferences) : []
+      }
+
+      return conferences
+    },
   })
 }
 
@@ -90,7 +93,6 @@ export function useGames(sport: string, events: Array<number>) {
   return useQuery({
     queryKey: [sport, events],
     queryFn: async () => {
-      console.log("useGames")
       let games: Game[] = []
       if (events && events.length) {
         let gamesRes = await fetch(
@@ -119,5 +121,6 @@ export type League = {
 export type Season = {
   label: string
   id: string
+  guid: string
   event_ids: number[]
 }

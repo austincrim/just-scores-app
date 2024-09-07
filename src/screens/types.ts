@@ -1,12 +1,12 @@
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
 import type {
   CompositeScreenProps,
-  NavigatorScreenParams
+  NavigatorScreenParams,
 } from "@react-navigation/native"
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 
 export type RootStackParamList = {
-  Tabs: NavigatorScreenParams<TabsParamList>
+  Home: NavigatorScreenParams<TabsParamList>
   GameDetails: { sport: "ncaaf" | "nfl" | "ncaab"; id: string }
 }
 
