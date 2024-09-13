@@ -6,9 +6,11 @@ import { useConferences, useGames, useSchedule } from "@/lib/hooks"
 
 export function NcaaFB() {
   let [selectedConference, setSelectedConference] = useState("Top 25")
-  let [selectedWeek, setSelectedWeek] = useState("2024-1")
   let { data: conferences } = useConferences("ncaaf")
   let { data: events } = useSchedule("ncaaf", selectedConference)
+  let [selectedWeek, setSelectedWeek] = useState(
+    events?.current_group.id ?? "2024-1",
+  )
   let eventIds: number[] = useMemo(() => {
     if (!events) return []
 
@@ -34,11 +36,7 @@ export function NcaaFB() {
                 onPress={() => setSelectedConference(item)}
                 className={`px-3 py-2 rounded-full border ${selectedConference === item ? "bg-amber-50 border-amber-800" : ""}`}
               >
-                <Text
-                // className={selectedConference === item ? "font-bold" : ""}
-                >
-                  {item}
-                </Text>
+                <Text>{item}</Text>
               </TouchableOpacity>
             )
           }}

@@ -5,16 +5,18 @@ import { GamePreview } from "@/components/game-preview"
 import { useGames, useSchedule } from "@/lib/hooks"
 
 export function Nfl() {
-  let [selectedWeek, setSelectedWeek] = useState("2024-1")
   let { data: events } = useSchedule("nfl")
+  let [selectedWeek, setSelectedWeek] = useState(
+    events?.current_group.id ?? "2024-1",
+  )
   let eventIds: number[] = useMemo(() => {
     if (!events) return []
-
     return (
       events.current_season.find((w) => w.id === selectedWeek)?.event_ids ??
       events.current_group.event_ids
     )
   }, [events, selectedWeek])
+
   let { data: games } = useGames("nfl", eventIds)
 
   let regularSeasonWeeks = useMemo(

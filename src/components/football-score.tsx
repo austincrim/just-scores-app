@@ -30,17 +30,17 @@ export function FootballScore({ game }: { game: NcaaFBEvent | NFLEvent }) {
             return (
               <View
                 key={index}
-                className="flex flex-row items-center gap-2 pl-2"
+                className="flex flex-row items-center pt-2 gap-2 pl-2"
               >
                 <Image
-                  className="absolute object-cover w-8 h-8 -left-1 -bottom-3"
+                  className="absolute z-10 object-cover w-8 h-8 -left-1 -bottom-3"
                   source={{ uri: logo }}
                   accessibilityLabel={`${summary.team} logo`}
                 />
                 {summary.scorer?.headshots?.original ? (
                   <Image
                     className="object-cover w-12 h-12 rounded-full"
-                    style={{ borderWidth: 4, borderColor: `#${teamColor}` }}
+                    style={{ borderWidth: 2, borderColor: `#${teamColor}` }}
                     source={{ uri: summary.scorer.headshots.small }}
                     accessibilityLabel={summary.scorer.full_name}
                   />
