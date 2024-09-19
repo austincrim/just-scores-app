@@ -17,6 +17,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.austincrim.justscores"
     },
-    "plugins": ["expo-font"]
+    "plugins": [
+      "expo-font",
+      ["react-native-widget-extension", { "widgetsFolder": "Widget" }]
+    ]
   }
 }

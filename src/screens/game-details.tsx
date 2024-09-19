@@ -2,11 +2,14 @@ import React from "react"
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native"
 import { openURL } from "expo-linking"
 import { SymbolView } from "expo-symbols"
+import { FlashList } from "@shopify/flash-list"
 import { useQuery } from "@tanstack/react-query"
 import { BasketballScore } from "@/components/basketball-score"
+import { BoxScore } from "@/components/box-score"
 import { FootballScore } from "@/components/football-score"
 import { API_URL } from "@/lib/hooks"
 import {
+  FootballPlayerRecord,
   Game,
   NcaaBBEvent,
   NcaaBBEventStats,
@@ -14,6 +17,13 @@ import {
   NFLEvent,
 } from "@/types"
 import { RootStackScreenProps } from "./types"
+
+type TeamPlayers = {
+  teamName: string
+  positions: {
+    [positionType: string]: FootballPlayerRecord[]
+  }
+}
 
 // box score api https://api.thescore.com/ncaaf/box_scores/game_id/player_records
 
@@ -35,7 +45,11 @@ const channelIds = new Map([
 
 type Props = RootStackScreenProps<"GameDetails">
 export function GameDetails({ route }: Props) {
-  let { data, status, error } = useQuery({
+  let {
+    data: gameQuery,
+    status,
+    error,
+  } = useQuery({
     queryKey: ["game", route.params.id],
     refetchInterval: 5000,
     queryFn: async () => {
@@ -59,6 +73,36 @@ export function GameDetails({ route }: Props) {
       }
     },
   })
+  let { data: boxScore } = useQuery({
+    queryKey: ["boxScore", gameQuery?.game.box_score.id],
+    queryFn: async () => {
+      if (!gameQuery?.game.box_score.id) return []
+      let res = await fetch(
+        `${API_URL}/${route.params.sport}/box_scores/${gameQuery?.game.box_score.id}/player_records`,
+      )
+
+      if (!res.ok) {
+        throw new Error(await res.text())
+      }
+      let boxScore: FootballPlayerRecord[] = await res.json()
+
+      return boxScore
+    },
+    select: (data) => {
+      const homeTeam: FootballPlayerRecord[] = []
+      const awayTeam: FootballPlayerRecord[] = []
+
+      data.forEach((player) => {
+        if (player.alignment === "home") {
+          homeTeam.push(player)
+        } else if (player.alignment === "away") {
+          awayTeam.push(player)
+        }
+      })
+
+      return { home: homeTeam, away: awayTeam }
+    },
+  })
 
   if (status === "pending") {
     return <Text>loading...</Text>
@@ -68,7 +112,7 @@ export function GameDetails({ route }: Props) {
     return <Text>{error?.message}</Text>
   }
 
-  if (!data) {
+  if (!gameQuery) {
     return <Text>nothing here</Text>
   }
 
@@ -76,52 +120,68 @@ export function GameDetails({ route }: Props) {
     <ScrollView className="px-4 py-4">
       <View className="flex items-center gap-4">
         <View className="flex self-start flex-row justify-between w-full items-center gap-2">
-          {data.game.status !== "pre_game" ? (
-            <Text className="text-2xl tabular-nums min-w-fit">
-              {data.game.box_score.progress.string}
+          {gameQuery.game.status !== "pre_game" ? (
+            <Text className="text-xl tabular-nums min-w-fit">
+              {gameQuery.game.box_score.progress.string}
             </Text>
           ) : (
-            <Text className="text-2xl tabular-nums min-w-fit">
-              {new Date(data.game.game_date).toLocaleTimeString(undefined, {
-                timeStyle: "short",
-              })}
+            <Text className="text-xl tabular-nums min-w-fit">
+              {new Date(gameQuery.game.game_date).toLocaleTimeString(
+                undefined,
+                {
+                  timeStyle: "short",
+                },
+              )}
             </Text>
           )}
-          {data.game.tv_listings_by_country_code?.us && (
+          {gameQuery.game.tv_listings_by_country_code?.us && (
             <TouchableOpacity
+              className="text-center"
               onPress={async () => {
                 try {
                   await openURL(
-                    `youtubetv://${channelIds.get(data.game.tv_listings_by_country_code.us[0].long_name.toLowerCase())}`,
+                    `youtubetv://${channelIds.get(gameQuery.game.tv_listings_by_country_code.us[0].long_name.toLowerCase())}`,
                   )
                 } catch (e) {
                   console.error(e)
                 }
               }}
-              className="text-center"
             >
               <View className="flex flex-row items-center gap-1">
                 <SymbolView name="tv" size={16} resizeMode="scaleAspectFit" />
                 <Text>
-                  {data.game.tv_listings_by_country_code.us[0].long_name}
+                  {gameQuery.game.tv_listings_by_country_code.us[0].long_name}
                 </Text>
               </View>
             </TouchableOpacity>
           )}
         </View>
         <View className="flex flex-col w-full gap-2">
-          <TeamLine game={data.game} type="away" />
-          <TeamLine game={data.game} type="home" />
+          <TeamLine game={gameQuery.game} type="away" />
+          <TeamLine game={gameQuery.game} type="home" />
         </View>
       </View>
       <View>
-        {isFootballEvent(data.game) && <FootballScore game={data.game} />}
-        {isBasketballEvent(data.game) && (
+        {isFootballEvent(gameQuery.game) && (
+          <FootballScore game={gameQuery.game} />
+        )}
+        {isBasketballEvent(gameQuery.game) && (
           <BasketballScore
-            game={data.game}
-            stats={data.stats as NcaaBBEventStats}
+            game={gameQuery.game}
+            stats={gameQuery.stats as NcaaBBEventStats}
           />
         )}
+      </View>
+      <View>
+        {isFootballEvent(gameQuery.game) && boxScore && (
+          <BoxScore game={gameQuery.game} boxScore={boxScore} />
+        )}
+        {/* {isBasketballEvent(gameQuery.game) && (
+          <BasketballScore
+            game={gameQuery.game}
+            stats={gameQuery.stats as NcaaBBEventStats}
+          />
+        )} */}
       </View>
     </ScrollView>
   )

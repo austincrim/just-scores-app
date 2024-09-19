@@ -1847,3 +1847,152 @@ export interface Away8 {
   receiving_yards: number
   percentage_of_total_receiving_yards: number
 }
+
+export type FootballPlayerRecord = {
+  alignment: string
+  api_uri: string
+  box_score: string
+  defensive_assists: number
+  defensive_blocked_kicks: number
+  defensive_misc_assists: number | null
+  defensive_misc_tackles: number | null
+  defensive_passes: number | null
+  defensive_sack_yards: number
+  defensive_sacks: number
+  defensive_safeties: number | null
+  defensive_sp_assists: number | null
+  defensive_sp_tackles: number | null
+  defensive_stuff_yards: number | null
+  defensive_stuffs: number
+  defensive_tackles: number
+  defensive_tackles_assists: number
+  defensive_tackles_total: number
+  defensive_touchdown_total: number
+  field_goals_attempted: number
+  field_goals_blocked: number | null
+  field_goals_long: number
+  field_goals_made: number
+  fumbles: number | null
+  fumbles_forced: number
+  fumbles_lost: number
+  fumbles_opponent_recovered: number
+  fumbles_opponent_recovered_touchdowns: number | null
+  fumbles_opponent_recovered_yards: number | null
+  fumbles_own_recovered: number
+  fumbles_own_recovered_touchdowns: number | null
+  fumbles_own_recovered_yards: number | null
+  id: number
+  interceptions: number
+  interceptions_touchdowns: number
+  interceptions_yards: number
+  interceptions_yards_long: number
+  kick_return_touchdowns: number | null
+  kick_return_yards: number | null
+  kick_return_yards_average: string
+  kick_return_yards_long: number | null
+  kick_returns: number | null
+  kicking_blocked_extra_points: number | null
+  kicking_extra_points_attempted: number | null
+  kicking_extra_points_made: number | null
+  passing_attempts: number
+  passing_completions: number
+  passing_interceptions: number
+  passing_rating: number | null
+  passing_sacks: number
+  passing_touchdowns: number
+  passing_yards: number
+  passing_yards_long: number
+  passing_yards_lost: number
+  pat_attempted: number
+  pat_blocked: number | null
+  pat_made: number
+  player: {
+    api_uri: string
+    first_initial_and_last_name: string
+    first_name: string
+    full_name: string
+    has_headshots: boolean
+    has_transparent_headshots: boolean
+    headshots: {
+      large: string
+      original: string
+      small: string
+      transparent_large: string
+      transparent_medium: string
+      transparent_small: string
+      w192xh192: string
+    }
+    id: number
+    last_name: string
+    number: number
+    position: string
+    position_abbreviation: string
+    resource_uri: string
+    subscription_count: number
+    teams: Array<{
+      abbreviation: string
+      api_uri: string
+      colour_1: string
+      colour_2: string
+      conference: string
+      division: string
+      full_name: string
+      has_extra_info: boolean
+      has_injuries: boolean
+      has_rosters: boolean
+      id: number
+      location: string
+      logos: {
+        facing: string | null
+        large: string
+        small: string
+        tiny: string
+        w72xh72: string
+      }
+      medium_name: string
+      name: string
+      resource_uri: string
+      rss_url: string
+      search_name: string
+      short_name: string
+      subscribable_alert_text: string
+      subscribable_alerts: Array<{
+        default: boolean
+        display: string
+        key: string
+      }>
+      subscription_count: number
+      updated_at: string
+    }>
+    updated_at: string
+  }
+  position_types: string[]
+  punt_return_touchdowns: number | null
+  punt_return_yards: number | null
+  punt_return_yards_average: string
+  punt_return_yards_long: number | null
+  punt_returns: number | null
+  punts: number
+  punts_average: number
+  punts_blocked: number | null
+  punts_inside_20: number
+  punts_net_average: number | null
+  punts_touchbacks: number
+  punts_yards: number
+  punts_yards_long: number
+  receiving_receptions: number
+  receiving_targets: number
+  receiving_touchdowns: number
+  receiving_yards: number
+  receiving_yards_average: string
+  receiving_yards_long: number
+  return_touchdowns: number
+  return_yards: number
+  rushing_attempts: number
+  rushing_touchdowns: number
+  rushing_yards: number
+  rushing_yards_average: string
+  rushing_yards_long: number
+  team: string
+  updated_at: string
+}
