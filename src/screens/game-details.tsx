@@ -2,7 +2,6 @@ import React from "react"
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native"
 import { openURL } from "expo-linking"
 import { SymbolView } from "expo-symbols"
-import { FlashList } from "@shopify/flash-list"
 import { useQuery } from "@tanstack/react-query"
 import { BasketballScore } from "@/components/basketball-score"
 import { BoxScore } from "@/components/box-score"
@@ -18,29 +17,23 @@ import {
 } from "@/types"
 import { RootStackScreenProps } from "./types"
 
-type TeamPlayers = {
-  teamName: string
-  positions: {
-    [positionType: string]: FootballPlayerRecord[]
-  }
-}
-
 // box score api https://api.thescore.com/ncaaf/box_scores/game_id/player_records
 
 const channelIds = new Map([
-  ["espn", "GWQUdCwWPJU"],
-  ["espn2", "58wFNK6wHiE"],
-  ["espnu", "qOY_wLN3Cws"],
-  ["fox", "Zb93jUWQ02I"],
-  ["btn", "dK6q3BY5Cho"],
-  ["fs1", "_Cg4OXROht0"],
-  ["fs2", "dOebiFJpesk"],
-  ["abc", "oq8VLH9APU4"],
-  ["cbs", "H8IaNgT3Ppg"],
-  ["sec network", "8_6sI1qMNEo"],
-  ["acc network", "vPQQzD4ZBec"],
-  ["cbs sports network", "2rzCpZXNzBw"],
-  ["the cw", "sn3_WG30_vA"],
+  ["espn", "youtubetv://GWQUdCwWPJU"],
+  ["espn2", "youtubetv://58wFNK6wHiE"],
+  ["espnu", "youtubetv://qOY_wLN3Cws"],
+  ["fox", "youtubetv://Zb93jUWQ02I"],
+  ["btn", "youtubetv://dK6q3BY5Cho"],
+  ["fs1", "youtubetv://_Cg4OXROht0"],
+  ["fs2", "youtubetv://dOebiFJpesk"],
+  ["abc", "youtubetv://oq8VLH9APU4"],
+  ["cbs", "youtubetv://H8IaNgT3Ppg"],
+  ["sec network", "youtubetv://8_6sI1qMNEo"],
+  ["acc network", "youtubetv://vPQQzD4ZBec"],
+  ["cbs sports network", "youtubetv://2rzCpZXNzBw"],
+  ["the cw", "youtubetv://sn3_WG30_vA"],
+  ["espn+", "https://espn.com/watch"],
 ])
 
 type Props = RootStackScreenProps<"GameDetails">
@@ -140,7 +133,9 @@ export function GameDetails({ route }: Props) {
               onPress={async () => {
                 try {
                   await openURL(
-                    `youtubetv://${channelIds.get(gameQuery.game.tv_listings_by_country_code.us[0].long_name.toLowerCase())}`,
+                    channelIds.get(
+                      gameQuery.game.tv_listings_by_country_code.us[0].long_name.toLowerCase(),
+                    )!,
                   )
                 } catch (e) {
                   console.error(e)
@@ -174,7 +169,7 @@ export function GameDetails({ route }: Props) {
       </View>
       <View>
         {isFootballEvent(gameQuery.game) && boxScore && (
-          <BoxScore game={gameQuery.game} boxScore={boxScore} />
+          <BoxScore boxScore={boxScore} />
         )}
         {/* {isBasketballEvent(gameQuery.game) && (
           <BasketballScore
