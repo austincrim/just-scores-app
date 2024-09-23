@@ -4,7 +4,7 @@
     "slug": "just-scores",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icons/ios/1024.png",
+    "icon": "./assets/icons/apple/1024.png",
     "scheme": "justscores",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -17,6 +17,12 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.austincrim.justscores"
     },
-    "plugins": ["expo-font"]
+    "plugins": ["expo-font"],
+    "extra": {
+      "eas": {
+        "projectId": "d445fa8e-4fbb-450f-a141-a83243d8dcb0"
+      }
+    },
+    "owner": "austincrim"
   }
 }
