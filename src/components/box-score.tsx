@@ -1,6 +1,8 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native"
+import { useState } from "react"
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
+import * as Haptics from "expo-haptics"
 import { FlashList } from "@shopify/flash-list"
-import { type FootballPlayerRecord } from "@/types"
+import { Game, type FootballPlayerRecord } from "@/types"
 
 type StatCategory = {
   [key: string]: Array<
@@ -11,8 +13,8 @@ type StatCategory = {
 
 const statCategories: StatCategory = {
   passing: [
-    { key: "passing_attempts", display: "ATT" },
     { key: "passing_completions", display: "COMP" },
+    { key: "passing_attempts", display: "ATT" },
     { key: "passing_yards", display: "YDS" },
     { key: "passing_touchdowns", display: "TDS" },
     { key: "passing_interceptions", display: "INTS" },
@@ -27,8 +29,8 @@ const statCategories: StatCategory = {
     { key: "rushing_yards_average", display: "AVG" },
   ],
   receiving: [
-    { key: "receiving_targets", display: "TGTS" },
     { key: "receiving_receptions", display: "REC" },
+    { key: "receiving_targets", display: "TGTS" },
     { key: "receiving_yards", display: "YDS" },
     { key: "receiving_touchdowns", display: "TDS" },
     { key: "receiving_yards_long", display: "LONG" },
@@ -76,10 +78,13 @@ const statCategories: StatCategory = {
 
 export function BoxScore({
   boxScore,
+  game,
 }: {
   boxScore: { home: FootballPlayerRecord[]; away: FootballPlayerRecord[] }
+  game: Game
 }) {
-  const playersByPosition = boxScore.home.reduce(
+  let [team, setTeam] = useState<"home" | "away">("home")
+  let playersByPosition = boxScore[team].reduce(
     (acc, player) => {
       player.position_types.forEach((positionType) => {
         if (!acc[positionType]) {
@@ -93,66 +98,92 @@ export function BoxScore({
   )
 
   return (
-    <FlashList
-      data={Object.entries(statCategories)}
-      estimatedItemSize={7000}
-      ItemSeparatorComponent={() => <View className="my-4" />}
-      renderItem={({ item: [type, stats] }) => (
-        <View key={type}>
-          <Text style={styles.positionHeader}>{type.replaceAll("_", " ")}</Text>
-          <ScrollView horizontal>
-            <View>
-              <FlashList
-                horizontal
-                data={["Name", ...stats]}
-                estimatedItemSize={99}
-                renderItem={({ item }) => (
-                  <Text
-                    key={typeof item === "string" ? item : item.key}
-                    style={styles.headerCell}
-                  >
-                    {(typeof item === "string"
-                      ? item
-                      : item.display
-                    ).replaceAll("_", " ")}
-                  </Text>
-                )}
-              />
-              <FlashList
-                data={playersByPosition[type]}
-                estimatedItemSize={99}
-                scrollEnabled={false}
-                renderItem={({ item, index }) => (
-                  <View
-                    key={item.id}
-                    style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
-                    className="flex flex-row flex-1 items-center"
-                  >
-                    <Text style={styles.cell}>{item.player.full_name}</Text>
-                    {stats.map((stat) => (
+    <>
+      <View className="flex flex-row items-center bg-zinc-50 rounded mb-4">
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+            setTeam("home")
+          }}
+          className={`px-4 py-2 flex-1 rounded-l items-center ${team === "home" && "bg-amber-200"}`}
+        >
+          <Text>{game.home_team.name}</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+            setTeam("away")
+          }}
+          className={`px-4 py-2 flex-1 rounded-r items-center ${team === "away" && "bg-amber-200"}`}
+        >
+          <Text>{game.away_team.name}</Text>
+        </Pressable>
+      </View>
+      <FlashList
+        data={Object.entries(statCategories)}
+        estimatedItemSize={7000}
+        ItemSeparatorComponent={() => <View className="my-4" />}
+        renderItem={({ item: [type, stats] }) =>
+          playersByPosition[type]?.length > 0 ? (
+            <View key={type}>
+              <Text style={styles.positionHeader}>
+                {type.replaceAll("_", " ")}
+              </Text>
+              <ScrollView horizontal>
+                <View>
+                  <FlashList
+                    horizontal
+                    data={["Name", ...stats]}
+                    estimatedItemSize={99}
+                    renderItem={({ item }) => (
                       <Text
-                        key={typeof stat === "string" ? stat : stat.key}
-                        style={styles.cell}
+                        key={typeof item === "string" ? item : item.key}
+                        style={styles.headerCell}
                       >
-                        {item[typeof stat === "string" ? stat : stat.key]
-                          ?.toString()
-                          .replaceAll("_", " ")}
+                        {(typeof item === "string"
+                          ? item
+                          : item.display
+                        ).replaceAll("_", " ")}
                       </Text>
-                    ))}
-                  </View>
-                )}
-              />
+                    )}
+                  />
+                  <FlashList
+                    data={playersByPosition[type]}
+                    estimatedItemSize={99}
+                    scrollEnabled={false}
+                    renderItem={({ item, index }) => (
+                      <View
+                        key={item.id}
+                        style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
+                        className="flex flex-row flex-1 items-center"
+                      >
+                        <Text style={styles.cell}>{item.player.full_name}</Text>
+                        {stats.map((stat) => (
+                          <Text
+                            key={typeof stat === "string" ? stat : stat.key}
+                            style={styles.cell}
+                          >
+                            {item[typeof stat === "string" ? stat : stat.key]
+                              ?.toString()
+                              .replaceAll("_", " ")}
+                          </Text>
+                        ))}
+                      </View>
+                    )}
+                  />
+                </View>
+              </ScrollView>
             </View>
-          </ScrollView>
-        </View>
-      )}
-    />
+          ) : null
+        }
+      />
+    </>
   )
 }
 
 const styles = StyleSheet.create({
   positionHeader: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "bold",
     paddingVertical: 10,
     backgroundColor: "#f0f0f0",

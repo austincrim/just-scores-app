@@ -17,7 +17,8 @@ export function Tabs() {
         component={NcaaFB}
         initialParams={{ sport: "ncaaf" }}
         options={{
-          title: "NCAA",
+          title: "NCAA Football",
+          tabBarLabel: "NCAA",
           tabBarIcon: ({ color, focused }) => (
             <SymbolView
               name={focused ? "football.fill" : "football"}
@@ -31,7 +32,8 @@ export function Tabs() {
         component={NcaaBB}
         initialParams={{ sport: "ncaab" }}
         options={{
-          title: "NCAA",
+          title: "NCAA Basketball",
+          tabBarLabel: "NCAA",
           tabBarIcon: ({ color, focused }) => (
             <SymbolView
               name={focused ? "basketball.fill" : "basketball"}

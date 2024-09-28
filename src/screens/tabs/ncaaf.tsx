@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react"
 import { Text, TouchableOpacity, View } from "react-native"
+import * as Haptics from "expo-haptics"
 import { FlashList } from "@shopify/flash-list"
 import { GamePreview } from "@/components/game-preview"
 import { useConferences, useGames, useSchedule } from "@/lib/hooks"
@@ -19,7 +20,8 @@ export function NcaaFB() {
       events.current_group.event_ids
     )
   }, [events, selectedConference, selectedWeek])
-  let { data: games } = useGames("ncaaf", eventIds)
+  let { data: games, refetch } = useGames("ncaaf", eventIds)
+  let [isRefetching, setIsRefetching] = useState(false)
 
   return (
     <View className="pt-4 px-2 flex-1">
@@ -33,7 +35,10 @@ export function NcaaFB() {
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
-                onPress={() => setSelectedConference(item)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+                  setSelectedConference(item)
+                }}
                 className={`px-3 py-2 rounded-full border ${selectedConference === item ? "bg-amber-50 border-amber-800" : ""}`}
               >
                 <Text>{item}</Text>
@@ -54,7 +59,10 @@ export function NcaaFB() {
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
-                onPress={() => setSelectedWeek(item.id)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+                  setSelectedWeek(item.id)
+                }}
                 className={`px-3 py-2 rounded-full border ${selectedWeek === item.id ? "bg-amber-50 border-amber-800" : ""}`}
               >
                 <Text>{item.label}</Text>
@@ -68,6 +76,12 @@ export function NcaaFB() {
         <FlashList
           data={games}
           estimatedItemSize={219}
+          onRefresh={() => {
+            setIsRefetching(true)
+            refetch()
+            setTimeout(() => setIsRefetching(false), 1500)
+          }}
+          refreshing={isRefetching}
           keyExtractor={(item) => String(item.id)}
           ItemSeparatorComponent={() => <View className="border-b" />}
           renderItem={({ index, item }) => {

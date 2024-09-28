@@ -92,6 +92,14 @@ export function useConferences(sport: "ncaaf" | "ncaab") {
 export function useGames(sport: string, events: Array<number>) {
   return useQuery({
     queryKey: [sport, events],
+    refetchInterval: 5000,
+    select: (data) => {
+      data.sort(
+        (a, b) =>
+          new Date(a.game_date).valueOf() - new Date(b.game_date).valueOf(),
+      )
+      return data
+    },
     queryFn: async () => {
       let games: Game[] = []
       if (events && events.length) {
@@ -102,13 +110,6 @@ export function useGames(sport: string, events: Array<number>) {
         games = await gamesRes.json()
       }
       return games
-    },
-    select: (data) => {
-      data.sort(
-        (a, b) =>
-          new Date(a.game_date).valueOf() - new Date(b.game_date).valueOf(),
-      )
-      return data
     },
   })
 }

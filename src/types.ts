@@ -125,6 +125,7 @@ export type NFLEvent = {
 export type Game = NcaaBBEvent | NcaaFBEvent | NFLEvent
 // TODO fix
 export type BBBoxScore = {
+  id: string
   progress: Progress
   last_play: {
     description: string
