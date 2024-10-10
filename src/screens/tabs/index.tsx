@@ -1,15 +1,35 @@
+import { Pressable } from "react-native"
+import * as Haptics from "expo-haptics"
 import { SymbolView } from "expo-symbols"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import {
+  BottomTabBarButtonProps,
+  createBottomTabNavigator,
+} from "@react-navigation/bottom-tabs"
+import colors from "tailwindcss/colors"
 import { NcaaBB } from "./ncaab"
 import { NcaaFB } from "./ncaaf"
 import { Nfl } from "./nfl"
+
+function HapticTab(props: BottomTabBarButtonProps) {
+  return (
+    <Pressable
+      onPress={(e) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+        props.onPress?.(e)
+      }}
+      style={props.style}
+    >
+      {props.children}
+    </Pressable>
+  )
+}
 
 let { Navigator, Screen } = createBottomTabNavigator()
 export function Tabs() {
   return (
     <Navigator
       screenOptions={{
-        tabBarActiveTintColor: "dodgerblue",
+        tabBarActiveTintColor: colors.amber["700"],
       }}
     >
       <Screen
@@ -25,6 +45,7 @@ export function Tabs() {
               tintColor={color}
             />
           ),
+          tabBarButton: (props) => <HapticTab {...props} />,
         }}
       />
       <Screen
@@ -40,6 +61,7 @@ export function Tabs() {
               tintColor={color}
             />
           ),
+          tabBarButton: (props) => <HapticTab {...props} />,
         }}
       />
       <Screen
@@ -54,6 +76,7 @@ export function Tabs() {
               tintColor={color}
             />
           ),
+          tabBarButton: (props) => <HapticTab {...props} />,
         }}
       />
     </Navigator>

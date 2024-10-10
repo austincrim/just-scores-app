@@ -38,7 +38,6 @@ export function useSchedule(
 
       return events
     },
-    // refetchInterval: 5000,
   })
 }
 

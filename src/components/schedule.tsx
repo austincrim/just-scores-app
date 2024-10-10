@@ -1,8 +1,8 @@
 import React from "react"
-import { View, Text } from "react-native"
+import { Text, View } from "react-native"
 import { FlashList } from "@shopify/flash-list"
-import GamePreview from "./game-preview"
 import { type Game } from "@/types"
+import { GamePreview } from "./game-preview"
 
 export function Schedule({ games }: { games: Array<Game> }) {
   return (

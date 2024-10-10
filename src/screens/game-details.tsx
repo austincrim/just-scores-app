@@ -67,7 +67,8 @@ export function GameDetails({ route, navigation }: Props) {
     },
   })
   let { data: boxScore } = useQuery({
-    queryKey: ["boxScore", gameQuery?.game.box_score.id],
+    queryKey: ["boxScore", gameQuery?.game?.box_score?.id],
+    enabled: gameQuery?.game.status !== "pre_game",
     queryFn: async () => {
       if (!gameQuery?.game.box_score.id) return []
       let res = await fetch(

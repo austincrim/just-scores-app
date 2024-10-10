@@ -26,12 +26,19 @@ export function GamePreview({ game }: { game: Game }) {
   return (
     <TouchableOpacity
       className="text-lg active flex flex-row items-center gap-2 py-4"
-      onPress={() =>
+      onPress={() => {
+        if (
+          route.name !== "nfl" &&
+          route.name !== "ncaab" &&
+          route.name !== "ncaaf"
+        ) {
+          throw new Error(`invalid route name: ${route.name}`)
+        }
         navigation.navigate("GameDetails", {
           sport: route.name,
           id: String(game.id),
         })
-      }
+      }}
     >
       {game.status === "in_progress" ? (
         <View className="w-3 h-3 rounded-full bg-emerald-500" />

@@ -1,7 +1,8 @@
 import { useState } from "react"
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
-import * as Haptics from "expo-haptics"
+import { ScrollView, StyleSheet, Text, View } from "react-native"
+import SegmentedControl from "@react-native-segmented-control/segmented-control"
 import { FlashList } from "@shopify/flash-list"
+import colors from "tailwindcss/colors"
 import { Game, type FootballPlayerRecord } from "@/types"
 
 type StatCategory = {
@@ -99,26 +100,17 @@ export function BoxScore({
 
   return (
     <>
-      <View className="flex flex-row items-center bg-zinc-50 rounded mb-4">
-        <Pressable
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-            setTeam("home")
-          }}
-          className={`px-4 py-2 flex-1 rounded-l items-center ${team === "home" && "bg-amber-200"}`}
-        >
-          <Text>{game.home_team.name}</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-            setTeam("away")
-          }}
-          className={`px-4 py-2 flex-1 rounded-r items-center ${team === "away" && "bg-amber-200"}`}
-        >
-          <Text>{game.away_team.name}</Text>
-        </Pressable>
-      </View>
+      <SegmentedControl
+        values={[game.home_team.abbreviation, game.away_team.abbreviation]}
+        selectedIndex={0}
+        onValueChange={(e) =>
+          setTeam(e === game.home_team.abbreviation ? "home" : "away")
+        }
+        tintColor={"#" + game[`${team}_team`].colour_1}
+        backgroundColor={colors.stone["50"]}
+        fontStyle={{ color: colors.stone["600"] }}
+        activeFontStyle={{ color: colors.stone["50"] }}
+      />
       <FlashList
         data={Object.entries(statCategories)}
         estimatedItemSize={7000}
