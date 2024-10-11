@@ -4,9 +4,14 @@ import { useNavigation, useRoute } from "@react-navigation/native"
 import { Game } from "@/types"
 import TeamLine from "./team-line"
 
-export function GamePreview({ game }: { game: Game }) {
+export function GamePreview({
+  game,
+  sport,
+}: {
+  game: Game
+  sport: "ncaaf" | "ncaab" | "nfl"
+}) {
   let navigation = useNavigation()
-  let route = useRoute()
 
   function renderGameStatus() {
     if (game.status !== "pre_game") {
@@ -27,15 +32,11 @@ export function GamePreview({ game }: { game: Game }) {
     <TouchableOpacity
       className="text-lg active flex flex-row items-center gap-2 py-4"
       onPress={() => {
-        if (
-          route.name !== "nfl" &&
-          route.name !== "ncaab" &&
-          route.name !== "ncaaf"
-        ) {
-          throw new Error(`invalid route name: ${route.name}`)
+        if (sport !== "nfl" && sport !== "ncaab" && sport !== "ncaaf") {
+          throw new Error(`invalid route name: ${sport}`)
         }
         navigation.navigate("GameDetails", {
-          sport: route.name,
+          sport,
           id: String(game.id),
         })
       }}

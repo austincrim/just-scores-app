@@ -41,7 +41,7 @@ export function useSchedule(
   })
 }
 
-export function useConferences(sport: "ncaaf" | "ncaab") {
+export function useConferences(sport: "ncaaf" | "ncaab" | "nfl") {
   return useQuery({
     queryKey: [sport, "conferences"],
     select: (data) => {
@@ -66,6 +66,8 @@ export function useConferences(sport: "ncaaf" | "ncaab") {
       return data
     },
     queryFn: async () => {
+      if (sport !== "ncaaf" && sport !== "ncaab") return Promise.resolve([])
+
       let leaguesRes = await fetch(`${API_URL}/${sport}/events/conferences`)
 
       let leagues: League[] | null = null

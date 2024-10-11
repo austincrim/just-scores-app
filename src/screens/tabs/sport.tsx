@@ -4,28 +4,33 @@ import * as Haptics from "expo-haptics"
 import { FlashList } from "@shopify/flash-list"
 import { GamePreview } from "@/components/game-preview"
 import { useConferences, useGames, useSchedule } from "@/lib/hooks"
+import { TabScreenProps } from "../types"
 
-export function NcaaFB() {
-  let [selectedConference, setSelectedConference] = useState("Top 25")
-  let { data: conferences } = useConferences("ncaaf")
-  let { data: events } = useSchedule("ncaaf", selectedConference)
+type Props = TabScreenProps<"scores">
+export function NcaaFB({ route }: Props) {
+  let isCollege = route.params.sport.includes("ncaa")
+  let [selectedConference, setSelectedConference] = useState(
+    isCollege ? "Top 25" : undefined,
+  )
+  let { data: conferences } = useConferences(route.params.sport)
+  let { data: events } = useSchedule(route.params.sport, selectedConference)
   let [selectedWeek, setSelectedWeek] = useState(
-    events?.current_group.id ?? "2024-1",
+    events?.current_group?.id ?? "2024-1",
   )
   let eventIds: number[] = useMemo(() => {
     if (!events) return []
 
     return (
-      events.current_season.find((w) => w.id === selectedWeek)?.event_ids ??
-      events.current_group.event_ids
+      events.current_season?.find((w) => w.id === selectedWeek)?.event_ids ??
+      events?.current_group?.event_ids
     )
   }, [events, selectedConference, selectedWeek])
-  let { data: games, refetch } = useGames("ncaaf", eventIds)
+  let { data: games, refetch } = useGames(route.params.sport, eventIds)
   let [isRefetching, setIsRefetching] = useState(false)
 
   return (
     <View className="pt-4 px-2 flex-1">
-      {conferences && (
+      {!!conferences?.length && (
         <FlashList
           horizontal
           estimatedItemSize={52}
@@ -47,7 +52,7 @@ export function NcaaFB() {
           }}
         />
       )}
-      <View className="h-3" />
+      {!!conferences?.length && <View className="h-3" />}
       {events && (
         <FlashList
           horizontal
@@ -56,6 +61,9 @@ export function NcaaFB() {
           extraData={selectedWeek}
           ItemSeparatorComponent={() => <View className="w-2" />}
           keyExtractor={(i) => i.id}
+          initialScrollIndex={events.current_season.findIndex(
+            (s) => s.id === selectedWeek,
+          )}
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
@@ -99,7 +107,7 @@ export function NcaaFB() {
                 <View
                   className={`relative flex flex-col gap-2 ${item.status === "in_progress" ? "active" : ""}`}
                 >
-                  <GamePreview game={item} />
+                  <GamePreview game={item} sport={route.params.sport} />
                 </View>
               </View>
             )

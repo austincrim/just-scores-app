@@ -26,7 +26,7 @@ function App() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Home"
+        name="Scores"
         component={Tabs}
         options={{ headerShown: false }}
       />

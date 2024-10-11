@@ -1,7 +1,7 @@
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister"
 import { MMKV } from "react-native-mmkv"
 
-let storage = new MMKV()
+export let storage = new MMKV()
 
 let clientStorage = {
   setItem: (key: string, value: boolean | string | number) => {

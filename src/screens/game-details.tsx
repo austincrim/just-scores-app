@@ -177,12 +177,14 @@ export function GameDetails({ route, navigation }: Props) {
         )}
       </View>
       <View>
-        {isFootballEvent(gameQuery.game) && boxScore && (
-          <>
-            <Text className="text-xl my-4">Box Score</Text>
-            <BoxScore boxScore={boxScore} game={gameQuery.game} />
-          </>
-        )}
+        {isFootballEvent(gameQuery.game) &&
+          boxScore &&
+          gameQuery.game.status !== "pre_game" && (
+            <>
+              <Text className="text-xl my-4">Box Score</Text>
+              <BoxScore boxScore={boxScore} game={gameQuery.game} />
+            </>
+          )}
         {/* {isBasketballEvent(gameQuery.game) && (
           <BasketballScore
             game={gameQuery.game}
