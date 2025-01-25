@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Pressable, Text, View } from "react-native"
+import { Pressable, Text, TouchableOpacity } from "react-native"
 import * as Haptics from "expo-haptics"
 import { SymbolView } from "expo-symbols"
 import {
@@ -49,14 +49,14 @@ export function Tabs() {
                 setSport(nativeEvent.actionKey)
               }}
             >
-              <View className="flex flex-row items-center gap-3">
+              <TouchableOpacity className="flex flex-row items-center gap-3">
                 <Text className="font-semibold text-xl">{title}</Text>
                 <SymbolView
                   name="chevron.down"
                   size={10}
                   resizeMode="scaleAspectFill"
                 />
-              </View>
+              </TouchableOpacity>
             </ContextMenuButton>
           ),
           tabBarLabel: "Scores",

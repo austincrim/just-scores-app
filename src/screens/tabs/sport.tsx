@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Text, TouchableOpacity, View } from "react-native"
 import * as Haptics from "expo-haptics"
 import { FlashList } from "@shopify/flash-list"
@@ -13,10 +13,11 @@ export function NcaaFB({ route }: Props) {
     isCollege ? "Top 25" : undefined,
   )
   let { data: conferences } = useConferences(route.params.sport)
-  let { data: events } = useSchedule(route.params.sport, selectedConference)
-  let [selectedWeek, setSelectedWeek] = useState(
-    events?.current_group?.id ?? "2024-1",
+  let { data: events, status: eventsStatus } = useSchedule(
+    route.params.sport,
+    selectedConference,
   )
+  let [selectedWeek, setSelectedWeek] = useState("")
   let eventIds: number[] = useMemo(() => {
     if (!events) return []
 
@@ -28,6 +29,12 @@ export function NcaaFB({ route }: Props) {
   let { data: games, refetch } = useGames(route.params.sport, eventIds)
   let [isRefetching, setIsRefetching] = useState(false)
 
+  useEffect(() => {
+    if (eventsStatus === "success") {
+      setSelectedWeek(events?.current_group.id ?? "2024-1")
+    }
+  }, [eventsStatus])
+
   return (
     <View className="pt-4 px-2 flex-1">
       {!!conferences?.length && (
@@ -37,6 +44,7 @@ export function NcaaFB({ route }: Props) {
           data={conferences}
           extraData={selectedConference}
           ItemSeparatorComponent={() => <View className="w-2" />}
+          showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
@@ -61,8 +69,9 @@ export function NcaaFB({ route }: Props) {
           extraData={selectedWeek}
           ItemSeparatorComponent={() => <View className="w-2" />}
           keyExtractor={(i) => i.id}
-          initialScrollIndex={events.current_season.findIndex(
-            (s) => s.id === selectedWeek,
+          showsHorizontalScrollIndicator={false}
+          initialScrollIndex={events?.current_season.findIndex(
+            (s) => s.id === events?.current_group.id,
           )}
           renderItem={({ item }) => {
             return (

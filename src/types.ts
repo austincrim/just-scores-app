@@ -123,13 +123,19 @@ export type NFLEvent = {
 }
 
 export type Game = NcaaBBEvent | NcaaFBEvent | NFLEvent
-// TODO fix
 export type BBBoxScore = {
-  id: string
+  api_uri: string
+  id: number
   progress: Progress
   last_play: {
+    api_uri: string
     description: string
+    event: string
+    id: number
+    minutes: number
     progress: Progress
+    seconds: number
+    segment: number
   }
   score: {
     home: {
@@ -138,14 +144,46 @@ export type BBBoxScore = {
     away: {
       score: number
     }
+    winning_team: string
+    losing_team: string
+    tie_game: boolean
+  }
+  updated_at: string
+  has_statistics: boolean
+  referees: any
+  event: {
+    api_uri: string
+  }
+  home_timeouts_left: any
+  away_timeouts_left: any
+  attendance: any
+  total_segments: number
+  line_scores: {
+    home: Array<{
+      team_fouls: any
+      api_uri: string
+      id: number
+      score: number
+      segment: number
+      segment_string: string
+      updated_at: string
+    }>
+    away: Array<{
+      team_fouls: any
+      api_uri: string
+      id: number
+      score: number
+      segment: number
+      segment_string: string
+      updated_at: string
+    }>
+  }
+  share_url: string
+  team_records: {
+    home: BBRecord
+    away: BBRecord
   }
 }
-
-export type CA = {
-  short_name: string
-  long_name: string
-}
-
 export type BBTeam = {
   colour_1: string
   colour_2: string
@@ -349,18 +387,24 @@ export type PreviewData = {
 }
 
 export type LineScores = {
-  home: Element[]
-  away: Element[]
-}
-
-export type Element = {
-  team_fouls: null
-  id: number
-  score: number
-  segment: number
-  segment_string: string
-  updated_at: string
-  api_uri: string
+  home: Array<{
+    team_fouls: null
+    id: number
+    score: number
+    segment: number
+    segment_string: string
+    updated_at: string
+    api_uri: string
+  }>
+  away: Array<{
+    team_fouls: null
+    id: number
+    score: number
+    segment: number
+    segment_string: string
+    updated_at: string
+    api_uri: string
+  }>
 }
 
 export type MatchupRecords = {
@@ -1995,5 +2039,106 @@ export type FootballPlayerRecord = {
   rushing_yards_average: string
   rushing_yards_long: number
   team: string
+  updated_at: string
+}
+
+export type BasketballPlayerRecord = {
+  alignment: string
+  api_uri: string
+  assists: number
+  blocked_shots: number
+  box_score: string
+  dnp_details: any
+  dnp_reason: any
+  dnp_type: any
+  ejections_player: number
+  field_goals_attempted: number
+  field_goals_made: number
+  field_goals_percentage: string
+  flagrant_fouls: number
+  free_throws_attempted: number
+  free_throws_made: number
+  free_throws_percentage: any
+  games_started: number
+  id: number
+  minutes: number
+  on_court: boolean
+  personal_fouls: number
+  personal_fouls_disqualifications: any
+  player: {
+    api_uri: string
+    first_initial_and_last_name: string
+    first_name: string
+    full_name: string
+    has_headshots: boolean
+    has_transparent_headshots: boolean
+    headshots: {
+      large: string
+      original: string
+      small: string
+      transparent_large: string
+      transparent_medium: string
+      transparent_small: string
+      w192xh192: string
+    }
+    id: number
+    last_name: string
+    number: number
+    position: string
+    position_abbreviation: string
+    resource_uri: string
+    subscription_count: number
+    teams: Array<{
+      abbreviation: string
+      api_uri: string
+      colour_1: string
+      colour_2: string
+      conference: string
+      division: string
+      full_name: string
+      has_extra_info: boolean
+      has_injuries: boolean
+      has_rosters: boolean
+      id: number
+      location: string
+      logos: {
+        facing: string | null
+        large: string
+        small: string
+        tiny: string
+        w72xh72: string
+      }
+      medium_name: string
+      name: string
+      resource_uri: string
+      rss_url: string
+      search_name: string
+      short_name: string
+      subscribable_alert_text: string
+      subscribable_alerts: Array<{
+        default: boolean
+        display: string
+        key: string
+      }>
+      subscription_count: number
+      updated_at: string
+    }>
+    updated_at: string
+  }
+  plus_minus: number
+  points: number
+  position: string
+  rebounds_defensive: number
+  rebounds_offensive: number
+  rebounds_total: number
+  started_game: boolean
+  steals: number
+  team: string
+  technical_fouls_player: number
+  three_point_field_goals_attempted: number
+  three_point_field_goals_made: number
+  three_point_field_goals_percentage: string
+  total_seconds: number
+  turnovers: number
   updated_at: string
 }

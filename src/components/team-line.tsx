@@ -1,6 +1,6 @@
-import { BBTeam, FBTeam, Game } from "@/types"
 import React from "react"
-import { View, Text, Image } from "react-native"
+import { Image, Text, View } from "react-native"
+import { BBTeam, FBTeam, Game } from "@/types"
 
 type Props = {
   team: BBTeam | FBTeam
@@ -13,12 +13,10 @@ function TeamLine({ team, game, type }: Props) {
   let ranking = game[`${type}_ranking`]
 
   function renderScore() {
-    if (score !== undefined) {
-      return <Text className="font-bold">{score}</Text>
-    } else if (game.status !== "pre_game") {
-      return <Text className="font-bold">0</Text>
+    if (game.status === "pre_game") {
+      return null
     }
-    return null
+    return <Text className="font-bold">{score ?? 0}</Text>
   }
 
   return (

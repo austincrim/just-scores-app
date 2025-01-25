@@ -3,11 +3,13 @@ import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native"
 import { openURL } from "expo-linking"
 import { SymbolView } from "expo-symbols"
 import { useQuery } from "@tanstack/react-query"
+import { BasketballBoxScore } from "@/components/basketball-box-score"
 import { BasketballScore } from "@/components/basketball-score"
-import { BoxScore } from "@/components/box-score"
+import { FootballBoxScore } from "@/components/football-box-score"
 import { FootballScore } from "@/components/football-score"
 import { API_URL } from "@/lib/hooks"
 import {
+  BasketballPlayerRecord,
   FootballPlayerRecord,
   Game,
   NcaaBBEvent,
@@ -78,13 +80,14 @@ export function GameDetails({ route, navigation }: Props) {
       if (!res.ok) {
         throw new Error(await res.text())
       }
-      let boxScore: FootballPlayerRecord[] = await res.json()
+      let boxScore: FootballPlayerRecord[] | BasketballPlayerRecord[] =
+        await res.json()
 
       return boxScore
     },
     select: (data) => {
-      const homeTeam: FootballPlayerRecord[] = []
-      const awayTeam: FootballPlayerRecord[] = []
+      const homeTeam: FootballPlayerRecord[] | BasketballPlayerRecord[] = []
+      const awayTeam: FootballPlayerRecord[] | BasketballPlayerRecord[] = []
 
       data.forEach((player) => {
         if (player.alignment === "home") {
@@ -176,21 +179,23 @@ export function GameDetails({ route, navigation }: Props) {
           />
         )}
       </View>
-      <View>
+      <View className="pb-12">
         {isFootballEvent(gameQuery.game) &&
           boxScore &&
           gameQuery.game.status !== "pre_game" && (
             <>
               <Text className="text-xl my-4">Box Score</Text>
-              <BoxScore boxScore={boxScore} game={gameQuery.game} />
+              <FootballBoxScore boxScore={boxScore} game={gameQuery.game} />
             </>
           )}
-        {/* {isBasketballEvent(gameQuery.game) && (
-          <BasketballScore
-            game={gameQuery.game}
-            stats={gameQuery.stats as NcaaBBEventStats}
-          />
-        )} */}
+        {isBasketballEvent(gameQuery.game) &&
+          boxScore &&
+          gameQuery.game.status !== "pre_game" && (
+            <>
+              <Text className="text-xl my-4">Box Score</Text>
+              <BasketballBoxScore boxScore={boxScore} game={gameQuery.game} />
+            </>
+          )}
       </View>
     </ScrollView>
   )

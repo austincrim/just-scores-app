@@ -77,7 +77,7 @@ const statCategories: StatCategory = {
   ],
 }
 
-export function BoxScore({
+export function FootballBoxScore({
   boxScore,
   game,
 }: {
