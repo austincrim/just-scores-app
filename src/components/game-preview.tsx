@@ -1,8 +1,9 @@
 import React from "react"
-import { Text, TouchableOpacity, View } from "react-native"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { TouchableOpacity, View } from "react-native"
+import { useNavigation } from "@react-navigation/native"
 import { Game } from "@/types"
 import TeamLine from "./team-line"
+import { Text } from "./text"
 
 export function GamePreview({
   game,
@@ -16,7 +17,7 @@ export function GamePreview({
   function renderGameStatus() {
     if (game.status !== "pre_game") {
       return (
-        <Text className="w-20 text-right">
+        <Text className="w-20 text-right text-lg">
           {game.box_score?.progress.string}
         </Text>
       )
@@ -24,7 +25,7 @@ export function GamePreview({
       let gameTime = new Date(game.game_date).toLocaleTimeString(undefined, {
         timeStyle: "short",
       })
-      return <Text className="w-[4ch]">{gameTime}</Text>
+      return <Text className="w-[4ch] text-lg">{gameTime}</Text>
     }
   }
 

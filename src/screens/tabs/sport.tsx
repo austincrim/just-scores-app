@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react"
-import { Text, TouchableOpacity, View } from "react-native"
+import React, { useEffect, useMemo, useState } from "react"
+import { TouchableOpacity, View } from "react-native"
 import * as Haptics from "expo-haptics"
 import { FlashList } from "@shopify/flash-list"
 import { GamePreview } from "@/components/game-preview"
+import { Text } from "@/components/text"
 import { useConferences, useGames, useSchedule } from "@/lib/hooks"
 import { TabScreenProps } from "../types"
 
 type Props = TabScreenProps<"scores">
-export function NcaaFB({ route }: Props) {
+export function SportSchedule({ route }: Props) {
   let isCollege = route.params.sport.includes("ncaa")
   let [selectedConference, setSelectedConference] = useState(
     isCollege ? "Top 25" : undefined,
@@ -36,7 +37,7 @@ export function NcaaFB({ route }: Props) {
   }, [eventsStatus])
 
   return (
-    <View className="pt-4 px-2 flex-1">
+    <View className="pt-4 px-2 flex-1 bg-zinc-900">
       {!!conferences?.length && (
         <FlashList
           horizontal
@@ -52,7 +53,7 @@ export function NcaaFB({ route }: Props) {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
                   setSelectedConference(item)
                 }}
-                className={`px-3 py-2 rounded-full border ${selectedConference === item ? "bg-amber-50 border-amber-800" : ""}`}
+                className={`px-3 py-2 rounded-full border ${selectedConference === item ? "border-indigo-900" : "border-zinc-800"}`}
               >
                 <Text>{item}</Text>
               </TouchableOpacity>
@@ -80,7 +81,7 @@ export function NcaaFB({ route }: Props) {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
                   setSelectedWeek(item.id)
                 }}
-                className={`px-3 py-2 rounded-full border ${selectedWeek === item.id ? "bg-amber-50 border-amber-800" : ""}`}
+                className={`px-3 py-2 rounded-full border ${selectedWeek === item.id ? "border-indigo-900" : "border-zinc-800"}`}
               >
                 <Text>{item.label}</Text>
               </TouchableOpacity>
@@ -100,7 +101,9 @@ export function NcaaFB({ route }: Props) {
           }}
           refreshing={isRefetching}
           keyExtractor={(item) => String(item.id)}
-          ItemSeparatorComponent={() => <View className="border-b" />}
+          ItemSeparatorComponent={() => (
+            <View className="border-b border-zinc-800" />
+          )}
           renderItem={({ index, item }) => {
             let currentGameDate = new Date(item.game_date).toLocaleDateString()
             let previousGameDate =

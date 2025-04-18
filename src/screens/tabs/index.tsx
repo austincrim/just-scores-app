@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Pressable, Text, TouchableOpacity } from "react-native"
+import { Pressable, TouchableOpacity } from "react-native"
 import * as Haptics from "expo-haptics"
 import { SymbolView } from "expo-symbols"
 import {
@@ -8,13 +8,14 @@ import {
 } from "@react-navigation/bottom-tabs"
 import { ContextMenuButton } from "react-native-ios-context-menu"
 import colors from "tailwindcss/colors"
+import { Text } from "@/components/text"
 import { TabsParamList } from "../types"
 import { Favorites } from "./favorites"
-import { NcaaFB } from "./sport"
+import { SportSchedule } from "./sport"
 
 let { Navigator, Screen } = createBottomTabNavigator<TabsParamList>()
 export function Tabs() {
-  let [sport, setSport] = useState<"ncaaf" | "ncaab" | "nfl">("ncaaf")
+  let [sport, setSport] = useState<"ncaaf" | "ncaab" | "nfl">("ncaab")
   let title =
     sport === "ncaaf"
       ? "NCAA Football"
@@ -25,12 +26,16 @@ export function Tabs() {
   return (
     <Navigator
       screenOptions={{
-        tabBarActiveTintColor: colors.amber["700"],
+        tabBarActiveTintColor: colors.indigo["500"],
+        tabBarStyle: {
+          backgroundColor: colors.zinc["800"],
+          borderTopColor: colors.zinc["700"],
+        },
       }}
     >
       <Screen
         name="scores"
-        component={NcaaFB}
+        component={SportSchedule}
         initialParams={{ sport }}
         navigationKey={sport}
         options={{
@@ -55,6 +60,7 @@ export function Tabs() {
                   name="chevron.down"
                   size={10}
                   resizeMode="scaleAspectFill"
+                  tintColor={colors.indigo["500"]}
                 />
               </TouchableOpacity>
             </ContextMenuButton>
@@ -67,6 +73,9 @@ export function Tabs() {
             />
           ),
           tabBarButton: (props) => <HapticTab {...props} />,
+          headerStyle: {
+            backgroundColor: colors.zinc["800"],
+          },
         }}
       />
       <Screen

@@ -1,8 +1,9 @@
 import React, { useState } from "react"
-import { ScrollView, StyleSheet, Text, View } from "react-native"
+import { ScrollView, StyleSheet, View } from "react-native"
 import SegmentedControl from "@react-native-segmented-control/segmented-control"
 import { FlashList } from "@shopify/flash-list"
 import colors from "tailwindcss/colors"
+import { Text } from "@/components/text"
 import { BasketballPlayerRecord, Game } from "@/types"
 
 const displayStats = [
@@ -69,7 +70,10 @@ export function BasketballBoxScore({
                   {item.player.first_initial_and_last_name}
                 </Text>
                 {displayStats.map((stat) => (
-                  <Text style={{ width: 40, textAlign: "right" }}>
+                  <Text
+                    key={`${item.id}-${stat}`}
+                    style={{ width: 40, textAlign: "right" }}
+                  >
                     {item[stat.key]}
                   </Text>
                 ))}

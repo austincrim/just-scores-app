@@ -2142,3 +2142,13 @@ export type BasketballPlayerRecord = {
   turnovers: number
   updated_at: string
 }
+
+export type BasketballBoxScore = {
+  home: BasketballPlayerRecord[]
+  away: BasketballPlayerRecord[]
+}
+
+export type FootballBoxScore = {
+  home: FootballPlayerRecord[]
+  away: FootballPlayerRecord[]
+}

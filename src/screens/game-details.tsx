@@ -16,6 +16,8 @@ import {
   NcaaBBEventStats,
   NcaaFBEvent,
   NFLEvent,
+  BasketballBoxScore as TBasketballBoxScore,
+  FootballBoxScore as TFootballBoxScore,
 } from "@/types"
 import { RootStackScreenProps } from "./types"
 
@@ -80,14 +82,14 @@ export function GameDetails({ route, navigation }: Props) {
       if (!res.ok) {
         throw new Error(await res.text())
       }
-      let boxScore: FootballPlayerRecord[] | BasketballPlayerRecord[] =
+      let boxScore: (FootballPlayerRecord | BasketballPlayerRecord)[] =
         await res.json()
 
       return boxScore
     },
     select: (data) => {
-      const homeTeam: FootballPlayerRecord[] | BasketballPlayerRecord[] = []
-      const awayTeam: FootballPlayerRecord[] | BasketballPlayerRecord[] = []
+      const homeTeam: (FootballPlayerRecord | BasketballPlayerRecord)[] = []
+      const awayTeam: (FootballPlayerRecord | BasketballPlayerRecord)[] = []
 
       data.forEach((player) => {
         if (player.alignment === "home") {
@@ -185,7 +187,10 @@ export function GameDetails({ route, navigation }: Props) {
           gameQuery.game.status !== "pre_game" && (
             <>
               <Text className="text-xl my-4">Box Score</Text>
-              <FootballBoxScore boxScore={boxScore} game={gameQuery.game} />
+              <FootballBoxScore
+                boxScore={boxScore as TFootballBoxScore}
+                game={gameQuery.game}
+              />
             </>
           )}
         {isBasketballEvent(gameQuery.game) &&
@@ -193,7 +198,10 @@ export function GameDetails({ route, navigation }: Props) {
           gameQuery.game.status !== "pre_game" && (
             <>
               <Text className="text-xl my-4">Box Score</Text>
-              <BasketballBoxScore boxScore={boxScore} game={gameQuery.game} />
+              <BasketballBoxScore
+                boxScore={boxScore as TBasketballBoxScore}
+                game={gameQuery.game}
+              />
             </>
           )}
       </View>
