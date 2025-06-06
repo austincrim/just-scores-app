@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native"
+import { Image, ScrollView, TouchableOpacity, View } from "react-native"
 import { openURL } from "expo-linking"
 import { SymbolView } from "expo-symbols"
 import { useQuery } from "@tanstack/react-query"
@@ -7,6 +7,7 @@ import { BasketballBoxScore } from "@/components/basketball-box-score"
 import { BasketballScore } from "@/components/basketball-score"
 import { FootballBoxScore } from "@/components/football-box-score"
 import { FootballScore } from "@/components/football-score"
+import { Text } from "@/components/text"
 import { API_URL } from "@/lib/hooks"
 import {
   BasketballPlayerRecord,
@@ -64,10 +65,7 @@ export function GameDetails({ route, navigation }: Props) {
       let stats: NcaaBBEventStats | NcaaFBEvent | NFLEvent =
         await statsRes.json()
 
-      return {
-        game,
-        stats,
-      }
+      return { game, stats }
     },
   })
   let { data: boxScore } = useQuery({
@@ -105,7 +103,7 @@ export function GameDetails({ route, navigation }: Props) {
 
   useEffect(() => {
     if (gameQuery?.game) {
-      navigation.setOptions({
+      navigation?.setOptions({
         title: `${gameQuery.game.away_team.abbreviation} @ ${gameQuery.game.home_team.abbreviation}`,
       })
     }
@@ -135,9 +133,7 @@ export function GameDetails({ route, navigation }: Props) {
             <Text className="text-xl tabular-nums min-w-fit">
               {new Date(gameQuery.game.game_date).toLocaleTimeString(
                 undefined,
-                {
-                  timeStyle: "short",
-                },
+                { timeStyle: "short" },
               )}
             </Text>
           )}

@@ -38,9 +38,9 @@ export function BasketballBoxScore({
           setTeam(e === game.home_team.abbreviation ? "home" : "away")
         }
         tintColor={"#" + game[`${team}_team`].colour_1}
-        backgroundColor={colors.stone["50"]}
-        fontStyle={{ color: colors.stone["600"] }}
-        activeFontStyle={{ color: colors.stone["50"] }}
+        backgroundColor={colors.zinc["900"]}
+        fontStyle={{ color: colors.zinc["200"] }}
+        activeFontStyle={{ color: colors.zinc["50"] }}
       />
       <ScrollView className="" horizontal>
         <View className="flex-1 flex gap-4">
@@ -71,7 +71,7 @@ export function BasketballBoxScore({
                 </Text>
                 {displayStats.map((stat) => (
                   <Text
-                    key={`${item.id}-${stat}`}
+                    key={`${item.id}-${stat.key}`}
                     style={{ width: 40, textAlign: "right" }}
                   >
                     {item[stat.key]}
@@ -87,24 +87,9 @@ export function BasketballBoxScore({
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: "row",
-    backgroundColor: "#e0e0e0",
-  },
-  headerCell: {
-    fontWeight: "bold",
-    padding: 10,
-    width: 100,
-    flex: 1,
-  },
-  evenRow: {
-    backgroundColor: "#f8f8f8",
-  },
-  oddRow: {
-    backgroundColor: "#ffffff",
-  },
-  cell: {
-    padding: 10,
-    width: 100,
-  },
+  headerRow: { flexDirection: "row", backgroundColor: "#e0e0e0" },
+  headerCell: { fontWeight: "bold", padding: 10, width: 100, flex: 1 },
+  evenRow: { backgroundColor: "#f8f8f8" },
+  oddRow: { backgroundColor: "#ffffff" },
+  cell: { padding: 10, width: 100 },
 })

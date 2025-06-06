@@ -13,7 +13,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "platforms": ["ios"],
+    "platforms": [
+      "ios"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.austincrim.justscores"
@@ -24,6 +26,9 @@
       }
     },
     "newArchEnabled": true,
-    "plugins": ["expo-font"]
+    "plugins": [
+      "expo-font",
+      "expo-web-browser"
+    ]
   }
 }
