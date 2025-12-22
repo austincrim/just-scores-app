@@ -107,9 +107,9 @@ export function FootballBoxScore({
           setTeam(e === game.home_team.abbreviation ? "home" : "away")
         }
         tintColor={"#" + game[`${team}_team`].colour_1}
-        backgroundColor={colors.stone["50"]}
-        fontStyle={{ color: colors.stone["600"] }}
-        activeFontStyle={{ color: colors.stone["50"] }}
+        backgroundColor={colors.zinc["900"]}
+        fontStyle={{ color: colors.zinc["200"] }}
+        activeFontStyle={{ color: colors.zinc["50"] }}
       />
       <FlashList
         data={Object.entries(statCategories)}
@@ -178,27 +178,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     paddingVertical: 10,
-    backgroundColor: "#f0f0f0",
+    color: colors.zinc[100],
     textTransform: "capitalize",
   },
-  headerRow: {
-    flexDirection: "row",
-    backgroundColor: "#e0e0e0",
-  },
+  headerRow: { flexDirection: "row" },
   headerCell: {
     fontWeight: "bold",
     padding: 10,
     width: 100,
     flex: 1,
-  },
-  evenRow: {
-    backgroundColor: "#f8f8f8",
-  },
-  oddRow: {
-    backgroundColor: "#ffffff",
+    color: colors.zinc[100],
   },
   cell: {
     padding: 10,
     width: 100,
+    color: colors.zinc[100],
   },
 })

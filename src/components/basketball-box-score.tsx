@@ -42,7 +42,7 @@ export function BasketballBoxScore({
         fontStyle={{ color: colors.zinc["200"] }}
         activeFontStyle={{ color: colors.zinc["50"] }}
       />
-      <ScrollView className="" horizontal>
+      <ScrollView horizontal>
         <View className="flex-1 flex gap-4">
           <FlashList
             data={displayStats}

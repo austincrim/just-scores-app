@@ -42,6 +42,7 @@ const channelIds = new Map([
 ])
 
 type Props = RootStackScreenProps<"GameDetails">
+
 export function GameDetails({ route, navigation }: Props) {
   let {
     data: gameQuery,
@@ -181,24 +182,20 @@ export function GameDetails({ route, navigation }: Props) {
         {isFootballEvent(gameQuery.game) &&
           boxScore &&
           gameQuery.game.status !== "pre_game" && (
-            <>
-              <Text className="text-xl my-4">Box Score</Text>
-              <FootballBoxScore
-                boxScore={boxScore as TFootballBoxScore}
-                game={gameQuery.game}
-              />
-            </>
+            <FootballBoxScore
+              boxScore={boxScore as TFootballBoxScore}
+              game={gameQuery.game}
+            />
           )}
         {isBasketballEvent(gameQuery.game) &&
           boxScore &&
           gameQuery.game.status !== "pre_game" && (
-            <>
-              <Text className="text-xl my-4">Box Score</Text>
+            <View className="mt-8">
               <BasketballBoxScore
                 boxScore={boxScore as TBasketballBoxScore}
                 game={gameQuery.game}
               />
-            </>
+            </View>
           )}
       </View>
     </ScrollView>
