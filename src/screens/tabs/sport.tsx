@@ -1,7 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react"
-import { TouchableOpacity, View } from "react-native"
+import {
+  RefreshControl,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native"
 import * as Haptics from "expo-haptics"
-import { FlashList } from "@shopify/flash-list"
+import { LegendList } from "@legendapp/list"
+import colors from "tailwindcss/colors"
 import { GamePreview } from "@/components/game-preview"
 import { Text } from "@/components/text"
 import { useConferences, useGames, useSchedule } from "@/lib/hooks"
@@ -30,22 +36,17 @@ export function SportSchedule({ route }: Props) {
   let { data: games, refetch } = useGames(route.params.sport, eventIds)
   let [isRefetching, setIsRefetching] = useState(false)
 
-  useEffect(() => {
-    if (eventsStatus === "success") {
-      setSelectedWeek(events?.current_group.id ?? "2024-1")
-    }
-  }, [eventsStatus])
+  if (selectedWeek === "" && eventsStatus === "success") {
+    setSelectedWeek(events?.current_group.id ?? "2025-1")
+  }
 
   return (
     <View className="pt-4 px-2 flex-1 bg-zinc-900">
-      {!!conferences?.length && (
-        <FlashList
+      {/*{!!conferences?.length && (
+        <LegendList
           horizontal
-          estimatedItemSize={52}
           data={conferences}
           extraData={selectedConference}
-          ItemSeparatorComponent={() => <View className="w-2" />}
-          showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
@@ -53,7 +54,7 @@ export function SportSchedule({ route }: Props) {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
                   setSelectedConference(item)
                 }}
-                className={`px-3 py-2 rounded-full border ${selectedConference === item ? "border-indigo-900" : "border-zinc-800"}`}
+                className={`px-3 py-2 rounded-full border ${selectedConference === item ? "border-emerald-900" : "border-zinc-800"}`}
               >
                 <Text>{item}</Text>
               </TouchableOpacity>
@@ -61,9 +62,8 @@ export function SportSchedule({ route }: Props) {
           }}
         />
       )}
-      {!!conferences?.length && <View className="h-3" />}
       {events && (
-        <FlashList
+        <LegendList
           horizontal
           estimatedItemSize={52}
           data={events.current_season}
@@ -81,17 +81,16 @@ export function SportSchedule({ route }: Props) {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
                   setSelectedWeek(item.id)
                 }}
-                className={`px-3 py-2 rounded-full border ${selectedWeek === item.id ? "border-indigo-900" : "border-zinc-800"}`}
+                className={`px-3 py-2 rounded-full border ${selectedWeek === item.id ? "border-emerald-900" : "border-zinc-800"}`}
               >
                 <Text>{item.label}</Text>
               </TouchableOpacity>
             )
           }}
         />
-      )}
-      <View className="h-6" />
+      )}*/}
       {games && games.length ? (
-        <FlashList
+        <LegendList
           data={games}
           estimatedItemSize={219}
           onRefresh={() => {
@@ -102,7 +101,10 @@ export function SportSchedule({ route }: Props) {
           refreshing={isRefetching}
           keyExtractor={(item) => String(item.id)}
           ItemSeparatorComponent={() => (
-            <View className="border-b border-zinc-800" />
+            <View
+              className="border-zinc-800"
+              style={{ borderBottomWidth: StyleSheet.hairlineWidth }}
+            />
           )}
           renderItem={({ index, item }) => {
             let currentGameDate = new Date(item.game_date).toLocaleDateString()
@@ -112,7 +114,7 @@ export function SportSchedule({ route }: Props) {
                 : null
 
             return (
-              <View className="pl-2 pr-8">
+              <View>
                 {(index === 0 || currentGameDate !== previousGameDate) && (
                   <Text className="mt-4 font-bold">{currentGameDate}</Text>
                 )}

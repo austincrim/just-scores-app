@@ -11,7 +11,7 @@ export function BasketballScore({
 }) {
   return (
     <View className="mt-4">
-      {game?.box_score.last_play?.description && (
+      {game?.box_score?.last_play?.description && (
         <View className="mt-4 text-sm">
           <Text className="text-xl text-zinc-100">Last Play</Text>
           <Text className="mt-2 text-zinc-100">

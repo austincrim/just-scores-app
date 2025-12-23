@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { ScrollView, StyleSheet, View } from "react-native"
+import { LegendList } from "@legendapp/list"
 import SegmentedControl from "@react-native-segmented-control/segmented-control"
-import { FlashList } from "@shopify/flash-list"
 import colors from "tailwindcss/colors"
 import { Text } from "@/components/text"
 import { BasketballPlayerRecord, Game } from "@/types"
@@ -44,7 +44,7 @@ export function BasketballBoxScore({
       />
       <ScrollView horizontal>
         <View className="flex-1 flex gap-4">
-          <FlashList
+          <LegendList
             data={displayStats}
             keyExtractor={(item) => item.key}
             horizontal
@@ -59,7 +59,7 @@ export function BasketballBoxScore({
               </Text>
             )}
           />
-          <FlashList
+          <LegendList
             data={boxScore[team]}
             keyExtractor={(item) => String(item.id)}
             ItemSeparatorComponent={() => <View className="h-4" />}

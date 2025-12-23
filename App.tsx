@@ -64,11 +64,16 @@ export default function App() {
               background: colors.zinc["900"],
               border: colors.zinc["800"],
               card: colors.zinc["800"],
-              primary: colors.indigo["600"],
+              primary: colors.emerald["300"],
               text: colors.zinc["100"],
               notification: colors.zinc["100"],
             },
-            fonts: { regular: { fontFamily: "Inter", fontWeight: "500" } },
+            fonts: {
+              regular: { fontFamily: "Inter", fontWeight: "500" },
+              medium: { fontFamily: "Inter", fontWeight: "300" },
+              bold: { fontFamily: "Inter", fontWeight: "700" },
+              heavy: { fontFamily: "Inter", fontWeight: "900" },
+            },
           }}
         />
       </PersistQueryClientProvider>

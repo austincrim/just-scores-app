@@ -42,12 +42,10 @@ export function GamePreview({
         })
       }}
     >
-      {game.status === "in_progress" ? (
+      {game.status === "in_progress" && (
         <View className="w-3 h-3 rounded-full bg-emerald-500" />
-      ) : (
-        <View className="w-3 h-3 rounded-full bg-transparent" />
       )}
-      <View className="flex flex-row items-center gap-2">
+      <View className="flex flex-row items-center gap-2 flex-shrink">
         <View className="flex flex-col flex-1 gap-3">
           <TeamLine team={game.away_team} type="away" game={game} />
           <TeamLine team={game.home_team} type="home" game={game} />

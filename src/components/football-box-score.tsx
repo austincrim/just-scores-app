@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { ScrollView, StyleSheet, Text, View } from "react-native"
+import { LegendList } from "@legendapp/list"
 import SegmentedControl from "@react-native-segmented-control/segmented-control"
-import { FlashList } from "@shopify/flash-list"
 import colors from "tailwindcss/colors"
 import { Game, type FootballPlayerRecord } from "@/types"
 
@@ -111,7 +111,7 @@ export function FootballBoxScore({
         fontStyle={{ color: colors.zinc["200"] }}
         activeFontStyle={{ color: colors.zinc["50"] }}
       />
-      <FlashList
+      <LegendList
         data={Object.entries(statCategories)}
         estimatedItemSize={7000}
         ItemSeparatorComponent={() => <View className="my-4" />}
@@ -123,7 +123,7 @@ export function FootballBoxScore({
               </Text>
               <ScrollView horizontal>
                 <View>
-                  <FlashList
+                  <LegendList
                     horizontal
                     data={["Name", ...stats]}
                     estimatedItemSize={99}
@@ -139,7 +139,7 @@ export function FootballBoxScore({
                       </Text>
                     )}
                   />
-                  <FlashList
+                  <LegendList
                     data={playersByPosition[type]}
                     estimatedItemSize={99}
                     scrollEnabled={false}

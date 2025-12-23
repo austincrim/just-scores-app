@@ -29,7 +29,7 @@ function TeamLine({ team, game, type }: Props) {
           accessibilityLabel={`${team.full_name} logo`}
         />
         {ranking && <Text className="text-xs font-bold">{ranking}</Text>}
-        <Text className="text-xl max-w-52">{team.name}</Text>
+        <Text className="text-lg max-w-52">{team.name}</Text>
       </View>
 
       {renderScore()}

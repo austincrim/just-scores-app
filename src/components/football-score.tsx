@@ -1,6 +1,7 @@
 import React from "react"
-import { Image, Text, View } from "react-native"
+import { Image, View } from "react-native"
 import { NcaaFBEvent, NFLEvent } from "@/types"
+import { Text } from "./text"
 
 export function FootballScore({ game }: { game: NcaaFBEvent | NFLEvent }) {
   return (
@@ -15,16 +16,14 @@ export function FootballScore({ game }: { game: NcaaFBEvent | NFLEvent }) {
 
       {game.box_score?.last_play?.details && (
         <View className="mt-4 text-sm">
-          <Text className="text-xl text-zinc-100">Last Play</Text>
-          <Text className="mt-2 text-zinc-100">
-            {game.box_score.last_play.details}
-          </Text>
+          <Text className="text-xl">Last Play</Text>
+          <Text className="mt-2">{game.box_score.last_play.details}</Text>
         </View>
       )}
 
       {game.box_score?.scoring_summary && (
         <View className="flex gap-6 my-8 text-xs">
-          <Text className="text-xl text-zinc-100">Scoring Summary</Text>
+          <Text className="text-xl">Scoring Summary</Text>
           {game.box_score.scoring_summary.map((summary, index) => {
             let logo = summary.scorer.teams[0].logos.small
             let teamColor = summary.scorer?.teams[0].colour_1
@@ -49,9 +48,7 @@ export function FootballScore({ game }: { game: NcaaFBEvent | NFLEvent }) {
                 ) : (
                   <View />
                 )}
-                <Text className="flex-shrink text-zinc-100">
-                  {summary.summary_text}
-                </Text>
+                <Text className="flex-shrink">{summary.summary_text}</Text>
               </View>
             )
           })}
