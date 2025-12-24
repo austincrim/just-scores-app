@@ -11,6 +11,7 @@ export function Favorites({}: Props) {
   return (
     <View className="pt-4 px-2 flex-1">
       <Text>Favorites</Text>
+      <Text>Add teams to favorites and get all their scores in one place.</Text>
       <Text
         style={{
           fontSize: 10,
