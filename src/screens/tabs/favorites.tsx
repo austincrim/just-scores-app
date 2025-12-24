@@ -14,9 +14,8 @@ export function Favorites({}: Props) {
       <Text
         style={{
           fontSize: 10,
-          color: colors.zinc[200],
+          color: colors.zinc[700],
           paddingTop: 12,
-          paddingHorizontal: 20,
         }}
       >
         {currentlyRunning.updateId?.split("-")[0] ??

@@ -8,7 +8,7 @@ export function Text({
 }: { children: React.ReactNode } & ComponentProps<typeof RNText>) {
   let style = props.style ?? {}
   return (
-    <RNText {...props} style={[{ color: colors.zinc[100] }, style]}>
+    <RNText {...props} style={[{ color: colors.zinc[800] }, style]}>
       {children}
     </RNText>
   )

@@ -17,7 +17,7 @@ export function GamePreview({
   function renderGameStatus() {
     if (game.status !== "pre_game") {
       return (
-        <Text className="w-20 text-right text-lg">
+        <Text className="text-lg text-right">
           {game.box_score?.progress.string}
         </Text>
       )
@@ -25,7 +25,7 @@ export function GamePreview({
       let gameTime = new Date(game.game_date).toLocaleTimeString(undefined, {
         timeStyle: "short",
       })
-      return <Text className="w-[4ch] text-lg">{gameTime}</Text>
+      return <Text className="text-lg">{gameTime}</Text>
     }
   }
 
@@ -45,12 +45,12 @@ export function GamePreview({
       {game.status === "in_progress" && (
         <View className="w-3 h-3 rounded-full bg-emerald-500" />
       )}
-      <View className="flex flex-row items-center gap-2 flex-shrink">
-        <View className="flex flex-col flex-1 gap-3">
+      <View className="flex flex-row gap-2 items-center flex-shrink">
+        <View className="flex flex-col flex-1 gap-1">
           <TeamLine team={game.away_team} type="away" game={game} />
           <TeamLine team={game.home_team} type="home" game={game} />
         </View>
-        {renderGameStatus()}
+        <View style={{ minWidth: 80 }}>{renderGameStatus()}</View>
       </View>
     </TouchableOpacity>
   )

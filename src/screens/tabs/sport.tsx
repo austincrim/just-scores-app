@@ -1,13 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react"
-import {
-  RefreshControl,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native"
-import * as Haptics from "expo-haptics"
+import React, { useMemo, useState } from "react"
+import { StyleSheet, View } from "react-native"
 import { LegendList } from "@legendapp/list"
-import colors from "tailwindcss/colors"
+import { format, isToday, isTomorrow } from "date-fns"
 import { GamePreview } from "@/components/game-preview"
 import { Text } from "@/components/text"
 import { useConferences, useGames, useSchedule } from "@/lib/hooks"
@@ -32,7 +26,7 @@ export function SportSchedule({ route }: Props) {
       events.current_season?.find((w) => w.id === selectedWeek)?.event_ids ??
       events?.current_group?.event_ids
     )
-  }, [events, selectedConference, selectedWeek])
+  }, [events, selectedWeek])
   let { data: games, refetch } = useGames(route.params.sport, eventIds)
   let [isRefetching, setIsRefetching] = useState(false)
 
@@ -41,7 +35,7 @@ export function SportSchedule({ route }: Props) {
   }
 
   return (
-    <View className="pt-4 px-2 flex-1 bg-zinc-900">
+    <View className="p-2 flex-1">
       {/*{!!conferences?.length && (
         <LegendList
           horizontal
@@ -92,7 +86,7 @@ export function SportSchedule({ route }: Props) {
       {games && games.length ? (
         <LegendList
           data={games}
-          estimatedItemSize={219}
+          showsVerticalScrollIndicator={false}
           onRefresh={() => {
             setIsRefetching(true)
             refetch()
@@ -102,12 +96,18 @@ export function SportSchedule({ route }: Props) {
           keyExtractor={(item) => String(item.id)}
           ItemSeparatorComponent={() => (
             <View
-              className="border-zinc-800"
+              className="border-zinc-200"
               style={{ borderBottomWidth: StyleSheet.hairlineWidth }}
             />
           )}
           renderItem={({ index, item }) => {
-            let currentGameDate = new Date(item.game_date).toLocaleDateString()
+            let gameDate = new Date(item.game_date)
+            let currentDateFormatted = gameDate.toLocaleDateString()
+            let displayDate = isToday(gameDate)
+              ? "Today"
+              : isTomorrow(gameDate)
+                ? "Tomorrow"
+                : format(gameDate, "MMMM do")
             let previousGameDate =
               index > 0
                 ? new Date(games[index - 1]?.game_date).toLocaleDateString()
@@ -115,8 +115,8 @@ export function SportSchedule({ route }: Props) {
 
             return (
               <View>
-                {(index === 0 || currentGameDate !== previousGameDate) && (
-                  <Text className="mt-4 font-bold">{currentGameDate}</Text>
+                {(index === 0 || currentDateFormatted !== previousGameDate) && (
+                  <Text className="mt-4 font-bold">{displayDate}</Text>
                 )}
                 <View
                   className={`relative flex flex-col gap-2 ${item.status === "in_progress" ? "active" : ""}`}

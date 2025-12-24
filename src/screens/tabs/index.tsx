@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { Alert, Pressable, TouchableOpacity, View } from "react-native"
+import { Pressable, View } from "react-native"
 import * as Haptics from "expo-haptics"
 import { SymbolView } from "expo-symbols"
 import { TrueSheet } from "@lodev09/react-native-true-sheet"
@@ -7,6 +7,7 @@ import {
   BottomTabBarButtonProps,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs"
+import { useNavigationState } from "@react-navigation/native"
 import colors from "tailwindcss/colors"
 import { Text } from "@/components/text"
 import { TabsParamList } from "../types"
@@ -14,9 +15,20 @@ import { Favorites } from "./favorites"
 import { SportSchedule } from "./sport"
 
 let { Navigator, Screen } = createBottomTabNavigator<TabsParamList>()
+
 export function Tabs() {
   let sheetRef = useRef<TrueSheet>(null)
-  let [sport, setSport] = useState<"ncaaf" | "ncaab" | "nfl">("ncaab")
+  let [sport, setSport] = useState<"ncaaf" | "ncaab" | "nfl">("nfl")
+  let currentRouteName = useNavigationState((state) => {
+    const route = state.routes[state.index]
+
+    if (route.state) {
+      return route.state.routes[route.state.index!].name
+    }
+
+    return route.name
+  })
+
   let title =
     sport === "ncaaf"
       ? "NCAA Football"
@@ -35,29 +47,6 @@ export function Tabs() {
           options={{
             headerTitle: () => (
               <Text className="font-semibold text-xl">{title}</Text>
-              // <ContextMenuButton
-              //   menuConfig={{
-              //     menuTitle: "",
-              //     menuItems: [
-              //       { actionTitle: "NCAA Football", actionKey: "ncaaf" },
-              //       { actionTitle: "NCAA Basketball", actionKey: "ncaab" },
-              //       { actionTitle: "NFL", actionKey: "nfl" },
-              //     ],
-              //   }}
-              //   onPressMenuItem={({ nativeEvent }) => {
-              //     // @ts-ignore
-              //     setSport(nativeEvent.actionKey)
-              //   }}
-              // >
-              //   <TouchableOpacity className="flex flex-row items-center gap-3">
-              //     <SymbolView
-              //       name="chevron.down"
-              //       size={10}
-              //       resizeMode="scaleAspectFill"
-              //       tintColor={colors.emerald["500"]}
-              //     />
-              //   </TouchableOpacity>
-              // </ContextMenuButton>
             ),
             tabBarLabel: "Scores",
             tabBarIcon: ({ color, focused }) => (
@@ -83,12 +72,13 @@ export function Tabs() {
             tabBarButton: (props) => (
               <HapticTab
                 {...props}
-                onLongPress={() => sheetRef.current?.present()}
+                onPress={(e) =>
+                  currentRouteName === "scores" || currentRouteName === "tabs"
+                    ? sheetRef.current?.present()
+                    : props.onPress!(e)
+                }
               />
             ),
-            headerStyle: {
-              backgroundColor: colors.zinc["800"],
-            },
           }}
         />
         <Screen
@@ -107,39 +97,41 @@ export function Tabs() {
         />
       </Navigator>
       <TrueSheet
+        backgroundColor={colors.zinc[200]}
         ref={sheetRef}
-        detents={["auto"]}
-        backgroundColor={colors.zinc[800]}
+        detents={[0.2]}
+        style={{ paddingVertical: 24 }}
       >
-        <View className="py-2">
-          <Pressable
-            onPress={() => {
-              setSport("nfl")
-              sheetRef.current?.dismiss()
-            }}
-            className="w-full py-4 px-8"
-          >
-            <Text className="text-2xl">NFL</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              setSport("ncaaf")
-              sheetRef.current?.dismiss()
-            }}
-            className="w-full py-4 px-8"
-          >
-            <Text className="text-2xl">NCAA Football</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              setSport("ncaab")
-              sheetRef.current?.dismiss()
-            }}
-            className="w-full py-4 px-8"
-          >
-            <Text className="text-2xl">NCAA Basketball</Text>
-          </Pressable>
-        </View>
+        <Pressable
+          className="flex-row px-2 py-4 gap-1 items-center active:bg-zinc-300"
+          onPress={() => {
+            setSport("nfl")
+            sheetRef.current?.dismiss()
+          }}
+        >
+          <Text className={`text-2xl`}>NFL</Text>
+          {sport === "nfl" && <SymbolView size={16} name="checkmark" />}
+        </Pressable>
+        <Pressable
+          className="flex-row px-2 py-4 gap-1 items-center active:bg-zinc-300"
+          onPress={() => {
+            setSport("ncaaf")
+            sheetRef.current?.dismiss()
+          }}
+        >
+          <Text className={`text-2xl`}>NCAA Football</Text>
+          {sport === "ncaaf" && <SymbolView size={16} name="checkmark" />}
+        </Pressable>
+        <Pressable
+          className="flex-row px-2 py-4 gap-1 items-center active:bg-zinc-300"
+          onPress={() => {
+            setSport("ncaab")
+            sheetRef.current?.dismiss()
+          }}
+        >
+          <Text className={`text-2xl`}>NCAA Basketball</Text>
+          {sport === "ncaab" && <SymbolView size={16} name="checkmark" />}
+        </Pressable>
       </TrueSheet>
     </>
   )

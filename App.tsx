@@ -14,13 +14,13 @@ import { Tabs } from "@/screens/tabs"
 
 let Stack = createNativeStackNavigator({
   screens: {
-    Scores: {
+    tabs: {
       screen: Tabs,
       options: {
         headerShown: false,
       },
     },
-    GameDetails: GameDetails,
+    details: GameDetails,
   },
 })
 let Navigator = createStaticNavigation(Stack)
@@ -52,7 +52,7 @@ export default function App() {
   return (
     <SafeAreaProvider
       onLayout={onLayoutRootView}
-      style={{ backgroundColor: colors.zinc["800"] }}
+      style={{ backgroundColor: colors.zinc[100] }}
     >
       <PersistQueryClientProvider
         client={queryClient}
@@ -61,12 +61,12 @@ export default function App() {
         <Navigator
           theme={{
             colors: {
-              background: colors.zinc["900"],
-              border: colors.zinc["800"],
-              card: colors.zinc["800"],
-              primary: colors.emerald["300"],
-              text: colors.zinc["100"],
-              notification: colors.zinc["100"],
+              background: colors.zinc[100],
+              border: colors.zinc[200],
+              card: colors.zinc[100],
+              primary: colors.emerald[500],
+              text: colors.zinc[800],
+              notification: colors.zinc[800],
             },
             fonts: {
               regular: { fontFamily: "Inter", fontWeight: "500" },
@@ -74,6 +74,7 @@ export default function App() {
               bold: { fontFamily: "Inter", fontWeight: "700" },
               heavy: { fontFamily: "Inter", fontWeight: "900" },
             },
+            dark: false,
           }}
         />
       </PersistQueryClientProvider>
