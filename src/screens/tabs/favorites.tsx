@@ -6,7 +6,7 @@ import { TabScreenProps } from "../types"
 
 type Props = TabScreenProps<"favorites">
 export function Favorites({}: Props) {
-  let { currentlyRunning } = useUpdates()
+  let { currentlyRunning, isDownloading } = useUpdates()
 
   return (
     <View className="pt-4 px-2 flex-1">
@@ -18,8 +18,10 @@ export function Favorites({}: Props) {
           paddingTop: 12,
         }}
       >
-        {currentlyRunning.updateId?.split("-")[0] ??
-          "Unable to determine version"}
+        {isDownloading
+          ? "Downloading..."
+          : (currentlyRunning.updateId?.split("-")[0] ??
+            "Unable to determine version")}
       </Text>
     </View>
   )
