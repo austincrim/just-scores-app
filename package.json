@@ -48,6 +48,7 @@
     "@babel/core": "^7.26.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.0",
     "@types/react": "~19.1.17",
+    "eas-build-cache-provider": "^16.4.2",
     "expo-dev-client": "^6.0.20",
     "prettier": "^3.3.3",
     "typescript": "~5.9.3"

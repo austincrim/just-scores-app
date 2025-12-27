@@ -8,14 +8,13 @@
     "icon": "./assets/icons/apple/1024.png",
     "scheme": "justscores",
     "userInterfaceStyle": "automatic",
+    "buildCacheProvider": "eas",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "platforms": [
-      "ios"
-    ],
+    "platforms": ["ios"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.austincrim.justscores",
@@ -29,10 +28,7 @@
       }
     },
     "newArchEnabled": true,
-    "plugins": [
-      "expo-font",
-      "expo-web-browser"
-    ],
+    "plugins": ["expo-font", "expo-web-browser"],
     "runtimeVersion": {
       "policy": "appVersion"
     },

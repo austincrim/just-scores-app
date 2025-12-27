@@ -36,7 +36,7 @@ export function GamePreview({
         if (sport !== "nfl" && sport !== "ncaab" && sport !== "ncaaf") {
           throw new Error(`invalid route name: ${sport}`)
         }
-        navigation.navigate("GameDetails", {
+        navigation.navigate("details", {
           sport,
           id: String(game.id),
         })

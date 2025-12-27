@@ -11,8 +11,9 @@ import colors from "tailwindcss/colors"
 import { persister } from "@/lib/storage"
 import { GameDetails } from "@/screens/game-details"
 import { Tabs } from "@/screens/tabs"
+import { RootStackParamList } from "@/screens/types"
 
-let Stack = createNativeStackNavigator({
+let Stack = createNativeStackNavigator<RootStackParamList>({
   screens: {
     tabs: {
       screen: Tabs,
