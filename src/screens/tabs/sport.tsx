@@ -1,7 +1,11 @@
-import React, { useMemo, useState } from "react"
-import { StyleSheet, View } from "react-native"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { Pressable, ScrollView, StyleSheet, View } from "react-native"
+import { SymbolView } from "expo-symbols"
 import { LegendList } from "@legendapp/list"
+import { TrueSheet } from "@lodev09/react-native-true-sheet"
+import { useNavigation } from "@react-navigation/native"
 import { format, isToday, isTomorrow } from "date-fns"
+import colors from "tailwindcss/colors"
 import { GamePreview } from "@/components/game-preview"
 import { Text } from "@/components/text"
 import { useConferences, useGames, useSchedule } from "@/lib/hooks"
@@ -9,10 +13,12 @@ import { TabScreenProps } from "../types"
 
 type Props = TabScreenProps<"scores">
 export function SportSchedule({ route }: Props) {
+  let sheetRef = useRef<TrueSheet>(null)
   let isCollege = route.params.sport.includes("ncaa")
   let [selectedConference, setSelectedConference] = useState(
     isCollege ? "Top 25" : undefined,
   )
+  let navigation = useNavigation()
   let { data: conferences } = useConferences(route.params.sport)
   let { data: events, status: eventsStatus } = useSchedule(
     route.params.sport,
@@ -34,8 +40,37 @@ export function SportSchedule({ route }: Props) {
     setSelectedWeek(events?.current_group.id ?? "2025-1")
   }
 
+  useEffect(() => {
+    if (selectedWeek) {
+      navigation.setOptions({
+        headerRight: () => (
+          <View
+            style={{
+              flex: 1,
+              alignItems: "flex-end",
+              marginRight: 16,
+            }}
+          >
+            <Pressable
+              onPress={() => sheetRef.current?.present()}
+              className="flex-row items-center gap-1"
+            >
+              <Text>
+                {
+                  events?.current_season.find((s) => s.id === selectedWeek)
+                    ?.label
+                }
+              </Text>
+              <SymbolView size={14} name="chevron.down" />
+            </Pressable>
+          </View>
+        ),
+      })
+    }
+  }, [selectedWeek])
+
   return (
-    <View className="p-2 flex-1">
+    <View className="p-2 px-4 flex-1">
       {/*{!!conferences?.length && (
         <LegendList
           horizontal
@@ -130,6 +165,49 @@ export function SportSchedule({ route }: Props) {
       ) : (
         <></>
       )}
+
+      <TrueSheet scrollable ref={sheetRef} detents={[0.7]}>
+        {/*<LegendList
+          data={events?.current_season}
+          style={{ backgroundColor: "grey" }}
+          keyExtractor={(i) => i.id}
+          renderItem={({ item: event }) => (
+            <Pressable
+              className="px-2 py-4 active:bg-zinc-300"
+              hitSlop={5}
+              onPress={() => {
+                setSelectedWeek(event.id)
+                sheetRef.current?.dismiss()
+              }}
+            >
+              <Text>{event.label}</Text>
+            </Pressable>
+          )}
+        />*/}
+        <ScrollView className="py-4" nestedScrollEnabled>
+          {events?.current_season.map((event) => (
+            <Pressable
+              key={event.id}
+              className="p-4 active:bg-zinc-200/50"
+              hitSlop={5}
+              onPress={() => {
+                setSelectedWeek(event.id)
+                sheetRef.current?.dismiss()
+              }}
+            >
+              <Text
+                style={
+                  event.id === events.current_group.id && {
+                    color: colors.blue[600],
+                  }
+                }
+              >
+                {event.label}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </TrueSheet>
     </View>
   )
 }

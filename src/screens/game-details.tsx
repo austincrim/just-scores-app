@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 import { Image, ScrollView, TouchableOpacity, View } from "react-native"
 import { openURL } from "expo-linking"
 import { SymbolView } from "expo-symbols"
+import { useNavigation } from "@react-navigation/native"
 import { useQuery } from "@tanstack/react-query"
 import { BasketballBoxScore } from "@/components/basketball-box-score"
 import { BasketballScore } from "@/components/basketball-score"
@@ -34,16 +35,19 @@ const channelIds = new Map([
   ["fox sports 2", "youtubetv://dOebiFJpesk"],
   ["abc", "youtubetv://oq8VLH9APU4"],
   ["cbs", "youtubetv://H8IaNgT3Ppg"],
+  ["nfl network", "youtubetv://ZpAfRye3sBw"],
   ["sec network", "youtubetv://8_6sI1qMNEo"],
   ["acc network", "youtubetv://vPQQzD4ZBec"],
   ["cbs sports network", "youtubetv://2rzCpZXNzBw"],
   ["the cw", "youtubetv://sn3_WG30_vA"],
   ["espn+", "https://espn.com/watch"],
+  ["peacock", "peacock://"],
 ])
 
-type Props = RootStackScreenProps<"GameDetails">
+type Props = RootStackScreenProps<"details">
 
-export function GameDetails({ route, navigation }: Props) {
+export function GameDetails({ route }: Props) {
+  let navigation = useNavigation()
   let {
     data: gameQuery,
     status,
@@ -105,10 +109,10 @@ export function GameDetails({ route, navigation }: Props) {
   useEffect(() => {
     if (gameQuery?.game) {
       navigation?.setOptions({
-        title: `${gameQuery.game.away_team.abbreviation} @ ${gameQuery.game.home_team.abbreviation}`,
+        headerTitle: `${gameQuery.game.away_team.abbreviation} @ ${gameQuery.game.home_team.abbreviation}`,
       })
     }
-  }, [])
+  }, [gameQuery?.game])
 
   if (status === "pending") {
     return <Text>loading...</Text>
@@ -121,6 +125,8 @@ export function GameDetails({ route, navigation }: Props) {
   if (!gameQuery) {
     return <Text>nothing here</Text>
   }
+
+  console.log(gameQuery.game.away_team.abbreviation)
 
   return (
     <ScrollView className="px-4 py-4">

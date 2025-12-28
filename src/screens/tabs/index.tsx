@@ -1,5 +1,6 @@
 import { useRef, useState } from "react"
 import { Pressable, View } from "react-native"
+import { Button, ContextMenu, Host } from "@expo/ui/swift-ui"
 import * as Haptics from "expo-haptics"
 import { SymbolView } from "expo-symbols"
 import { TrueSheet } from "@lodev09/react-native-true-sheet"
@@ -56,6 +57,15 @@ export function Tabs() {
                     name={focused ? "basketball.fill" : "basketball"}
                     tintColor={color}
                   />
+                ) : sport === "nfl" ? (
+                  <SymbolView
+                    name={
+                      focused
+                        ? "american.football.professional.fill"
+                        : "football"
+                    }
+                    tintColor={color}
+                  />
                 ) : (
                   <SymbolView
                     name={focused ? "football.fill" : "football"}
@@ -97,7 +107,7 @@ export function Tabs() {
         />
       </Navigator>
       <TrueSheet
-        backgroundColor={colors.zinc[200]}
+        // backgroundColor={colors.zinc[200]}
         ref={sheetRef}
         detents={[0.2]}
         style={{ paddingVertical: 24 }}
@@ -109,7 +119,11 @@ export function Tabs() {
             sheetRef.current?.dismiss()
           }}
         >
-          <Text className={`text-2xl`}>NFL</Text>
+          <SymbolView
+            tintColor={colors.zinc[800]}
+            name="american.football.professional"
+          />
+          <Text className={`text-xl`}>NFL</Text>
           {sport === "nfl" && <SymbolView size={16} name="checkmark" />}
         </Pressable>
         <Pressable
@@ -119,7 +133,8 @@ export function Tabs() {
             sheetRef.current?.dismiss()
           }}
         >
-          <Text className={`text-2xl`}>NCAA Football</Text>
+          <SymbolView tintColor={colors.zinc[800]} name="football" />
+          <Text className={`text-xl`}>NCAA Football</Text>
           {sport === "ncaaf" && <SymbolView size={16} name="checkmark" />}
         </Pressable>
         <Pressable
@@ -129,7 +144,8 @@ export function Tabs() {
             sheetRef.current?.dismiss()
           }}
         >
-          <Text className={`text-2xl`}>NCAA Basketball</Text>
+          <SymbolView tintColor={colors.zinc[800]} name="basketball" />
+          <Text className={`text-xl`}>NCAA Basketball</Text>
           {sport === "ncaab" && <SymbolView size={16} name="checkmark" />}
         </Pressable>
       </TrueSheet>

@@ -19,9 +19,10 @@ let Stack = createNativeStackNavigator<RootStackParamList>({
       screen: Tabs,
       options: {
         headerShown: false,
+        title: "Scores",
       },
     },
-    details: GameDetails,
+    details: { screen: GameDetails },
   },
 })
 let Navigator = createStaticNavigation(Stack)
