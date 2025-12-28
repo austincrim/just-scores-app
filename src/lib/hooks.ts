@@ -19,6 +19,7 @@ export function useSchedule(
 ) {
   return useQuery({
     queryKey: [sport, conference],
+    refetchInterval: 10000,
     queryFn: async () => {
       let scheduleRes = await fetch(
         `${API_URL}/${sport}/schedule?utc_offset=-21600&conference=${

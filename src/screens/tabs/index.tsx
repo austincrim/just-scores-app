@@ -106,12 +106,7 @@ export function Tabs() {
           }}
         />
       </Navigator>
-      <TrueSheet
-        // backgroundColor={colors.zinc[200]}
-        ref={sheetRef}
-        detents={[0.2]}
-        style={{ paddingVertical: 24 }}
-      >
+      <TrueSheet ref={sheetRef} detents={[0.2]} style={{ paddingVertical: 24 }}>
         <Pressable
           className="flex-row px-2 py-4 gap-1 items-center active:bg-zinc-300"
           onPress={() => {

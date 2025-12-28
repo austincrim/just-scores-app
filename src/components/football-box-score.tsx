@@ -107,12 +107,13 @@ export function FootballBoxScore({
           setTeam(e === game.home_team.abbreviation ? "home" : "away")
         }
         tintColor={"#" + game[`${team}_team`].colour_1}
-        backgroundColor={colors.zinc["900"]}
-        fontStyle={{ color: colors.zinc["200"] }}
-        activeFontStyle={{ color: colors.zinc["50"] }}
+        backgroundColor={colors.zinc["100"]}
+        fontStyle={{ color: colors.zinc["800"] }}
+        activeFontStyle={{ color: colors.zinc["100"] }}
       />
       <LegendList
         data={Object.entries(statCategories)}
+        keyExtractor={([k, v]) => k}
         estimatedItemSize={7000}
         ItemSeparatorComponent={() => <View className="my-4" />}
         renderItem={({ item: [type, stats] }) =>
@@ -178,7 +179,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     paddingVertical: 10,
-    color: colors.zinc[100],
     textTransform: "capitalize",
   },
   headerRow: { flexDirection: "row" },
@@ -187,11 +187,9 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 100,
     flex: 1,
-    color: colors.zinc[100],
   },
   cell: {
     padding: 10,
     width: 100,
-    color: colors.zinc[100],
   },
 })

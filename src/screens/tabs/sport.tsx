@@ -12,19 +12,23 @@ import { useConferences, useGames, useSchedule } from "@/lib/hooks"
 import { TabScreenProps } from "../types"
 
 type Props = TabScreenProps<"scores">
+
 export function SportSchedule({ route }: Props) {
-  let sheetRef = useRef<TrueSheet>(null)
   let isCollege = route.params.sport.includes("ncaa")
+  let scheduleSheetRef = useRef<TrueSheet>(null)
+  let conferenceSheetRef = useRef<TrueSheet>(null)
+  let navigation = useNavigation()
   let [selectedConference, setSelectedConference] = useState(
     isCollege ? "Top 25" : undefined,
   )
-  let navigation = useNavigation()
+  let [selectedWeek, setSelectedWeek] = useState("")
+  let [isRefetching, setIsRefetching] = useState(false)
+
   let { data: conferences } = useConferences(route.params.sport)
   let { data: events, status: eventsStatus } = useSchedule(
     route.params.sport,
     selectedConference,
   )
-  let [selectedWeek, setSelectedWeek] = useState("")
   let eventIds: number[] = useMemo(() => {
     if (!events) return []
 
@@ -34,7 +38,6 @@ export function SportSchedule({ route }: Props) {
     )
   }, [events, selectedWeek])
   let { data: games, refetch } = useGames(route.params.sport, eventIds)
-  let [isRefetching, setIsRefetching] = useState(false)
 
   if (selectedWeek === "" && eventsStatus === "success") {
     setSelectedWeek(events?.current_group.id ?? "2025-1")
@@ -52,22 +55,55 @@ export function SportSchedule({ route }: Props) {
             }}
           >
             <Pressable
-              onPress={() => sheetRef.current?.present()}
+              onPress={() => scheduleSheetRef.current?.present()}
               className="flex-row items-center gap-1"
             >
-              <Text>
+              <Text
+                style={{
+                  color: colors.blue[600],
+                  borderColor: colors.blue[600],
+                  borderBottomWidth: 1,
+                }}
+              >
                 {
                   events?.current_season.find((s) => s.id === selectedWeek)
                     ?.label
                 }
               </Text>
-              <SymbolView size={14} name="chevron.down" />
+              {/*<SymbolView size={14} name="chevron.down" />*/}
             </Pressable>
           </View>
         ),
       })
     }
-  }, [selectedWeek])
+    if (selectedConference) {
+      navigation.setOptions({
+        headerLeft: () => (
+          <View
+            style={{
+              flex: 1,
+              marginLeft: 16,
+            }}
+          >
+            <Pressable
+              onPress={() => conferenceSheetRef.current?.present()}
+              className="flex-row items-center gap-1"
+            >
+              <Text
+                style={{
+                  color: colors.blue[600],
+                  borderColor: colors.blue[600],
+                  borderBottomWidth: 1,
+                }}
+              >
+                {selectedConference}
+              </Text>
+            </Pressable>
+          </View>
+        ),
+      })
+    }
+  }, [selectedWeek, selectedConference])
 
   return (
     <View className="p-2 px-4 flex-1">
@@ -166,24 +202,7 @@ export function SportSchedule({ route }: Props) {
         <></>
       )}
 
-      <TrueSheet scrollable ref={sheetRef} detents={[0.7]}>
-        {/*<LegendList
-          data={events?.current_season}
-          style={{ backgroundColor: "grey" }}
-          keyExtractor={(i) => i.id}
-          renderItem={({ item: event }) => (
-            <Pressable
-              className="px-2 py-4 active:bg-zinc-300"
-              hitSlop={5}
-              onPress={() => {
-                setSelectedWeek(event.id)
-                sheetRef.current?.dismiss()
-              }}
-            >
-              <Text>{event.label}</Text>
-            </Pressable>
-          )}
-        />*/}
+      <TrueSheet scrollable ref={scheduleSheetRef} detents={[0.7]}>
         <ScrollView className="py-4" nestedScrollEnabled>
           {events?.current_season.map((event) => (
             <Pressable
@@ -192,7 +211,7 @@ export function SportSchedule({ route }: Props) {
               hitSlop={5}
               onPress={() => {
                 setSelectedWeek(event.id)
-                sheetRef.current?.dismiss()
+                scheduleSheetRef.current?.dismiss()
               }}
             >
               <Text
@@ -203,6 +222,31 @@ export function SportSchedule({ route }: Props) {
                 }
               >
                 {event.label}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </TrueSheet>
+      <TrueSheet scrollable ref={conferenceSheetRef} detents={[0.7]}>
+        <ScrollView className="py-4" nestedScrollEnabled>
+          {conferences?.map((conference) => (
+            <Pressable
+              key={conference}
+              className="p-4 active:bg-zinc-200/50"
+              hitSlop={5}
+              onPress={() => {
+                setSelectedConference(conference)
+                conferenceSheetRef.current?.dismiss()
+              }}
+            >
+              <Text
+                style={
+                  selectedConference === conference && {
+                    color: colors.blue[600],
+                  }
+                }
+              >
+                {conference}
               </Text>
             </Pressable>
           ))}

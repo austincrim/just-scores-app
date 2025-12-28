@@ -38,8 +38,8 @@ export function BasketballBoxScore({
           setTeam(e === game.home_team.abbreviation ? "home" : "away")
         }
         tintColor={"#" + game[`${team}_team`].colour_1}
-        backgroundColor={colors.zinc["900"]}
-        fontStyle={{ color: colors.zinc["200"] }}
+        backgroundColor={colors.zinc["100"]}
+        fontStyle={{ color: colors.zinc["800"] }}
         activeFontStyle={{ color: colors.zinc["50"] }}
       />
       <ScrollView horizontal>
@@ -85,11 +85,3 @@ export function BasketballBoxScore({
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  headerRow: { flexDirection: "row", backgroundColor: "#e0e0e0" },
-  headerCell: { fontWeight: "bold", padding: 10, width: 100, flex: 1 },
-  evenRow: { backgroundColor: "#f8f8f8" },
-  oddRow: { backgroundColor: "#ffffff" },
-  cell: { padding: 10, width: 100 },
-})

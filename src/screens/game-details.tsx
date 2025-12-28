@@ -126,8 +126,6 @@ export function GameDetails({ route }: Props) {
     return <Text>nothing here</Text>
   }
 
-  console.log(gameQuery.game.away_team.abbreviation)
-
   return (
     <ScrollView className="px-4 py-4">
       <View className="flex items-center gap-4">

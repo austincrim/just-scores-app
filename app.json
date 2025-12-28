@@ -8,7 +8,6 @@
     "icon": "./assets/icons/apple/1024.png",
     "scheme": "justscores",
     "userInterfaceStyle": "automatic",
-    "buildCacheProvider": "eas",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",

@@ -66,7 +66,7 @@ export default function App() {
               background: colors.zinc[100],
               border: colors.zinc[200],
               card: colors.zinc[100],
-              primary: colors.emerald[500],
+              primary: colors.emerald[600],
               text: colors.zinc[800],
               notification: colors.zinc[800],
             },
