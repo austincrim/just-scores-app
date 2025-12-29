@@ -1,0 +1,217 @@
+import React, { useEffect } from "react"
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native"
+import { useNavigation } from "@react-navigation/native"
+import colors from "tailwindcss/colors"
+import { Text } from "@/components/text"
+import { useTeamSchedule, useTeamStanding } from "@/lib/hooks"
+import { Game } from "@/types"
+import { RootStackScreenProps } from "./types"
+
+type Props = RootStackScreenProps<"team">
+
+export function TeamDetail({ route }: Props) {
+  let navigation = useNavigation()
+  let {
+    data: games,
+    status,
+    error,
+  } = useTeamSchedule(route.params.sport, route.params.teamId)
+  let { data: standing } = useTeamStanding(
+    route.params.sport,
+    route.params.teamId,
+  )
+
+  // Filter, sort games, and calculate conference record
+  const allGames = games
+    ? games
+        .filter((g) => g.home_team && g.away_team)
+        .sort(
+          (a, b) =>
+            new Date(a.game_date).getTime() - new Date(b.game_date).getTime(),
+        )
+    : []
+
+  // Calculate conference record from completed games
+  let confWins = 0
+  let confLosses = 0
+  if (games) {
+    const now = new Date()
+    games.forEach((game) => {
+      if (!game.home_team || !game.away_team) return
+
+      const gameDate = new Date(game.game_date)
+      const isTeamHome = game.home_team.id === route.params.teamId
+      const team = isTeamHome ? game.home_team : game.away_team
+      const opponent = isTeamHome ? game.away_team : game.home_team
+
+      if (gameDate < now && game.status !== "pre_game") {
+        const teamScore = isTeamHome
+          ? game.box_score?.score?.home?.score
+          : game.box_score?.score?.away?.score
+        const opponentScore = isTeamHome
+          ? game.box_score?.score?.away?.score
+          : game.box_score?.score?.home?.score
+
+        if (teamScore !== undefined && opponentScore !== undefined) {
+          if (opponent.conference === team.conference) {
+            if (teamScore > opponentScore) {
+              confWins++
+            } else if (opponentScore > teamScore) {
+              confLosses++
+            }
+          }
+        }
+      }
+    })
+  }
+  const confRecord =
+    confWins + confLosses > 0 ? `${confWins}-${confLosses}` : null
+
+  if (status === "pending") {
+    return <Text>loading...</Text>
+  }
+
+  if (status === "error") {
+    return <Text>{error?.message}</Text>
+  }
+
+  if (!games || games.length === 0) {
+    return <Text>No games found</Text>
+  }
+
+  const firstGame = games.find(
+    (g) =>
+      g.home_team?.id === route.params.teamId ||
+      g.away_team?.id === route.params.teamId,
+  )
+
+  if (!firstGame) {
+    return <Text>Team data not found</Text>
+  }
+
+  const team =
+    firstGame.home_team?.id === route.params.teamId
+      ? firstGame.home_team
+      : firstGame.away_team
+
+  return (
+    <ScrollView className="flex-1 px-4 py-4">
+      <View className="items-center gap-3 mb-6">
+        <Image
+          source={{ uri: team.logos.large || team.logos.small }}
+          className="w-24 h-24"
+          accessibilityLabel={`${team.name} logo`}
+        />
+        <Text className="text-2xl font-bold">{team.full_name}</Text>
+        {standing && (
+          <View className="items-center">
+            <Text className="text-xl">
+              {standing.short_record}
+              {confRecord && ` (${confRecord})`}
+            </Text>
+            <Text className="text-sm">
+              {standing.division ?? standing.conference}
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {allGames.length > 0 && (
+        <View className="mb-12">
+          {allGames.map((game) => (
+            <GameRow
+              key={game.id}
+              game={game}
+              teamId={route.params.teamId}
+              sport={route.params.sport}
+            />
+          ))}
+        </View>
+      )}
+    </ScrollView>
+  )
+}
+
+function GameRow({
+  game,
+  teamId,
+  sport,
+}: {
+  game: Game
+  teamId: number
+  sport: "ncaaf" | "nfl" | "ncaab"
+}) {
+  let navigation = useNavigation()
+
+  if (!game.home_team || !game.away_team) {
+    return null
+  }
+
+  const isTeamHome = game.home_team.id === teamId
+  const opponent = isTeamHome ? game.away_team : game.home_team
+  const teamScore = isTeamHome
+    ? game.box_score?.score?.home?.score
+    : game.box_score?.score?.away?.score
+  const opponentScore = isTeamHome
+    ? game.box_score?.score?.away?.score
+    : game.box_score?.score?.home?.score
+
+  const isCompleted = game.status !== "pre_game" && teamScore !== undefined
+  const isWin = isCompleted && teamScore > opponentScore
+  const isLoss = isCompleted && teamScore < opponentScore
+
+  const gameDateStr = new Date(game.game_date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  })
+
+  return (
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate("details", {
+          sport,
+          id: String(game.id),
+        })
+      }
+    >
+      <View
+        className="flex-row items-center justify-between py-3 px-3"
+        style={{
+          borderBottomWidth: StyleSheet.hairlineWidth,
+          borderColor: colors.zinc[500],
+        }}
+      >
+        <View className="flex-1">
+          <Text className="text-sm">{gameDateStr}</Text>
+          <View className="flex-row items-center gap-2 mt-1">
+            <Image source={{ uri: opponent.logos.small }} className="w-8 h-8" />
+            <Text className="flex-1">{opponent.name}</Text>
+          </View>
+        </View>
+        {isCompleted ? (
+          <View className="flex-row gap-2 items-center">
+            <Text className="font-bold">
+              {isWin ? "W" : isLoss ? "L" : "T"}
+            </Text>
+            <Text>
+              {teamScore} - {opponentScore}
+            </Text>
+          </View>
+        ) : (
+          <Text>
+            {new Date(game.game_date).toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            })}
+          </Text>
+        )}
+      </View>
+    </TouchableOpacity>
+  )
+}

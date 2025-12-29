@@ -12,6 +12,7 @@ import colors from "tailwindcss/colors"
 import { persister } from "@/lib/storage"
 import { GameDetails } from "@/screens/game-details"
 import { Tabs } from "@/screens/tabs"
+import { TeamDetail } from "@/screens/team-details"
 import { RootStackParamList } from "@/screens/types"
 
 let Stack = createNativeStackNavigator<RootStackParamList>({
@@ -24,6 +25,7 @@ let Stack = createNativeStackNavigator<RootStackParamList>({
       },
     },
     details: { screen: GameDetails },
+    team: { screen: TeamDetail, options: { title: null } },
   },
 })
 let lightTheme = {

@@ -207,6 +207,7 @@ export function GameDetails({ route }: Props) {
 }
 
 function TeamLine({ game, type }: { game: Game; type: "away" | "home" }) {
+  let navigation = useNavigation()
   let team = type === "home" ? game.home_team : game.away_team
   let score =
     type === "home"
@@ -217,35 +218,51 @@ function TeamLine({ game, type }: { game: Game; type: "away" | "home" }) {
     isFootballEvent(game) &&
     game.box_score?.team_in_possession?.name === team.name
 
+  const sport = game.api_uri.includes("nfl")
+    ? "nfl"
+    : game.api_uri.includes("ncaaf")
+      ? "ncaaf"
+      : "ncaab"
+
   return (
-    <View className="flex flex-row items-center justify-between">
-      <View className="flex flex-row items-center justify-between gap-2 font-semibold">
-        <Image
-          source={{ uri: team.logos.small }}
-          className="object-cover w-20 h-20"
-          accessibilityLabel={`${team.name} logo`}
-        />
-        {ranking && <Text className="text-lg">{ranking}</Text>}
-        <View className="flex flex-row items-center gap-1">
-          <Text
-            className={`text-2xl font-bold ${
-              hasPossession ? "text-amber-800" : ""
-            }`}
-          >
-            {team.name}
-          </Text>
-          {hasPossession && (
-            <SymbolView
-              name="football.fill"
-              size={20}
-              tintColor="#92400e"
-              style={{ transform: "rotate(45deg)" }}
-            />
-          )}
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate("team", {
+          sport,
+          teamId: team.id,
+          teamName: team.name,
+        })
+      }
+    >
+      <View className="flex flex-row items-center justify-between">
+        <View className="flex flex-row items-center justify-between gap-2 font-semibold">
+          <Image
+            source={{ uri: team.logos.small }}
+            className="object-cover w-20 h-20"
+            accessibilityLabel={`${team.name} logo`}
+          />
+          {ranking && <Text className="text-lg">{ranking}</Text>}
+          <View className="flex flex-row items-center gap-1">
+            <Text
+              className={`text-2xl font-bold ${
+                hasPossession ? "text-amber-800" : ""
+              }`}
+            >
+              {team.name}
+            </Text>
+            {hasPossession && (
+              <SymbolView
+                name="football.fill"
+                size={20}
+                tintColor="#92400e"
+                style={{ transform: "rotate(45deg)" }}
+              />
+            )}
+          </View>
         </View>
+        <Text className="text-5xl tabular-nums">{score}</Text>
       </View>
-      <Text className="text-5xl tabular-nums">{score}</Text>
-    </View>
+    </TouchableOpacity>
   )
 }
 
