@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
-import { Pressable, ScrollView, StyleSheet, View } from "react-native"
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useColorScheme,
+  View,
+} from "react-native"
 import { SymbolView } from "expo-symbols"
 import { LegendList } from "@legendapp/list"
 import { TrueSheet } from "@lodev09/react-native-true-sheet"
@@ -15,6 +21,7 @@ type Props = TabScreenProps<"scores">
 
 export function SportSchedule({ route }: Props) {
   let isCollege = route.params.sport.includes("ncaa")
+  let isDark = useColorScheme() === "dark"
   let scheduleSheetRef = useRef<TrueSheet>(null)
   let conferenceSheetRef = useRef<TrueSheet>(null)
   let navigation = useNavigation()
@@ -60,8 +67,8 @@ export function SportSchedule({ route }: Props) {
             >
               <Text
                 style={{
-                  color: colors.blue[600],
-                  borderColor: colors.blue[600],
+                  color: isDark ? colors.sky[300] : colors.sky[600],
+                  borderColor: isDark ? colors.sky[300] : colors.sky[600],
                   borderBottomWidth: 1,
                 }}
               >
@@ -91,8 +98,8 @@ export function SportSchedule({ route }: Props) {
             >
               <Text
                 style={{
-                  color: colors.blue[600],
-                  borderColor: colors.blue[600],
+                  color: isDark ? colors.sky[300] : colors.sky[600],
+                  borderColor: isDark ? colors.sky[300] : colors.sky[600],
                   borderBottomWidth: 1,
                 }}
               >
@@ -103,7 +110,7 @@ export function SportSchedule({ route }: Props) {
         ),
       })
     }
-  }, [selectedWeek, selectedConference])
+  }, [selectedWeek, selectedConference, isDark])
 
   return (
     <View className="p-2 px-4 flex-1">
@@ -207,7 +214,7 @@ export function SportSchedule({ route }: Props) {
           {events?.current_season.map((event) => (
             <Pressable
               key={event.id}
-              className="p-4 active:bg-zinc-200/50"
+              className="p-4"
               hitSlop={5}
               onPress={() => {
                 setSelectedWeek(event.id)
@@ -217,7 +224,7 @@ export function SportSchedule({ route }: Props) {
               <Text
                 style={
                   event.id === events.current_group.id && {
-                    color: colors.blue[600],
+                    color: isDark ? colors.sky[300] : colors.sky[600],
                   }
                 }
               >
@@ -232,7 +239,7 @@ export function SportSchedule({ route }: Props) {
           {conferences?.map((conference) => (
             <Pressable
               key={conference}
-              className="p-4 active:bg-zinc-200/50"
+              className="p-4"
               hitSlop={5}
               onPress={() => {
                 setSelectedConference(conference)
@@ -242,7 +249,7 @@ export function SportSchedule({ route }: Props) {
               <Text
                 style={
                   selectedConference === conference && {
-                    color: colors.blue[600],
+                    color: isDark ? colors.sky[300] : colors.sky[600],
                   }
                 }
               >

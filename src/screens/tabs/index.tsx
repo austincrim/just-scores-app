@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { Pressable, View } from "react-native"
+import { Pressable, useColorScheme, View } from "react-native"
 import { Button, ContextMenu, Host } from "@expo/ui/swift-ui"
 import * as Haptics from "expo-haptics"
 import { SymbolView } from "expo-symbols"
@@ -18,6 +18,8 @@ import { SportSchedule } from "./sport"
 let { Navigator, Screen } = createBottomTabNavigator<TabsParamList>()
 
 export function Tabs() {
+  let isDark = useColorScheme() === "dark"
+  let iconColor = isDark ? colors.zinc[300] : colors.zinc[800]
   let sheetRef = useRef<TrueSheet>(null)
   let [sport, setSport] = useState<"ncaaf" | "ncaab" | "nfl">("nfl")
   let currentRouteName = useNavigationState((state) => {
@@ -115,7 +117,7 @@ export function Tabs() {
           }}
         >
           <SymbolView
-            tintColor={colors.zinc[800]}
+            tintColor={iconColor}
             name="american.football.professional"
           />
           <Text className={`text-xl`}>NFL</Text>
@@ -128,7 +130,7 @@ export function Tabs() {
             sheetRef.current?.dismiss()
           }}
         >
-          <SymbolView tintColor={colors.zinc[800]} name="football" />
+          <SymbolView tintColor={iconColor} name="football" />
           <Text className={`text-xl`}>NCAA Football</Text>
           {sport === "ncaaf" && <SymbolView size={16} name="checkmark" />}
         </Pressable>
@@ -139,7 +141,7 @@ export function Tabs() {
             sheetRef.current?.dismiss()
           }}
         >
-          <SymbolView tintColor={colors.zinc[800]} name="basketball" />
+          <SymbolView tintColor={iconColor} name="basketball" />
           <Text className={`text-xl`}>NCAA Basketball</Text>
           {sport === "ncaab" && <SymbolView size={16} name="checkmark" />}
         </Pressable>

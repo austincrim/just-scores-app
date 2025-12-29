@@ -1,9 +1,10 @@
 import { useState } from "react"
-import { ScrollView, StyleSheet, Text, View } from "react-native"
+import { ScrollView, StyleSheet, useColorScheme, View } from "react-native"
 import { LegendList } from "@legendapp/list"
 import SegmentedControl from "@react-native-segmented-control/segmented-control"
 import colors from "tailwindcss/colors"
 import { Game, type FootballPlayerRecord } from "@/types"
+import { Text } from "./text"
 
 type StatCategory = {
   [key: string]: Array<
@@ -84,6 +85,7 @@ export function FootballBoxScore({
   boxScore: { home: FootballPlayerRecord[]; away: FootballPlayerRecord[] }
   game: Game
 }) {
+  let isDark = useColorScheme() === "dark"
   let [team, setTeam] = useState<"home" | "away">("home")
   let playersByPosition = boxScore[team].reduce(
     (acc, player) => {
@@ -107,8 +109,8 @@ export function FootballBoxScore({
           setTeam(e === game.home_team.abbreviation ? "home" : "away")
         }
         tintColor={"#" + game[`${team}_team`].colour_1}
-        backgroundColor={colors.zinc["100"]}
-        fontStyle={{ color: colors.zinc["800"] }}
+        backgroundColor={isDark ? colors.zinc[800] : colors.zinc["100"]}
+        fontStyle={{ color: isDark ? colors.zinc[100] : colors.zinc["800"] }}
         activeFontStyle={{ color: colors.zinc["100"] }}
       />
       <LegendList

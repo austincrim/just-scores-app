@@ -1,8 +1,9 @@
 import "./global.css"
 import { useCallback } from "react"
+import { useColorScheme } from "react-native"
 import { useFonts } from "expo-font"
 import * as SplashScreen from "expo-splash-screen"
-import { createStaticNavigation } from "@react-navigation/native"
+import { createStaticNavigation, DarkTheme } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { QueryClient } from "@tanstack/react-query"
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client"
@@ -25,6 +26,42 @@ let Stack = createNativeStackNavigator<RootStackParamList>({
     details: { screen: GameDetails },
   },
 })
+let lightTheme = {
+  colors: {
+    background: colors.zinc[100],
+    border: colors.zinc[200],
+    card: colors.zinc[100],
+    primary: colors.sky[600],
+    text: colors.zinc[800],
+    notification: colors.zinc[800],
+  },
+  fonts: {
+    regular: { fontFamily: "Inter", fontWeight: "500" },
+    medium: { fontFamily: "Inter", fontWeight: "300" },
+    bold: { fontFamily: "Inter", fontWeight: "700" },
+    heavy: { fontFamily: "Inter", fontWeight: "900" },
+  },
+  dark: false,
+} as const
+let darkTheme = {
+  ...DarkTheme,
+  colors: {
+    background: colors.zinc[800],
+    border: colors.zinc[700],
+    card: colors.zinc[700],
+    primary: colors.sky[300],
+    text: colors.zinc[100],
+    notification: colors.zinc[100],
+  },
+  fonts: {
+    regular: { fontFamily: "Inter", fontWeight: "500" },
+    medium: { fontFamily: "Inter", fontWeight: "300" },
+    bold: { fontFamily: "Inter", fontWeight: "700" },
+    heavy: { fontFamily: "Inter", fontWeight: "900" },
+  },
+  dark: true,
+} as const
+
 let Navigator = createStaticNavigation(Stack)
 let queryClient = new QueryClient({
   defaultOptions: {
@@ -36,6 +73,7 @@ let queryClient = new QueryClient({
 SplashScreen.preventAutoHideAsync()
 
 export default function App() {
+  let scheme = useColorScheme()
   let [fontsLoaded, fontError] = useFonts({
     OffBit: require("./assets/fonts/OffBitTrial-Regular.otf"),
     OffBitBold: require("./assets/fonts/OffBitTrial-Bold.otf"),
@@ -60,25 +98,7 @@ export default function App() {
         client={queryClient}
         persistOptions={{ persister }}
       >
-        <Navigator
-          theme={{
-            colors: {
-              background: colors.zinc[100],
-              border: colors.zinc[200],
-              card: colors.zinc[100],
-              primary: colors.emerald[600],
-              text: colors.zinc[800],
-              notification: colors.zinc[800],
-            },
-            fonts: {
-              regular: { fontFamily: "Inter", fontWeight: "500" },
-              medium: { fontFamily: "Inter", fontWeight: "300" },
-              bold: { fontFamily: "Inter", fontWeight: "700" },
-              heavy: { fontFamily: "Inter", fontWeight: "900" },
-            },
-            dark: false,
-          }}
-        />
+        <Navigator theme={scheme === "dark" ? darkTheme : lightTheme} />
       </PersistQueryClientProvider>
     </SafeAreaProvider>
   )
