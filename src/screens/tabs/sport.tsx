@@ -38,7 +38,6 @@ export function SportSchedule({ route }: Props) {
   )
   let [selectedWeek, setSelectedWeek] = useState("")
   let [isRefetching, setIsRefetching] = useState(false)
-  let [isSwiping, setIsSwiping] = useState(false)
 
   let { data: conferences } = useConferences(route.params.sport)
   let { data: events, status: eventsStatus } = useSchedule(
@@ -85,23 +84,15 @@ export function SportSchedule({ route }: Props) {
 
         if (translationX > swipeThreshold && currentIndex > 0) {
           swipeDirection.value = 1
-          setIsSwiping(true)
           setSelectedWeek(events.current_season[currentIndex - 1].id)
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-          setTimeout(() => {
-            setIsSwiping(false)
-          }, 400)
         } else if (
           translationX < -swipeThreshold &&
           currentIndex < events.current_season.length - 1
         ) {
           swipeDirection.value = -1
-          setIsSwiping(true)
           setSelectedWeek(events.current_season[currentIndex + 1].id)
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-          setTimeout(() => {
-            setIsSwiping(false)
-          }, 400)
         }
       }
     })
@@ -158,7 +149,6 @@ export function SportSchedule({ route }: Props) {
                     ?.label
                 }
               </Text>
-              {/*<SymbolView size={14} name="chevron.down" />*/}
             </Pressable>
           </View>
         ),
@@ -236,11 +226,7 @@ export function SportSchedule({ route }: Props) {
                     <View
                       className={`relative flex flex-col gap-2 ${item.status === "in_progress" ? "active" : ""}`}
                     >
-                      <GamePreview
-                        game={item}
-                        sport={route.params.sport}
-                        disabled={isSwiping}
-                      />
+                      <GamePreview game={item} sport={route.params.sport} />
                     </View>
                   </View>
                 )

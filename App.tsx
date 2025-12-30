@@ -1,10 +1,10 @@
 import "./global.css"
 import { useColorScheme } from "react-native"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { createStaticNavigation, DarkTheme } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { QueryClient } from "@tanstack/react-query"
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import colors from "tailwindcss/colors"
 import { persister } from "@/lib/storage"
@@ -22,8 +22,8 @@ let Stack = createNativeStackNavigator<RootStackParamList>({
         title: "Scores",
       },
     },
-    details: { screen: GameDetails },
-    team: { screen: TeamDetail, options: { title: undefined } },
+    details: { screen: GameDetails, options: { title: "" } },
+    team: { screen: TeamDetail, options: { title: "" } },
   },
 })
 let lightTheme = {
