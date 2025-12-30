@@ -6,11 +6,12 @@ import {
   useColorScheme,
   View,
 } from "react-native"
-import { SymbolView } from "expo-symbols"
 import { LegendList } from "@legendapp/list"
 import { TrueSheet } from "@lodev09/react-native-true-sheet"
 import { useNavigation } from "@react-navigation/native"
 import { format, isToday, isTomorrow } from "date-fns"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
+import { runOnJS } from "react-native-reanimated"
 import colors from "tailwindcss/colors"
 import { GamePreview } from "@/components/game-preview"
 import { Text } from "@/components/text"
@@ -49,6 +50,30 @@ export function SportSchedule({ route }: Props) {
   if (selectedWeek === "" && eventsStatus === "success") {
     setSelectedWeek(events?.current_group.id ?? "2025-1")
   }
+
+  const changeScheduleGesture = Gesture.Pan()
+    .onEnd((e) => {
+      const swipeThreshold = 50
+      const { translationX } = e
+
+      if (events?.current_season) {
+        const currentIndex = events.current_season.findIndex(
+          (s) => s.id === selectedWeek,
+        )
+
+        if (translationX > swipeThreshold && currentIndex > 0) {
+          // Swipe right: go to previous week
+          setSelectedWeek(events.current_season[currentIndex - 1].id)
+        } else if (
+          translationX < -swipeThreshold &&
+          currentIndex < events.current_season.length - 1
+        ) {
+          // Swipe left: go to next week
+          setSelectedWeek(events.current_season[currentIndex + 1].id)
+        }
+      }
+    })
+    .runOnJS(true)
 
   useEffect(() => {
     if (selectedWeek) {
@@ -113,152 +138,106 @@ export function SportSchedule({ route }: Props) {
   }, [selectedWeek, selectedConference, isDark])
 
   return (
-    <View className="p-2 px-4 flex-1">
-      {/*{!!conferences?.length && (
-        <LegendList
-          horizontal
-          data={conferences}
-          extraData={selectedConference}
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-                  setSelectedConference(item)
-                }}
-                className={`px-3 py-2 rounded-full border ${selectedConference === item ? "border-emerald-900" : "border-zinc-800"}`}
-              >
-                <Text>{item}</Text>
-              </TouchableOpacity>
-            )
-          }}
-        />
-      )}
-      {events && (
-        <LegendList
-          horizontal
-          estimatedItemSize={52}
-          data={events.current_season}
-          extraData={selectedWeek}
-          ItemSeparatorComponent={() => <View className="w-2" />}
-          keyExtractor={(i) => i.id}
-          showsHorizontalScrollIndicator={false}
-          initialScrollIndex={events?.current_season.findIndex(
-            (s) => s.id === events?.current_group.id,
-          )}
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-                  setSelectedWeek(item.id)
-                }}
-                className={`px-3 py-2 rounded-full border ${selectedWeek === item.id ? "border-emerald-900" : "border-zinc-800"}`}
-              >
-                <Text>{item.label}</Text>
-              </TouchableOpacity>
-            )
-          }}
-        />
-      )}*/}
-      {games && games.length ? (
-        <LegendList
-          data={games}
-          showsVerticalScrollIndicator={false}
-          onRefresh={() => {
-            setIsRefetching(true)
-            refetch()
-            setTimeout(() => setIsRefetching(false), 1500)
-          }}
-          refreshing={isRefetching}
-          keyExtractor={(item) => String(item.id)}
-          ItemSeparatorComponent={() => (
-            <View
-              className="border-zinc-200"
-              style={{ borderBottomWidth: StyleSheet.hairlineWidth }}
-            />
-          )}
-          renderItem={({ index, item }) => {
-            let gameDate = new Date(item.game_date)
-            let currentDateFormatted = gameDate.toLocaleDateString()
-            let displayDate = isToday(gameDate)
-              ? "Today"
-              : isTomorrow(gameDate)
-                ? "Tomorrow"
-                : format(gameDate, "MMMM do")
-            let previousGameDate =
-              index > 0
-                ? new Date(games[index - 1]?.game_date).toLocaleDateString()
-                : null
+    <GestureDetector gesture={changeScheduleGesture}>
+      <View className="p-2 px-4 flex-1">
+        {games && (
+          <LegendList
+            data={games}
+            showsVerticalScrollIndicator={false}
+            onRefresh={() => {
+              setIsRefetching(true)
+              refetch()
+              setTimeout(() => setIsRefetching(false), 1500)
+            }}
+            refreshing={isRefetching}
+            keyExtractor={(item) => `${String(item.id)}-${selectedWeek}`}
+            ItemSeparatorComponent={() => (
+              <View
+                className="border-zinc-200"
+                style={{ borderBottomWidth: StyleSheet.hairlineWidth }}
+              />
+            )}
+            renderItem={({ index, item }) => {
+              let gameDate = new Date(item.game_date)
+              let currentDateFormatted = gameDate.toLocaleDateString()
+              let displayDate = isToday(gameDate)
+                ? "Today"
+                : isTomorrow(gameDate)
+                  ? "Tomorrow"
+                  : format(gameDate, "MMMM do")
+              let previousGameDate =
+                index > 0
+                  ? new Date(games[index - 1]?.game_date).toLocaleDateString()
+                  : null
 
-            return (
-              <View>
-                {(index === 0 || currentDateFormatted !== previousGameDate) && (
-                  <Text className="mt-4 font-bold">{displayDate}</Text>
-                )}
-                <View
-                  className={`relative flex flex-col gap-2 ${item.status === "in_progress" ? "active" : ""}`}
-                >
-                  <GamePreview game={item} sport={route.params.sport} />
+              return (
+                <View>
+                  {(index === 0 ||
+                    currentDateFormatted !== previousGameDate) && (
+                    <Text className="mt-4 font-bold">{displayDate}</Text>
+                  )}
+                  <View
+                    className={`relative flex flex-col gap-2 ${item.status === "in_progress" ? "active" : ""}`}
+                  >
+                    <GamePreview game={item} sport={route.params.sport} />
+                  </View>
                 </View>
-              </View>
-            )
-          }}
-        />
-      ) : (
-        <></>
-      )}
+              )
+            }}
+          />
+        )}
 
-      <TrueSheet scrollable ref={scheduleSheetRef} detents={[0.7]}>
-        <ScrollView className="py-4" nestedScrollEnabled>
-          {events?.current_season.map((event) => (
-            <Pressable
-              key={event.id}
-              className="p-4"
-              hitSlop={5}
-              onPress={() => {
-                setSelectedWeek(event.id)
-                scheduleSheetRef.current?.dismiss()
-              }}
-            >
-              <Text
-                style={
-                  event.id === events.current_group.id && {
-                    color: isDark ? colors.sky[300] : colors.sky[600],
-                  }
-                }
+        <TrueSheet scrollable ref={scheduleSheetRef} detents={[0.7]}>
+          <ScrollView className="py-4" nestedScrollEnabled>
+            {events?.current_season.map((event) => (
+              <Pressable
+                key={event.id}
+                className="p-4"
+                hitSlop={5}
+                onPress={() => {
+                  setSelectedWeek(event.id)
+                  scheduleSheetRef.current?.dismiss()
+                }}
               >
-                {event.label}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-      </TrueSheet>
-      <TrueSheet scrollable ref={conferenceSheetRef} detents={[0.7]}>
-        <ScrollView className="py-4" nestedScrollEnabled>
-          {conferences?.map((conference) => (
-            <Pressable
-              key={conference}
-              className="p-4"
-              hitSlop={5}
-              onPress={() => {
-                setSelectedConference(conference)
-                conferenceSheetRef.current?.dismiss()
-              }}
-            >
-              <Text
-                style={
-                  selectedConference === conference && {
-                    color: isDark ? colors.sky[300] : colors.sky[600],
+                <Text
+                  style={
+                    event.id === events.current_group.id && {
+                      color: isDark ? colors.sky[300] : colors.sky[600],
+                    }
                   }
-                }
+                >
+                  {event.label}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </TrueSheet>
+        <TrueSheet scrollable ref={conferenceSheetRef} detents={[0.7]}>
+          <ScrollView className="py-4" nestedScrollEnabled>
+            {conferences?.map((conference) => (
+              <Pressable
+                key={conference}
+                className="p-4"
+                hitSlop={5}
+                onPress={() => {
+                  setSelectedConference(conference)
+                  conferenceSheetRef.current?.dismiss()
+                }}
               >
-                {conference}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-      </TrueSheet>
-    </View>
+                <Text
+                  style={
+                    selectedConference === conference && {
+                      color: isDark ? colors.sky[300] : colors.sky[600],
+                    }
+                  }
+                >
+                  {conference}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </TrueSheet>
+      </View>
+    </GestureDetector>
   )
 }

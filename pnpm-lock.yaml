@@ -50,9 +50,6 @@ importers:
       expo-constants:
         specifier: ~18.0.12
         version: 18.0.12(expo@54.0.30(@babel/core@7.27.4)(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))
-      expo-font:
-        specifier: ~14.0.10
-        version: 14.0.10(expo@54.0.30(@babel/core@7.27.4)(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       expo-haptics:
         specifier: ~15.0.8
         version: 15.0.8(expo@54.0.30(@babel/core@7.27.4)(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))
@@ -74,9 +71,6 @@ importers:
       expo-updates:
         specifier: ~29.0.15
         version: 29.0.15(expo@54.0.30(@babel/core@7.27.4)(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
-      expo-web-browser:
-        specifier: ~15.0.10
-        version: 15.0.10(expo@54.0.30(@babel/core@7.27.4)(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))
       nativewind:
         specifier: ^4.1.23
         version: 4.1.23(react-native-reanimated@4.1.6(@babel/core@7.27.4)(react-native-worklets@0.7.1(@babel/core@7.27.4)(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native-safe-area-context@5.6.2(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)(tailwindcss@3.4.17)
@@ -1753,12 +1747,6 @@ packages:
     peerDependencies:
       expo: '*'
       react: '*'
-      react-native: '*'
-
-  expo-web-browser@15.0.10:
-    resolution: {integrity: sha512-fvDhW4bhmXAeWFNFiInmsGCK83PAqAcQaFyp/3pE/jbdKmFKoRCWr46uZGIfN4msLK/OODhaQ/+US7GSJNDHJg==}
-    peerDependencies:
-      expo: '*'
       react-native: '*'
 
   expo@54.0.30:
@@ -5420,11 +5408,6 @@ snapshots:
       resolve-from: 5.0.0
     transitivePeerDependencies:
       - supports-color
-
-  expo-web-browser@15.0.10(expo@54.0.30(@babel/core@7.27.4)(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0)):
-    dependencies:
-      expo: 54.0.30(@babel/core@7.27.4)(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
-      react-native: 0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0)
 
   expo@54.0.30(@babel/core@7.27.4)(react-native@0.81.5(@babel/core@7.27.4)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
     dependencies:

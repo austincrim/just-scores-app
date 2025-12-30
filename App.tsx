@@ -1,8 +1,6 @@
 import "./global.css"
-import { useCallback } from "react"
 import { useColorScheme } from "react-native"
-import { useFonts } from "expo-font"
-import * as SplashScreen from "expo-splash-screen"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { createStaticNavigation, DarkTheme } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { QueryClient } from "@tanstack/react-query"
@@ -25,7 +23,7 @@ let Stack = createNativeStackNavigator<RootStackParamList>({
       },
     },
     details: { screen: GameDetails },
-    team: { screen: TeamDetail, options: { title: null } },
+    team: { screen: TeamDetail, options: { title: undefined } },
   },
 })
 let lightTheme = {
@@ -72,36 +70,20 @@ let queryClient = new QueryClient({
     },
   },
 })
-SplashScreen.preventAutoHideAsync()
 
 export default function App() {
   let scheme = useColorScheme()
-  let [fontsLoaded, fontError] = useFonts({
-    OffBit: require("./assets/fonts/OffBitTrial-Regular.otf"),
-    OffBitBold: require("./assets/fonts/OffBitTrial-Bold.otf"),
-  })
-
-  let onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded || fontError) {
-      await SplashScreen.hideAsync()
-    }
-  }, [fontsLoaded, fontError])
-
-  if (!fontsLoaded && !fontError) {
-    return null
-  }
 
   return (
-    <SafeAreaProvider
-      onLayout={onLayoutRootView}
-      style={{ backgroundColor: colors.zinc[100] }}
-    >
-      <PersistQueryClientProvider
-        client={queryClient}
-        persistOptions={{ persister }}
-      >
-        <Navigator theme={scheme === "dark" ? darkTheme : lightTheme} />
-      </PersistQueryClientProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={{ persister }}
+        >
+          <Navigator theme={scheme === "dark" ? darkTheme : lightTheme} />
+        </PersistQueryClientProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   )
 }
