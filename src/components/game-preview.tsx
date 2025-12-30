@@ -8,9 +8,11 @@ import { Text } from "./text"
 export function GamePreview({
   game,
   sport,
+  disabled = false,
 }: {
   game: Game
   sport: "ncaaf" | "ncaab" | "nfl"
+  disabled?: boolean
 }) {
   let navigation = useNavigation()
 
@@ -32,6 +34,7 @@ export function GamePreview({
   return (
     <TouchableOpacity
       className="text-lg active flex flex-row items-center gap-2 py-4"
+      disabled={disabled}
       onPress={() => {
         if (sport !== "nfl" && sport !== "ncaab" && sport !== "ncaaf") {
           throw new Error(`invalid route name: ${sport}`)

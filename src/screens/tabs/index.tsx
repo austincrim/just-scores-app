@@ -110,7 +110,7 @@ export function Tabs() {
       </Navigator>
       <TrueSheet ref={sheetRef} detents={[0.2]} style={{ paddingVertical: 24 }}>
         <Pressable
-          className="flex-row px-2 py-4 gap-1 items-center active:bg-zinc-300"
+          className="flex-row px-2 py-4 gap-1 items-center"
           onPress={() => {
             setSport("nfl")
             sheetRef.current?.dismiss()
@@ -124,7 +124,7 @@ export function Tabs() {
           {sport === "nfl" && <SymbolView size={16} name="checkmark" />}
         </Pressable>
         <Pressable
-          className="flex-row px-2 py-4 gap-1 items-center active:bg-zinc-300"
+          className="flex-row px-2 py-4 gap-1 items-center"
           onPress={() => {
             setSport("ncaaf")
             sheetRef.current?.dismiss()
@@ -135,7 +135,7 @@ export function Tabs() {
           {sport === "ncaaf" && <SymbolView size={16} name="checkmark" />}
         </Pressable>
         <Pressable
-          className="flex-row px-2 py-4 gap-1 items-center active:bg-zinc-300"
+          className="flex-row px-2 py-4 gap-1 items-center"
           onPress={() => {
             setSport("ncaab")
             sheetRef.current?.dismiss()
