@@ -38,6 +38,7 @@ export function SportSchedule({ route }: Props) {
   )
   let [selectedWeek, setSelectedWeek] = useState("")
   let [isRefetching, setIsRefetching] = useState(false)
+  let [isSwiping, setIsSwiping] = useState(false)
 
   let { data: conferences } = useConferences(route.params.sport)
   let { data: events, status: eventsStatus } = useSchedule(
@@ -56,7 +57,6 @@ export function SportSchedule({ route }: Props) {
 
   const swipeDirection = useSharedValue<-1 | 1>(1)
   const animationProgress = useSharedValue(0)
-  const isSwipingRef = useRef(false)
   const prevGamesRef = useRef(games)
 
   if (selectedWeek === "" && eventsStatus === "success") {
@@ -85,22 +85,22 @@ export function SportSchedule({ route }: Props) {
 
         if (translationX > swipeThreshold && currentIndex > 0) {
           swipeDirection.value = 1
-          isSwipingRef.current = true
+          setIsSwiping(true)
           setSelectedWeek(events.current_season[currentIndex - 1].id)
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
           setTimeout(() => {
-            isSwipingRef.current = false
+            setIsSwiping(false)
           }, 400)
         } else if (
           translationX < -swipeThreshold &&
           currentIndex < events.current_season.length - 1
         ) {
           swipeDirection.value = -1
-          isSwipingRef.current = true
+          setIsSwiping(true)
           setSelectedWeek(events.current_season[currentIndex + 1].id)
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
           setTimeout(() => {
-            isSwipingRef.current = false
+            setIsSwiping(false)
           }, 400)
         }
       }
@@ -239,7 +239,7 @@ export function SportSchedule({ route }: Props) {
                       <GamePreview
                         game={item}
                         sport={route.params.sport}
-                        disabled={isSwipingRef.current}
+                        disabled={isSwiping}
                       />
                     </View>
                   </View>
