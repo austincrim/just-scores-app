@@ -1,6 +1,5 @@
 import React, { useState } from "react"
-import { ScrollView, StyleSheet, View } from "react-native"
-import { LegendList } from "@legendapp/list"
+import { FlatList, ScrollView, useColorScheme, View } from "react-native"
 import SegmentedControl from "@react-native-segmented-control/segmented-control"
 import colors from "tailwindcss/colors"
 import { Text } from "@/components/text"
@@ -29,6 +28,8 @@ export function BasketballBoxScore({
   game: Game
 }) {
   let [team, setTeam] = useState<"home" | "away">("home")
+  let isDark = useColorScheme() === "dark"
+
   return (
     <View className="flex gap-4">
       <SegmentedControl
@@ -38,18 +39,17 @@ export function BasketballBoxScore({
           setTeam(e === game.home_team.abbreviation ? "home" : "away")
         }
         tintColor={"#" + game[`${team}_team`].colour_1}
-        backgroundColor={colors.zinc["100"]}
-        fontStyle={{ color: colors.zinc["800"] }}
-        activeFontStyle={{ color: colors.zinc["50"] }}
+        backgroundColor={isDark ? colors.zinc[800] : colors.zinc[100]}
+        fontStyle={{ color: isDark ? colors.zinc[100] : colors.zinc[800] }}
+        activeFontStyle={{ color: colors.zinc[100] }}
       />
       <ScrollView horizontal>
         <View className="flex-1 flex gap-4">
-          <LegendList
+          <FlatList
             data={displayStats}
             keyExtractor={(item) => item.key}
             horizontal
             scrollEnabled={false}
-            estimatedItemSize={28}
             renderItem={({ item, index }) => (
               <Text
                 className="font-semibold"
@@ -59,11 +59,10 @@ export function BasketballBoxScore({
               </Text>
             )}
           />
-          <LegendList
+          <FlatList
             data={boxScore[team]}
             keyExtractor={(item) => String(item.id)}
             ItemSeparatorComponent={() => <View className="h-4" />}
-            estimatedItemSize={48}
             renderItem={({ item }) => (
               <View className="flex flex-row gap-2">
                 <Text style={{ width: 100 }}>

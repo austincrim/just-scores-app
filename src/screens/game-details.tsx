@@ -14,12 +14,9 @@ import {
   BasketballPlayerRecord,
   FootballPlayerRecord,
   Game,
-  NcaaBBEvent,
-  NcaaBBEventStats,
   NcaaFBEvent,
   NFLEvent,
-  BasketballBoxScore as TBasketballBoxScore,
-  FootballBoxScore as TFootballBoxScore,
+  NcaaBBEvent,
 } from "@/types"
 import { RootStackScreenProps } from "./types"
 
@@ -63,14 +60,9 @@ export function GameDetails({ route }: Props) {
       if (!res.ok) {
         throw new Error(await res.text())
       }
-      let game: NcaaBBEvent | NcaaFBEvent | NFLEvent = await res.json()
+      let game = await res.json() as Game
 
-      let statsRes = await fetch(`${API_URL}${game.api_uri}`)
-      if (!statsRes.ok) console.error(await statsRes.text())
-      let stats: NcaaBBEventStats | NcaaFBEvent | NFLEvent =
-        await statsRes.json()
-
-      return { game, stats }
+      return { game }
     },
   })
   let { data: boxScore } = useQuery({
@@ -142,14 +134,14 @@ export function GameDetails({ route }: Props) {
               )}
             </Text>
           )}
-          {gameQuery.game.tv_listings_by_country_code?.us && (
+          {gameQuery.game.tv_listings_by_country_code?.us?.[0] && (
             <TouchableOpacity
               className="text-center"
               onPress={async () => {
                 try {
                   await openURL(
                     channelIds.get(
-                      gameQuery.game.tv_listings_by_country_code.us[0].long_name.toLowerCase(),
+                      gameQuery.game.tv_listings_by_country_code.us![0].long_name.toLowerCase(),
                     )!,
                   )
                 } catch (e) {
@@ -160,7 +152,7 @@ export function GameDetails({ route }: Props) {
               <View className="flex flex-row items-center gap-1">
                 <SymbolView name="tv" size={16} resizeMode="scaleAspectFit" />
                 <Text>
-                  {gameQuery.game.tv_listings_by_country_code.us[0].long_name}
+                  {gameQuery.game.tv_listings_by_country_code.us![0].long_name}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -172,31 +164,38 @@ export function GameDetails({ route }: Props) {
         </View>
       </View>
       <View>
-        {isFootballEvent(gameQuery.game) && (
-          <FootballScore game={gameQuery.game} />
-        )}
-        {isBasketballEvent(gameQuery.game) && (
-          <BasketballScore
-            game={gameQuery.game}
-            stats={gameQuery.stats as NcaaBBEventStats}
-          />
-        )}
-      </View>
+         {isFootballEvent(gameQuery.game) && (
+           <FootballScore game={gameQuery.game} />
+         )}
+         {isBasketballEvent(gameQuery.game) && (
+           <BasketballScore game={gameQuery.game} />
+         )}
+       </View>
       <View className="pb-12">
         {isFootballEvent(gameQuery.game) &&
           boxScore &&
           gameQuery.game.status !== "pre_game" && (
             <FootballBoxScore
-              boxScore={boxScore as TFootballBoxScore}
+              boxScore={
+                boxScore as {
+                  home: FootballPlayerRecord[]
+                  away: FootballPlayerRecord[]
+                }
+              }
               game={gameQuery.game}
             />
-          )}
-        {isBasketballEvent(gameQuery.game) &&
-          boxScore &&
-          gameQuery.game.status !== "pre_game" && (
+            )}
+            {isBasketballEvent(gameQuery.game) &&
+            boxScore &&
+            gameQuery.game.status !== "pre_game" && (
             <View className="mt-8">
               <BasketballBoxScore
-                boxScore={boxScore as TBasketballBoxScore}
+                boxScore={
+                  boxScore as {
+                    home: BasketballPlayerRecord[]
+                    away: BasketballPlayerRecord[]
+                  }
+                }
                 game={gameQuery.game}
               />
             </View>
@@ -216,7 +215,7 @@ function TeamLine({ game, type }: { game: Game; type: "away" | "home" }) {
   let ranking = type === "home" ? game.home_ranking : game.away_ranking
   let hasPossession =
     isFootballEvent(game) &&
-    game.box_score?.team_in_possession?.name === team.name
+    game.box_score?.team_in_possession?.name === team?.name
 
   const sport = game.api_uri.includes("nfl")
     ? "nfl"

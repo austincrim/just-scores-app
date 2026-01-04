@@ -1,14 +1,8 @@
 import React from "react"
-import { Image, Text, View } from "react-native"
-import { NcaaBBEvent, NcaaBBEventStats } from "@/types"
+import { Text, View } from "react-native"
+import { NcaaBBEvent } from "@/types"
 
-export function BasketballScore({
-  game,
-  stats,
-}: {
-  game: NcaaBBEvent
-  stats: NcaaBBEventStats
-}) {
+export function BasketballScore({ game }: { game: NcaaBBEvent }) {
   return (
     <View className="mt-4">
       {game?.box_score?.last_play?.description && (

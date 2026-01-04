@@ -1,6 +1,5 @@
-import { useRef, useState } from "react"
+import { forwardRef, useRef, useState } from "react"
 import { Pressable, useColorScheme, View } from "react-native"
-import { Button, ContextMenu, Host } from "@expo/ui/swift-ui"
 import * as Haptics from "expo-haptics"
 import { SymbolView } from "expo-symbols"
 import { TrueSheet } from "@lodev09/react-native-true-sheet"
@@ -82,6 +81,7 @@ export function Tabs() {
               </View>
             ),
             tabBarButton: (props) => (
+              // @ts-expect-error BottomTabBarButtonProps has incompatible ref type
               <HapticTab
                 {...props}
                 onPress={(e) =>
@@ -104,6 +104,7 @@ export function Tabs() {
                 tintColor={color}
               />
             ),
+            // @ts-expect-error BottomTabBarButtonProps has incompatible ref type
             tabBarButton: (props) => <HapticTab {...props} />,
           }}
         />
@@ -150,17 +151,19 @@ export function Tabs() {
   )
 }
 
-function HapticTab(props: BottomTabBarButtonProps) {
-  return (
-    <Pressable
-      {...props}
-      onPress={(e) => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-        props.onPress?.(e)
-      }}
-      style={props.style}
-    >
-      {props.children}
-    </Pressable>
-  )
-}
+const HapticTab = forwardRef<View, Omit<BottomTabBarButtonProps, "ref">>(
+  (props, ref) => {
+    return (
+      <Pressable
+        ref={ref}
+        onPress={(e) => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+          props.onPress?.(e)
+        }}
+        style={props.style}
+      >
+        {props.children}
+      </Pressable>
+    )
+  },
+)

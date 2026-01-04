@@ -1,10 +1,10 @@
 import React from "react"
 import { Image, View } from "react-native"
-import { BBTeam, FBTeam, Game } from "@/types"
+import { Team, Game } from "@/types"
 import { Text } from "./text"
 
 type Props = {
-  team: BBTeam | FBTeam
+  team: Team
   game: Game
   type: "away" | "home"
 }

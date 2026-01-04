@@ -1,6 +1,11 @@
 import { useState } from "react"
-import { ScrollView, StyleSheet, useColorScheme, View } from "react-native"
-import { LegendList } from "@legendapp/list"
+import {
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  useColorScheme,
+  View,
+} from "react-native"
 import SegmentedControl from "@react-native-segmented-control/segmented-control"
 import colors from "tailwindcss/colors"
 import { Game, type FootballPlayerRecord } from "@/types"
@@ -53,11 +58,11 @@ const statCategories: StatCategory = {
     { key: "punts_touchbacks", display: "TB" },
   ],
   kick_returning: [
-    "kick_returns",
-    "kick_return_yards",
-    "kick_return_touchdowns",
-    "kick_return_yards_long",
-    "kick_return_yards_average",
+    { key: "kick_returns", display: "KR" },
+    { key: "kick_return_yards", display: "YDS" },
+    { key: "kick_return_touchdowns", display: "TDS" },
+    { key: "kick_return_yards_long", display: "LONG" },
+    { key: "kick_return_yards_average", display: "AVG" },
   ],
   punt_returning: [
     { key: "punt_returns", display: "PR" },
@@ -113,61 +118,56 @@ export function FootballBoxScore({
         fontStyle={{ color: isDark ? colors.zinc[100] : colors.zinc["800"] }}
         activeFontStyle={{ color: colors.zinc["100"] }}
       />
-      <LegendList
+      <View className="my-4" />
+      <FlatList
         data={Object.entries(statCategories)}
         keyExtractor={([k, v]) => k}
-        estimatedItemSize={7000}
-        ItemSeparatorComponent={() => <View className="my-4" />}
+        ItemSeparatorComponent={() => <View className="my-2" />}
         renderItem={({ item: [type, stats] }) =>
           playersByPosition[type]?.length > 0 ? (
             <View key={type}>
               <Text style={styles.positionHeader}>
                 {type.replaceAll("_", " ")}
               </Text>
-              <ScrollView horizontal>
-                <View>
-                  <LegendList
-                    horizontal
-                    data={["Name", ...stats]}
-                    estimatedItemSize={99}
-                    renderItem={({ item }) => (
-                      <Text
-                        key={typeof item === "string" ? item : item.key}
-                        style={styles.headerCell}
-                      >
-                        {(typeof item === "string"
-                          ? item
-                          : item.display
-                        ).replaceAll("_", " ")}
-                      </Text>
-                    )}
-                  />
-                  <LegendList
-                    data={playersByPosition[type]}
-                    estimatedItemSize={99}
-                    scrollEnabled={false}
-                    renderItem={({ item, index }) => (
-                      <View
-                        key={item.id}
-                        style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
-                        className="flex flex-row flex-1 items-center"
-                      >
-                        <Text style={styles.cell}>{item.player.full_name}</Text>
-                        {stats.map((stat) => (
-                          <Text
-                            key={typeof stat === "string" ? stat : stat.key}
-                            style={styles.cell}
-                          >
-                            {item[typeof stat === "string" ? stat : stat.key]
-                              ?.toString()
-                              .replaceAll("_", " ")}
-                          </Text>
-                        ))}
-                      </View>
-                    )}
-                  />
-                </View>
-              </ScrollView>
+              <View>
+                <FlatList
+                  horizontal
+                  data={["Name", ...stats]}
+                  renderItem={({ item }) => (
+                    <Text
+                      key={typeof item === "string" ? item : item.key}
+                      style={styles.headerCell}
+                    >
+                      {(typeof item === "string"
+                        ? item
+                        : item.display
+                      ).replaceAll("_", " ")}
+                    </Text>
+                  )}
+                />
+                <FlatList
+                  data={playersByPosition[type]}
+                  renderItem={({ item, index }) => (
+                    <View
+                      key={item.id}
+                      style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
+                      className="flex flex-row flex-1 items-center"
+                    >
+                      <Text style={styles.cell}>{item.player.full_name}</Text>
+                      {stats.map((stat) => (
+                        <Text
+                          key={typeof stat === "string" ? stat : stat.key}
+                          style={styles.cell}
+                        >
+                          {item[typeof stat === "string" ? stat : stat.key]
+                            ?.toString()
+                            .replaceAll("_", " ")}
+                        </Text>
+                      ))}
+                    </View>
+                  )}
+                />
+              </View>
             </View>
           ) : null
         }
@@ -179,19 +179,24 @@ export function FootballBoxScore({
 const styles = StyleSheet.create({
   positionHeader: {
     fontSize: 14,
-    fontWeight: "bold",
     paddingVertical: 10,
     textTransform: "capitalize",
   },
   headerRow: { flexDirection: "row" },
   headerCell: {
     fontWeight: "bold",
-    padding: 10,
+    paddingVertical: 10,
     width: 100,
     flex: 1,
   },
   cell: {
-    padding: 10,
+    paddingVertical: 10,
     width: 100,
+  },
+  evenRow: {
+    backgroundColor: "transparent",
+  },
+  oddRow: {
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
   },
 })

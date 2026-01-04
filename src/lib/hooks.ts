@@ -104,12 +104,17 @@ export function useGames(sport: string, events: Array<number>) {
     },
     queryFn: async () => {
       let games: Game[] = []
-      if (events && events.length) {
-        let gamesRes = await fetch(
-          `${API_URL}/${sport}/events?id.in=${events.join(",")}`,
-        )
+      try {
+        if (events && events.length) {
+          let gamesRes = await fetch(
+            `${API_URL}/${sport}/events?id.in=${events.join(",")}`,
+          )
 
-        games = await gamesRes.json()
+          games = await gamesRes.json()
+        }
+      } catch (e) {
+        console.error(e)
+        return []
       }
       return games
     },
