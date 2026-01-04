@@ -1,6 +1,6 @@
 import React from "react"
 import { Image, View } from "react-native"
-import { Team, Game } from "@/types"
+import { Game, Team } from "@/types"
 import { Text } from "./text"
 
 type Props = {
@@ -24,12 +24,14 @@ function TeamLine({ team, game, type }: Props) {
     <View className="flex flex-row items-center justify-between gap-1">
       <View className="flex flex-row items-center gap-1">
         <Image
-          source={{ uri: team.logos.large }}
+          source={{ uri: team.logos.large ?? team.logos.w72xh72 }}
           className="w-8 h-8"
           accessibilityLabel={`${team.full_name} logo`}
         />
         {ranking && <Text className="text-xs font-bold">{ranking}</Text>}
-        <Text className="text-lg max-w-52">{team.name}</Text>
+        <Text className="text-lg max-w-52">
+          {team.name ?? team.medium_name ?? team.abbreviation}
+        </Text>
       </View>
 
       {renderScore()}

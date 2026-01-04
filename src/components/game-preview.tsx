@@ -27,7 +27,7 @@ export function GamePreview({
       let gameTime = new Date(game.game_date).toLocaleTimeString(undefined, {
         timeStyle: "short",
       })
-      return <Text className="text-lg">{gameTime}</Text>
+      return <Text className="text-lg text-right">{gameTime}</Text>
     }
   }
 

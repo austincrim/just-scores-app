@@ -155,7 +155,7 @@ export function SportSchedule({ route }: Props) {
             keyExtractor={(item) => `${String(item.id)}-${selectedWeek}`}
             ItemSeparatorComponent={() => (
               <View
-                className="border-zinc-200"
+                className="border-zinc-200 dark:border-zinc-700"
                 style={{ borderBottomWidth: StyleSheet.hairlineWidth }}
               />
             )}
@@ -166,7 +166,7 @@ export function SportSchedule({ route }: Props) {
                 ? "Today"
                 : isTomorrow(gameDate)
                   ? "Tomorrow"
-                  : format(gameDate, "MMMM do")
+                  : format(gameDate, "E · MMMM do")
               let previousGameDate =
                 index > 0
                   ? new Date(games[index - 1]?.game_date).toLocaleDateString()

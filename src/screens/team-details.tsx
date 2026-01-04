@@ -1,22 +1,31 @@
-import React, { useEffect } from "react"
+import React from "react"
 import {
   Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native"
+import * as Haptics from "expo-haptics"
+import { SymbolView } from "expo-symbols"
 import { useNavigation } from "@react-navigation/native"
+import { useMMKVObject } from "react-native-mmkv"
 import colors from "tailwindcss/colors"
 import { Text } from "@/components/text"
 import { useTeamSchedule, useTeamStanding } from "@/lib/hooks"
-import { Game } from "@/types"
+import { FAVORITES_KEY, storage } from "@/lib/storage"
+import { Game, Team } from "@/types"
 import { RootStackScreenProps } from "./types"
 
 type Props = RootStackScreenProps<"team">
 
 export function TeamDetail({ route }: Props) {
   let navigation = useNavigation()
+  let [favoriteTeams, setFavoriteTeams] = useMMKVObject<Team[]>(
+    FAVORITES_KEY,
+    storage,
+  ) ?? [[], () => {}]
   let {
     data: games,
     status,
@@ -25,6 +34,10 @@ export function TeamDetail({ route }: Props) {
   let { data: standing } = useTeamStanding(
     route.params.sport,
     route.params.teamId,
+  )
+
+  const isFavorite = (favoriteTeams ?? []).some(
+    (t) => t.id === route.params.teamId,
   )
 
   // Filter, sort games, and calculate conference record
@@ -100,6 +113,15 @@ export function TeamDetail({ route }: Props) {
       ? firstGame.home_team
       : firstGame.away_team
 
+  const handleFavoriteToggle = () => {
+    const current = favoriteTeams ?? []
+    if (isFavorite) {
+      setFavoriteTeams(current.filter((t) => t.id !== route.params.teamId))
+    } else {
+      setFavoriteTeams([...current, team])
+    }
+  }
+
   return (
     <ScrollView className="flex-1 px-4 py-4">
       <View className="items-center gap-3 mb-6">
@@ -108,7 +130,21 @@ export function TeamDetail({ route }: Props) {
           className="w-24 h-24"
           accessibilityLabel={`${team.name} logo`}
         />
-        <Text className="text-2xl font-bold">{team.full_name}</Text>
+        <View className="flex-row items-center gap-2">
+          <Text className="text-2xl font-bold">{team.full_name}</Text>
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+              handleFavoriteToggle()
+            }}
+          >
+            <SymbolView
+              name={isFavorite ? "star.fill" : "star"}
+              size={24}
+              tintColor={isFavorite ? colors.yellow[400] : colors.zinc[400]}
+            />
+          </Pressable>
+        </View>
         {standing && (
           <View className="items-center">
             <Text className="text-xl">

@@ -581,6 +581,19 @@ export type TvListingsByCountryCode = {
 }
 
 // ============================================================================
+// MULTISPORT TYPES
+// ============================================================================
+
+export type MultisportLeagueData = {
+  league: League
+  events: Game[]
+}
+
+export type MultisportResponse = {
+  [leagueSlug: string]: MultisportLeagueData
+}
+
+// ============================================================================
 // UNION TYPES
 // ============================================================================
 

@@ -12,6 +12,19 @@ Returns current season info with weeks/groups and all season types (preseason, r
 
 ## Events (Games)
 
+### GET `/multisport/events`
+Fetches events across multiple sports in a single request.
+- **Params**:
+  - `leagues` (required, comma-separated: `nfl,nba,nhl,mlb,epl,ncaaf,ncaab`, etc.)
+  - `game_date.in` (required, comma-separated ISO timestamps for date range)
+  - `team_id` (optional, filter by team ID - single or comma-separated)
+  - `limit` (optional, results per league)
+  - `status` (optional, filter by status: `pre_game`, `in_progress`, `final`)
+  - `sort` (optional)
+  - `rpp` (optional, results per page)
+- **Response**: Object with league keys containing `league` metadata and `events` array
+- **Note**: Requires at least 2 dates in `game_date.in`
+
 ### GET `/{sport}/events/{eventId}`
 Fetches detailed info for a single event.
 - **Response**: Full event object with teams, scores, box_score, tv_listings, etc.

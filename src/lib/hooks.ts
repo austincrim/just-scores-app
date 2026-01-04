@@ -195,3 +195,58 @@ export function useTeamStanding(
     },
   })
 }
+
+export function useFavoritesGames(teamIds: number[]) {
+  return useQuery({
+    queryKey: ["multisport", "favorites", teamIds],
+    refetchInterval: 5000,
+    enabled: teamIds.length > 0,
+    queryFn: async () => {
+      if (!teamIds.length) return { games: [] as Game[], teamIds: [] }
+
+      const now = new Date()
+      const startDate = new Date(now)
+      const endDate = new Date(now)
+      endDate.setUTCDate(endDate.getUTCDate() + 7)
+
+      const startDateStr = startDate.toISOString().split("T")[0]
+      const endDateStr = endDate.toISOString().split("T")[0]
+      const dateParam = `${startDateStr},${endDateStr}`
+
+      try {
+        let res = await fetch(
+          `${API_URL}/multisport/events?leagues=nfl,ncaaf,ncaab&game_date.in=${dateParam}`,
+        )
+        if (!res.ok) {
+          console.error(await res.text())
+          return { games: [] as Game[], teamIds }
+        }
+
+        let data = (await res.json()) as Record<string, { events: Game[] }>
+        let allGames: Game[] = []
+        Object.values(data).forEach((league) => {
+          if (league.events) {
+            allGames.push(...league.events)
+          }
+        })
+
+        // Filter to only games where a favorite team is playing
+        const filteredGames = allGames.filter(
+          (game) =>
+            teamIds.includes(game.home_team?.id) ||
+            teamIds.includes(game.away_team?.id),
+        )
+
+        filteredGames.sort(
+          (a, b) =>
+            new Date(a.game_date).valueOf() - new Date(b.game_date).valueOf(),
+        )
+
+        return { games: filteredGames, teamIds }
+      } catch (e) {
+        console.error(e)
+        return { games: [] as Game[], teamIds }
+      }
+    },
+  })
+}
