@@ -118,32 +118,36 @@ export type Player = {
 }
 
 export type Team = {
-  abbreviation: string
-  api_uri: string
-  colour_1: string
-  colour_2: string
-  conference: string
-  division: string
-  full_name: string
-  has_extra_info: boolean
-  has_injuries: boolean
-  has_rosters: boolean
-  id: number
-  location: string
-  logos: Logos
-  medium_name: string
-  name: string
-  resource_uri: string
-  rss_url?: string
-  search_name: string
-  short_name: string
-  standing?: Standing
-  sub_division?: string | null
-  subscribable_alert_text?: string
-  subscribable_alerts: SubscribableAlert[]
-  subscription_count: number
-  updated_at: string
-  payroll_url?: string
+   abbreviation: string
+   api_uri: string
+   colour_1: string
+   colour_2: string
+   conference: string
+   division: string
+   full_name: string
+   has_extra_info: boolean
+   has_injuries: boolean
+   has_rosters: boolean
+   id: number
+   location: string
+   logos: Logos
+   medium_name: string
+   name: string
+   resource_uri: string
+   rss_url?: string
+   search_name: string
+   short_name: string
+   standing?: Standing
+   sub_division?: string | null
+   subscribable_alert_text?: string
+   subscribable_alerts: SubscribableAlert[]
+   subscription_count: number
+   updated_at: string
+   payroll_url?: string
+}
+
+export type FavoriteTeam = Team & {
+   sport: "nfl" | "ncaab" | "ncaaf"
 }
 
 // ============================================================================

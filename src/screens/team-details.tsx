@@ -15,14 +15,14 @@ import colors from "tailwindcss/colors"
 import { Text } from "@/components/text"
 import { useTeamSchedule, useTeamStanding } from "@/lib/hooks"
 import { FAVORITES_KEY, storage } from "@/lib/storage"
-import { Game, Team } from "@/types"
+import { FavoriteTeam, Game, Team } from "@/types"
 import { RootStackScreenProps } from "./types"
 
 type Props = RootStackScreenProps<"team">
 
 export function TeamDetail({ route }: Props) {
   let navigation = useNavigation()
-  let [favoriteTeams, setFavoriteTeams] = useMMKVObject<Team[]>(
+  let [favoriteTeams, setFavoriteTeams] = useMMKVObject<FavoriteTeam[]>(
     FAVORITES_KEY,
     storage,
   ) ?? [[], () => {}]
@@ -118,7 +118,7 @@ export function TeamDetail({ route }: Props) {
     if (isFavorite) {
       setFavoriteTeams(current.filter((t) => t.id !== route.params.teamId))
     } else {
-      setFavoriteTeams([...current, team])
+      setFavoriteTeams([...current, { ...team, sport: route.params.sport }])
     }
   }
 
@@ -226,8 +226,13 @@ function GameRow({
         <View className="flex-1">
           <Text className="text-sm">{gameDateStr}</Text>
           <View className="flex-row items-center gap-2 mt-1">
-            <Image source={{ uri: opponent.logos.small }} className="w-8 h-8" />
-            <Text className="flex-1">{opponent.name}</Text>
+            <Text className="text-xs text-zinc-400 mr-1">
+              {isTeamHome ? "vs" : "@"}
+            </Text>
+            <View className="flex-row items-center gap-1">
+              <Image source={{ uri: opponent.logos.small }} className="w-8 h-8" />
+              <Text className="flex-1">{opponent.name}</Text>
+            </View>
           </View>
         </View>
         {isCompleted ? (

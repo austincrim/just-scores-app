@@ -48,12 +48,16 @@ export function GamePreview({
       {game.status === "in_progress" && (
         <View className="w-3 h-3 rounded-full bg-emerald-500" />
       )}
-      <View className="flex flex-row gap-2 items-center flex-shrink">
+      <View className="flex flex-row gap-2 items-start flex-shrink">
         <View className="flex flex-col flex-1 gap-1">
-          <TeamLine team={game.away_team} type="away" game={game} />
+          <TeamLine
+            team={game.away_team}
+            type="away"
+            game={game}
+            renderStatus={renderGameStatus}
+          />
           <TeamLine team={game.home_team} type="home" game={game} />
         </View>
-        <View style={{ minWidth: 80 }}>{renderGameStatus()}</View>
       </View>
     </TouchableOpacity>
   )

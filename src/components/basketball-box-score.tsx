@@ -6,18 +6,20 @@ import { Text } from "@/components/text"
 import { BasketballPlayerRecord, Game } from "@/types"
 
 const displayStats = [
+  // spacing placeholder
+  { key: "spacer", display: "" },
   { key: "minutes", display: "MIN" },
   { key: "points", display: "PTS" },
   { key: "rebounds_total", display: "REB" },
   { key: "assists", display: "AST" },
   { key: "steals", display: "STL" },
   { key: "blocked_shots", display: "BLK" },
-  { key: "field_goals_attempted", display: "FGA" },
   { key: "field_goals_made", display: "FGM" },
-  { key: "three_point_field_goals_attempted", display: "3PA" },
+  { key: "field_goals_attempted", display: "FGA" },
   { key: "three_point_field_goals_made", display: "3PM" },
-  { key: "free_throws_attempted", display: "FTA" },
+  { key: "three_point_field_goals_attempted", display: "3PA" },
   { key: "free_throws_made", display: "FTM" },
+  { key: "free_throws_attempted", display: "FTA" },
 ] as const
 
 export function BasketballBoxScore({
@@ -31,7 +33,7 @@ export function BasketballBoxScore({
   let isDark = useColorScheme() === "dark"
 
   return (
-    <View className="flex gap-4">
+    <View className="flex gap-8">
       <SegmentedControl
         values={[game.home_team.abbreviation, game.away_team.abbreviation]}
         selectedIndex={0}
@@ -43,7 +45,7 @@ export function BasketballBoxScore({
         fontStyle={{ color: isDark ? colors.zinc[100] : colors.zinc[800] }}
         activeFontStyle={{ color: colors.zinc[100] }}
       />
-      <ScrollView horizontal>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View className="flex-1 flex gap-4">
           <FlatList
             data={displayStats}
@@ -51,30 +53,32 @@ export function BasketballBoxScore({
             horizontal
             scrollEnabled={false}
             renderItem={({ item, index }) => (
-              <Text
-                className="font-semibold"
-                style={{ width: 48, marginLeft: index === 0 ? 120 : 0 }}
-              >
-                {item.display}
-              </Text>
+              <View style={{ width: index === 0 ? 100 : 40 }}>
+                <Text className="font-semibold text-center">
+                  {item.display}
+                </Text>
+              </View>
             )}
           />
           <FlatList
+            scrollEnabled={false}
             data={boxScore[team]}
             keyExtractor={(item) => String(item.id)}
-            ItemSeparatorComponent={() => <View className="h-4" />}
+            ItemSeparatorComponent={() => <View className="h-6" />}
             renderItem={({ item }) => (
-              <View className="flex flex-row gap-2">
-                <Text style={{ width: 100 }}>
-                  {item.player.first_initial_and_last_name}
-                </Text>
-                {displayStats.map((stat) => (
-                  <Text
-                    key={`${item.id}-${stat.key}`}
-                    style={{ width: 40, textAlign: "right" }}
-                  >
-                    {item[stat.key]}
-                  </Text>
+              <View className="flex flex-row">
+                <View style={{ width: 100 }}>
+                  <Text>{item.player.first_initial_and_last_name}</Text>
+                </View>
+                {displayStats.slice(1).map((stat) => (
+                  <View style={{ width: 40 }}>
+                    <Text
+                      className="text-center"
+                      key={`${item.id}-${stat.key}`}
+                    >
+                      {stat.key === "spacer" ? null : item[stat.key]}
+                    </Text>
+                  </View>
                 ))}
               </View>
             )}

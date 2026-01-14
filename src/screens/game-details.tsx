@@ -8,15 +8,16 @@ import { BasketballBoxScore } from "@/components/basketball-box-score"
 import { BasketballScore } from "@/components/basketball-score"
 import { FootballBoxScore } from "@/components/football-box-score"
 import { FootballScore } from "@/components/football-score"
+import { GameDetailsSkeleton } from "@/components/game-details-skeleton"
 import { Text } from "@/components/text"
 import { API_URL } from "@/lib/hooks"
 import {
   BasketballPlayerRecord,
   FootballPlayerRecord,
   Game,
+  NcaaBBEvent,
   NcaaFBEvent,
   NFLEvent,
-  NcaaBBEvent,
 } from "@/types"
 import { RootStackScreenProps } from "./types"
 
@@ -60,7 +61,7 @@ export function GameDetails({ route }: Props) {
       if (!res.ok) {
         throw new Error(await res.text())
       }
-      let game = await res.json() as Game
+      let game = (await res.json()) as Game
 
       return { game }
     },
@@ -107,7 +108,7 @@ export function GameDetails({ route }: Props) {
   }, [gameQuery?.game])
 
   if (status === "pending") {
-    return <Text>loading...</Text>
+    return <GameDetailsSkeleton />
   }
 
   if (status === "error") {
@@ -164,13 +165,13 @@ export function GameDetails({ route }: Props) {
         </View>
       </View>
       <View>
-         {isFootballEvent(gameQuery.game) && (
-           <FootballScore game={gameQuery.game} />
-         )}
-         {isBasketballEvent(gameQuery.game) && (
-           <BasketballScore game={gameQuery.game} />
-         )}
-       </View>
+        {isFootballEvent(gameQuery.game) && (
+          <FootballScore game={gameQuery.game} />
+        )}
+        {isBasketballEvent(gameQuery.game) && (
+          <BasketballScore game={gameQuery.game} />
+        )}
+      </View>
       <View className="pb-12">
         {isFootballEvent(gameQuery.game) &&
           boxScore &&
@@ -184,10 +185,10 @@ export function GameDetails({ route }: Props) {
               }
               game={gameQuery.game}
             />
-            )}
-            {isBasketballEvent(gameQuery.game) &&
-            boxScore &&
-            gameQuery.game.status !== "pre_game" && (
+          )}
+        {isBasketballEvent(gameQuery.game) &&
+          boxScore &&
+          gameQuery.game.status !== "pre_game" && (
             <View className="mt-8">
               <BasketballBoxScore
                 boxScore={

@@ -11,6 +11,9 @@ import colors from "tailwindcss/colors"
 import { Game, type FootballPlayerRecord } from "@/types"
 import { Text } from "./text"
 
+const CELL_WIDTH = 60
+const NAME_WIDTH = 100
+
 type StatCategory = {
   [key: string]: Array<
     | keyof FootballPlayerRecord
@@ -121,53 +124,64 @@ export function FootballBoxScore({
       <View className="my-4" />
       <FlatList
         data={Object.entries(statCategories)}
-        keyExtractor={([k, v]) => k}
-        ItemSeparatorComponent={() => <View className="my-2" />}
+        keyExtractor={([k]) => k}
+        ItemSeparatorComponent={() => <View className="my-4" />}
+        scrollEnabled={false}
         renderItem={({ item: [type, stats] }) =>
           playersByPosition[type]?.length > 0 ? (
             <View key={type}>
               <Text style={styles.positionHeader}>
                 {type.replaceAll("_", " ")}
               </Text>
-              <View>
-                <FlatList
-                  horizontal
-                  data={["Name", ...stats]}
-                  renderItem={({ item }) => (
-                    <Text
-                      key={typeof item === "string" ? item : item.key}
-                      style={styles.headerCell}
-                    >
-                      {(typeof item === "string"
-                        ? item
-                        : item.display
-                      ).replaceAll("_", " ")}
-                    </Text>
-                  )}
-                />
-                <FlatList
-                  data={playersByPosition[type]}
-                  renderItem={({ item, index }) => (
-                    <View
-                      key={item.id}
-                      style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
-                      className="flex flex-row flex-1 items-center"
-                    >
-                      <Text style={styles.cell}>{item.player.full_name}</Text>
-                      {stats.map((stat) => (
-                        <Text
-                          key={typeof stat === "string" ? stat : stat.key}
-                          style={styles.cell}
-                        >
-                          {item[typeof stat === "string" ? stat : stat.key]
-                            ?.toString()
-                            .replaceAll("_", " ")}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View>
+                  {/* Header row */}
+                  <View className="flex flex-row border-b border-zinc-600">
+                    <View style={{ width: NAME_WIDTH }}>
+                      <Text style={styles.nameHeaderCell}>Name</Text>
+                    </View>
+                    {stats.map((stat) => (
+                      <View
+                        key={typeof stat === "string" ? stat : stat.key}
+                        style={{ width: CELL_WIDTH }}
+                      >
+                        <Text style={styles.headerCell}>
+                          {(typeof stat === "string"
+                            ? stat
+                            : stat.display
+                          ).replaceAll("_", " ")}
                         </Text>
+                      </View>
+                    ))}
+                  </View>
+                  {/* Data rows */}
+                  {playersByPosition[type].map((player, index) => (
+                    <View
+                      key={player.id}
+                      style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
+                      className="flex flex-row items-center"
+                    >
+                      <View style={{ width: NAME_WIDTH }}>
+                        <Text style={styles.nameCell}>
+                          {player.player.first_initial_and_last_name}
+                        </Text>
+                      </View>
+                      {stats.map((stat) => (
+                        <View
+                          key={typeof stat === "string" ? stat : stat.key}
+                          style={{ width: CELL_WIDTH }}
+                        >
+                          <Text style={styles.cell}>
+                            {player[typeof stat === "string" ? stat : stat.key]
+                              ?.toString()
+                              .replaceAll("_", " ") ?? "-"}
+                          </Text>
+                        </View>
                       ))}
                     </View>
-                  )}
-                />
-              </View>
+                  ))}
+                </View>
+              </ScrollView>
             </View>
           ) : null
         }
@@ -178,20 +192,36 @@ export function FootballBoxScore({
 
 const styles = StyleSheet.create({
   positionHeader: {
-    fontSize: 14,
-    paddingVertical: 10,
+    fontSize: 16,
+    fontWeight: "600",
+    paddingVertical: 8,
     textTransform: "capitalize",
   },
-  headerRow: { flexDirection: "row" },
+  nameHeaderCell: {
+    fontWeight: "bold",
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+    fontSize: 12,
+    textAlign: "left",
+  },
+  nameCell: {
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+    fontSize: 12,
+    textAlign: "left",
+  },
   headerCell: {
     fontWeight: "bold",
-    paddingVertical: 10,
-    width: 100,
-    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    fontSize: 12,
+    textAlign: "center",
   },
   cell: {
-    paddingVertical: 10,
-    width: 100,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    fontSize: 12,
+    textAlign: "center",
   },
   evenRow: {
     backgroundColor: "transparent",

@@ -6,14 +6,14 @@ import { GamePreview } from "@/components/game-preview"
 import { Text } from "@/components/text"
 import { useFavoritesGames } from "@/lib/hooks"
 import { FAVORITES_KEY, storage } from "@/lib/storage"
-import { Game, NcaaBBEvent, NcaaFBEvent, NFLEvent, Team } from "@/types"
+import { FavoriteTeam, Game } from "@/types"
 import { TabScreenProps } from "../types"
 
 type Props = TabScreenProps<"favorites">
 
 export function Favorites({}: Props) {
   let navigation = useNavigation()
-  let [favoriteTeams] = useMMKVObject<Team[]>(FAVORITES_KEY, storage) ?? [[]]
+  let [favoriteTeams] = useMMKVObject<FavoriteTeam[]>(FAVORITES_KEY, storage) ?? [[]]
 
   let { data: favoritesData } = useFavoritesGames(
     favoriteTeams?.map((t) => t.id) ?? [],
@@ -45,7 +45,7 @@ export function Favorites({}: Props) {
               onPress={() =>
                 navigation.navigate("team", {
                   teamId: team.id,
-                  sport: "nfl",
+                  sport: team.sport,
                   teamName: team.name,
                 })
               }
