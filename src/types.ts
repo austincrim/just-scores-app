@@ -598,6 +598,23 @@ export type MultisportResponse = {
 }
 
 // ============================================================================
+// META TYPES
+// ============================================================================
+
+export type LiveConference = {
+  conference: string
+  in_progress_event_count: number
+}
+
+export type LiveLeague = {
+  league: string
+  in_progress_event_count: number
+  conferences: LiveConference[]
+}
+
+export type LiveLeaguesResponse = LiveLeague[]
+
+// ============================================================================
 // UNION TYPES
 // ============================================================================
 

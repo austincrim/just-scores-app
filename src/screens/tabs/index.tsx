@@ -10,6 +10,7 @@ import {
 import { useNavigationState } from "@react-navigation/native"
 import colors from "tailwindcss/colors"
 import { Text } from "@/components/text"
+import { useLiveLeagues } from "@/lib/hooks"
 import { TabsParamList } from "../types"
 import { Favorites } from "./favorites"
 import { SportSchedule } from "./sport"
@@ -30,6 +31,8 @@ export function Tabs() {
 
     return route.name
   })
+
+  let { data: liveCounts } = useLiveLeagues()
 
   let title =
     sport === "ncaaf"
@@ -111,43 +114,66 @@ export function Tabs() {
       </Navigator>
       <TrueSheet ref={sheetRef} detents={[0.2]} style={{ paddingVertical: 24 }}>
         <Pressable
-          className="flex-row px-2 py-4 gap-1 items-center"
+          className="flex-row px-4 py-4 items-center justify-between"
           onPress={() => {
             setSport("nfl")
             sheetRef.current?.dismiss()
           }}
         >
-          <SymbolView
-            tintColor={iconColor}
-            name="american.football.professional"
-          />
-          <Text className={`text-xl`}>NFL</Text>
-          {sport === "nfl" && <SymbolView size={16} name="checkmark" />}
+          <View className="flex-row items-center gap-1">
+            <SymbolView
+              tintColor={iconColor}
+              name="american.football.professional"
+            />
+            <Text className="text-xl">NFL</Text>
+            {sport === "nfl" && <SymbolView size={16} name="checkmark" />}
+          </View>
+          <LiveBadge count={liveCounts?.nfl ?? 0} iconColor={iconColor} />
         </Pressable>
         <Pressable
-          className="flex-row px-2 py-4 gap-1 items-center"
+          className="flex-row px-4 py-4 items-center justify-between"
           onPress={() => {
             setSport("ncaaf")
             sheetRef.current?.dismiss()
           }}
         >
-          <SymbolView tintColor={iconColor} name="football" />
-          <Text className={`text-xl`}>NCAA Football</Text>
-          {sport === "ncaaf" && <SymbolView size={16} name="checkmark" />}
+          <View className="flex-row items-center gap-1">
+            <SymbolView tintColor={iconColor} name="football" />
+            <Text className="text-xl">NCAA Football</Text>
+            {sport === "ncaaf" && <SymbolView size={16} name="checkmark" />}
+          </View>
+          <LiveBadge count={liveCounts?.ncaaf ?? 0} iconColor={iconColor} />
         </Pressable>
         <Pressable
-          className="flex-row px-2 py-4 gap-1 items-center"
+          className="flex-row px-4 py-4 items-center justify-between"
           onPress={() => {
             setSport("ncaab")
             sheetRef.current?.dismiss()
           }}
         >
-          <SymbolView tintColor={iconColor} name="basketball" />
-          <Text className={`text-xl`}>NCAA Basketball</Text>
-          {sport === "ncaab" && <SymbolView size={16} name="checkmark" />}
+          <View className="flex-row items-center gap-1">
+            <SymbolView tintColor={iconColor} name="basketball" />
+            <Text className="text-xl">NCAA Basketball</Text>
+            {sport === "ncaab" && <SymbolView size={16} name="checkmark" />}
+          </View>
+          <LiveBadge count={liveCounts?.ncaab ?? 0} iconColor={iconColor} />
         </Pressable>
       </TrueSheet>
     </>
+  )
+}
+
+function LiveBadge({ count, iconColor }: { count: number; iconColor: string }) {
+  if (!count) return null
+  return (
+    <View className="flex-row items-center gap-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg px-2.5 py-1">
+      <SymbolView
+        name="dot.radiowaves.left.and.right"
+        size={14}
+        tintColor={iconColor}
+      />
+      <Text className="text-sm font-medium">{count} live</Text>
+    </View>
   )
 }
 

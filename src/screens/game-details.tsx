@@ -24,20 +24,20 @@ import { RootStackScreenProps } from "./types"
 // box score api https://api.thescore.com/ncaaf/box_scores/game_id/player_records
 
 const channelIds = new Map([
-  ["espn", "youtubetv://GWQUdCwWPJU"],
-  ["espn2", "youtubetv://58wFNK6wHiE"],
-  ["espnu", "youtubetv://qOY_wLN3Cws"],
-  ["fox", "youtubetv://Zb93jUWQ02I"],
-  ["btn", "youtubetv://dK6q3BY5Cho"],
-  ["fox sports 1", "youtubetv://_Cg4OXROht0"],
-  ["fox sports 2", "youtubetv://dOebiFJpesk"],
-  ["abc", "youtubetv://oq8VLH9APU4"],
-  ["cbs", "youtubetv://H8IaNgT3Ppg"],
-  ["nfl network", "youtubetv://ZpAfRye3sBw"],
-  ["sec network", "youtubetv://8_6sI1qMNEo"],
-  ["acc network", "youtubetv://vPQQzD4ZBec"],
-  ["cbs sports network", "youtubetv://2rzCpZXNzBw"],
-  ["the cw", "youtubetv://sn3_WG30_vA"],
+  ["espn", "https://tv.youtube.com/watch/GWQUdCwWPJU"],
+  ["espn2", "https://tv.youtube.com/watch/58wFNK6wHiE"],
+  ["espnu", "https://tv.youtube.com/watch/qOY_wLN3Cws"],
+  ["fox", "https://tv.youtube.com/watch/Zb93jUWQ02I"],
+  ["btn", "https://tv.youtube.com/watch/dK6q3BY5Cho"],
+  ["fox sports 1", "https://tv.youtube.com/watch/_Cg4OXROht0"],
+  ["fox sports 2", "https://tv.youtube.com/watch/dOebiFJpesk"],
+  ["abc", "https://tv.youtube.com/watch/oq8VLH9APU4"],
+  ["cbs", "https://tv.youtube.com/watch/H8IaNgT3Ppg"],
+  ["nfl network", "https://tv.youtube.com/watch/ZpAfRye3sBw"],
+  ["sec network", "https://tv.youtube.com/watch/8_6sI1qMNEo"],
+  ["acc network", "https://tv.youtube.com/watch/vPQQzD4ZBec"],
+  ["cbs sports network", "https://tv.youtube.com/watch/2rzCpZXNzBw"],
+  ["the cw", "https://tv.youtube.com/watch/sn3_WG30_vA"],
   ["espn+", "https://espn.com/watch"],
   ["peacock", "peacock://"],
 ])
@@ -96,6 +96,49 @@ export function GameDetails({ route }: Props) {
       })
 
       return { home: homeTeam, away: awayTeam }
+    },
+  })
+
+  let { data: standings } = useQuery({
+    queryKey: [
+      "standings",
+      route.params.sport,
+      gameQuery?.game.home_team.id,
+      gameQuery?.game.away_team.id,
+    ],
+    enabled: gameQuery?.game.status === "pre_game",
+    queryFn: async () => {
+      type TeamStanding = {
+        short_record: string
+        short_home_record?: string
+        short_away_record?: string
+      }
+      let [homeRes, awayRes] = await Promise.all([
+        fetch(
+          `${API_URL}/${route.params.sport}/teams/${gameQuery?.game.home_team.id}`,
+        ),
+        fetch(
+          `${API_URL}/${route.params.sport}/teams/${gameQuery?.game.away_team.id}`,
+        ),
+      ])
+      let home: { standing?: TeamStanding } | null = homeRes.ok
+        ? await homeRes.json()
+        : null
+      let away: { standing?: TeamStanding } | null = awayRes.ok
+        ? await awayRes.json()
+        : null
+      return {
+        home: {
+          record: home?.standing?.short_record ?? null,
+          homeRecord: home?.standing?.short_home_record ?? null,
+          awayRecord: home?.standing?.short_away_record ?? null,
+        },
+        away: {
+          record: away?.standing?.short_record ?? null,
+          homeRecord: away?.standing?.short_home_record ?? null,
+          awayRecord: away?.standing?.short_away_record ?? null,
+        },
+      }
     },
   })
 
@@ -160,9 +203,80 @@ export function GameDetails({ route }: Props) {
           )}
         </View>
         <View className="flex flex-col w-full gap-2">
-          <TeamLine game={gameQuery.game} type="away" />
-          <TeamLine game={gameQuery.game} type="home" />
+          <TeamLine
+            game={gameQuery.game}
+            type="away"
+            record={standings?.away?.record ?? undefined}
+          />
+          <TeamLine
+            game={gameQuery.game}
+            type="home"
+            record={standings?.home?.record ?? undefined}
+          />
         </View>
+        {gameQuery.game.status === "pre_game" && (
+          <View className="w-full mt-6 gap-4">
+            {(gameQuery.game.odd?.line || gameQuery.game.odd?.over_under) && (
+              <View className="flex-row mx-auto items-center gap-16 pb-4 border-b dark:border-zinc-700 border-zinc-300">
+                {gameQuery.game.odd?.line && (
+                  <View className="items-center">
+                    <Text className="text-zinc-500 text-sm">Spread</Text>
+                    <Text className="text-lg font-semibold">
+                      {gameQuery.game.odd.line}
+                    </Text>
+                  </View>
+                )}
+                {gameQuery.game.odd?.over_under && (
+                  <View className="items-center">
+                    <Text className="text-zinc-500 text-sm">O/U</Text>
+                    <Text className="text-lg font-semibold">
+                      {gameQuery.game.odd.over_under}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
+            {(standings?.away?.awayRecord || standings?.home?.homeRecord) && (
+              <View className="flex-row mx-auto gap-16">
+                {standings?.away?.awayRecord && (
+                  <View className="items-center">
+                    <Text className="text-zinc-500 text-sm">
+                      {gameQuery.game.away_team.abbreviation} Away
+                    </Text>
+                    <Text className="text-lg font-semibold">
+                      {standings.away.awayRecord}
+                    </Text>
+                  </View>
+                )}
+                {standings?.home?.homeRecord && (
+                  <View className="items-center">
+                    <Text className="text-zinc-500 text-sm">
+                      {gameQuery.game.home_team.abbreviation} Home
+                    </Text>
+                    <Text className="text-lg font-semibold">
+                      {standings.home.homeRecord}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
+            {(("stadium" in gameQuery.game && gameQuery.game.stadium) ||
+              gameQuery.game.location) && (
+              <View className="items-center border-t border-zinc-300 dark:border-zinc-700 pt-4">
+                <Text className="text-center font-semibold">
+                  {"stadium" in gameQuery.game && gameQuery.game.stadium
+                    ? `${gameQuery.game.stadium}`
+                    : gameQuery.game.location}
+                </Text>
+                {"stadium" in gameQuery.game && gameQuery.game.location && (
+                  <Text className="text-zinc-500 text-sm">
+                    {gameQuery.game.location}
+                  </Text>
+                )}
+              </View>
+            )}
+          </View>
+        )}
       </View>
       <View>
         {isFootballEvent(gameQuery.game) && (
@@ -206,7 +320,15 @@ export function GameDetails({ route }: Props) {
   )
 }
 
-function TeamLine({ game, type }: { game: Game; type: "away" | "home" }) {
+function TeamLine({
+  game,
+  type,
+  record,
+}: {
+  game: Game
+  type: "away" | "home"
+  record?: string
+}) {
   let navigation = useNavigation()
   let team = type === "home" ? game.home_team : game.away_team
   let score =
@@ -217,6 +339,7 @@ function TeamLine({ game, type }: { game: Game; type: "away" | "home" }) {
   let hasPossession =
     isFootballEvent(game) &&
     game.box_score?.team_in_possession?.name === team?.name
+  let isPreGame = game.status === "pre_game"
 
   const sport = game.api_uri.includes("nfl")
     ? "nfl"
@@ -260,7 +383,11 @@ function TeamLine({ game, type }: { game: Game; type: "away" | "home" }) {
             )}
           </View>
         </View>
-        <Text className="text-5xl tabular-nums">{score}</Text>
+        {isPreGame && record ? (
+          <Text className="text-2xl text-zinc-500">{record}</Text>
+        ) : (
+          <Text className="text-5xl tabular-nums">{score}</Text>
+        )}
       </View>
     </TouchableOpacity>
   )

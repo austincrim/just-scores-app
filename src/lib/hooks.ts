@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { Game } from "@/types"
+import { Game, LiveLeaguesResponse } from "@/types"
 
 export const API_URL = "https://api.thescore.com"
 export const POWER = [
@@ -247,6 +247,30 @@ export function useFavoritesGames(teamIds: number[]) {
         console.error(e)
         return { games: [] as Game[], teamIds }
       }
+    },
+  })
+}
+
+export function useLiveLeagues() {
+  return useQuery({
+    queryKey: ["meta", "leagues", "live"],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      let res = await fetch(`${API_URL}/meta/leagues/live`)
+      if (!res.ok) {
+        console.error(await res.text())
+        return []
+      }
+      return (await res.json()) as LiveLeaguesResponse
+    },
+    select: (data) => {
+      const sports = ["nfl", "ncaaf", "ncaab"] as const
+      return Object.fromEntries(
+        sports.map((sport) => [
+          sport,
+          data.find((l) => l.league === sport)?.in_progress_event_count ?? 0,
+        ]),
+      ) as Record<(typeof sports)[number], number>
     },
   })
 }

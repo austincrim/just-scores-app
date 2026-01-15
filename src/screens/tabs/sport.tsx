@@ -48,7 +48,7 @@ export function SportSchedule({ route }: Props) {
   let { data: games, refetch } = useGames(route.params.sport, eventIds)
 
   if (selectedWeek === "" && eventsStatus === "success") {
-    setSelectedWeek(events?.current_group.id ?? "2025-1")
+    setSelectedWeek(events?.current_group?.id ?? "2025-1")
   }
 
   const changeScheduleGesture = Gesture.Pan()
@@ -223,6 +223,7 @@ export function SportSchedule({ route }: Props) {
                 hitSlop={5}
                 onPress={() => {
                   setSelectedConference(conference)
+                  setSelectedWeek("")
                   conferenceSheetRef.current?.dismiss()
                 }}
               >

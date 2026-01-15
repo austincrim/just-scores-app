@@ -87,6 +87,15 @@ Fetches injury report for a team.
 
 ---
 
+## Meta
+
+### GET `/meta/leagues/live`
+Returns live event counts across all leagues and conferences.
+- **Response**: Array of objects with `league` slug, `in_progress_event_count`, and `conferences` array (with conference name and count)
+- **Use case**: Quickly check which leagues/conferences have games in progress
+
+---
+
 ## Known Limitations
 
 - `/{sport}/teams/{teamId}/rosters` - Returns 404 error
