@@ -12,16 +12,19 @@ import colors from "tailwindcss/colors"
 import { Text } from "@/components/text"
 import { useLiveLeagues } from "@/lib/hooks"
 import { TabsParamList } from "../types"
+import { AllSportsView } from "./all-sports"
 import { Favorites } from "./favorites"
 import { SportSchedule } from "./sport"
 
 let { Navigator, Screen } = createBottomTabNavigator<TabsParamList>()
 
+type SportOption = "all" | "ncaaf" | "ncaab" | "nfl"
+
 export function Tabs() {
   let isDark = useColorScheme() === "dark"
   let iconColor = isDark ? colors.zinc[300] : colors.zinc[800]
   let sheetRef = useRef<TrueSheet>(null)
-  let [sport, setSport] = useState<"ncaaf" | "ncaab" | "nfl">("nfl")
+  let [sport, setSport] = useState<SportOption>("all")
   let currentRouteName = useNavigationState((state) => {
     const route = state.routes[state.index]
 
@@ -35,19 +38,21 @@ export function Tabs() {
   let { data: liveCounts } = useLiveLeagues()
 
   let title =
-    sport === "ncaaf"
-      ? "NCAA Football"
-      : sport === "ncaab"
-        ? "NCAA Basketball"
-        : "NFL"
+    sport === "all"
+      ? "All Sports"
+      : sport === "ncaaf"
+        ? "NCAA Football"
+        : sport === "ncaab"
+          ? "NCAA Basketball"
+          : "NFL"
 
   return (
     <>
       <Navigator>
         <Screen
           name="scores"
-          component={SportSchedule}
-          initialParams={{ sport }}
+          component={sport === "all" ? AllSportsView : SportSchedule}
+          initialParams={{ sport: sport === "all" ? "nfl" : sport }}
           navigationKey={sport}
           options={{
             headerTitle: () => (
@@ -56,7 +61,12 @@ export function Tabs() {
             tabBarLabel: "Scores",
             tabBarIcon: ({ color, focused }) => (
               <View className="flex flex-row items-center">
-                {sport === "ncaab" ? (
+                {sport === "all" ? (
+                  <SymbolView
+                    name={focused ? "sportscourt.fill" : "sportscourt"}
+                    tintColor={color}
+                  />
+                ) : sport === "ncaab" ? (
                   <SymbolView
                     name={focused ? "basketball.fill" : "basketball"}
                     tintColor={color}
@@ -112,7 +122,28 @@ export function Tabs() {
           }}
         />
       </Navigator>
-      <TrueSheet ref={sheetRef} detents={[0.2]} style={{ paddingVertical: 24 }}>
+      <TrueSheet ref={sheetRef} detents={[0.3]} style={{ paddingVertical: 24 }}>
+        <Pressable
+          className="flex-row px-4 py-4 items-center justify-between"
+          onPress={() => {
+            setSport("all")
+            sheetRef.current?.dismiss()
+          }}
+        >
+          <View className="flex-row items-center gap-1">
+            <SymbolView tintColor={iconColor} name="sportscourt" />
+            <Text className="text-xl">All Sports</Text>
+            {sport === "all" && <SymbolView size={16} name="checkmark" />}
+          </View>
+          <LiveBadge
+            count={
+              (liveCounts?.nfl ?? 0) +
+              (liveCounts?.ncaaf ?? 0) +
+              (liveCounts?.ncaab ?? 0)
+            }
+            iconColor={iconColor}
+          />
+        </Pressable>
         <Pressable
           className="flex-row px-4 py-4 items-center justify-between"
           onPress={() => {
