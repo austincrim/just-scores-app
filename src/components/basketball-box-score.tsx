@@ -1,42 +1,65 @@
 import React, { useState } from "react"
-import { FlatList, ScrollView, useColorScheme, View } from "react-native"
+import {
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  useColorScheme,
+  View,
+} from "react-native"
 import SegmentedControl from "@react-native-segmented-control/segmented-control"
 import colors from "tailwindcss/colors"
 import { Text } from "@/components/text"
-import { BasketballPlayerRecord, Game } from "@/types"
+import { BasketballPlayerRecord, BasketballTeamRecord, Game } from "@/types"
+
+const CELL_WIDTH = 50
+const NAME_WIDTH = 100
 
 const displayStats = [
-  // spacing placeholder
-  { key: "spacer", display: "" },
   { key: "minutes", display: "MIN" },
   { key: "points", display: "PTS" },
   { key: "rebounds_total", display: "REB" },
   { key: "assists", display: "AST" },
   { key: "steals", display: "STL" },
   { key: "blocked_shots", display: "BLK" },
-  { key: "field_goals_made", display: "FGM" },
-  { key: "field_goals_attempted", display: "FGA" },
-  { key: "three_point_field_goals_made", display: "3PM" },
-  { key: "three_point_field_goals_attempted", display: "3PA" },
-  { key: "free_throws_made", display: "FTM" },
-  { key: "free_throws_attempted", display: "FTA" },
+  { key: "turnovers", display: "TO" },
+  { key: "fg", display: "FG", isCombined: true },
+  { key: "3pt", display: "3PT", isCombined: true },
+  { key: "ft", display: "FT", isCombined: true },
 ] as const
+
+function getStatValue(
+  player: BasketballPlayerRecord,
+  stat: (typeof displayStats)[number],
+): string {
+  if (stat.key === "fg") {
+    return `${player.field_goals_made}/${player.field_goals_attempted}`
+  }
+  if (stat.key === "3pt") {
+    return `${player.three_point_field_goals_made}/${player.three_point_field_goals_attempted}`
+  }
+  if (stat.key === "ft") {
+    return `${player.free_throws_made}/${player.free_throws_attempted}`
+  }
+  return String(player[stat.key as keyof BasketballPlayerRecord] ?? "-")
+}
 
 export function BasketballBoxScore({
   boxScore,
   game,
+  teamRecords,
 }: {
   boxScore: { home: BasketballPlayerRecord[]; away: BasketballPlayerRecord[] }
   game: Game
+  teamRecords?: { home: BasketballTeamRecord; away: BasketballTeamRecord } | null
 }) {
   let [team, setTeam] = useState<"home" | "away">("home")
   let isDark = useColorScheme() === "dark"
 
   return (
-    <View className="flex gap-8">
+    <View className="flex gap-4">
       <SegmentedControl
         values={[game.home_team.abbreviation, game.away_team.abbreviation]}
-        selectedIndex={0}
+        selectedIndex={team === "home" ? 0 : 1}
         onValueChange={(e) =>
           setTeam(e === game.home_team.abbreviation ? "home" : "away")
         }
@@ -46,45 +69,104 @@ export function BasketballBoxScore({
         activeFontStyle={{ color: colors.zinc[100] }}
       />
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View className="flex-1 flex gap-4">
-          <FlatList
-            data={displayStats}
-            keyExtractor={(item) => item.key}
-            horizontal
-            scrollEnabled={false}
-            renderItem={({ item, index }) => (
-              <View style={{ width: index === 0 ? 100 : 40 }}>
-                <Text className="font-semibold text-center">
-                  {item.display}
+        <View>
+          {/* Header row */}
+          <View className="flex flex-row border-b border-zinc-600">
+            <View style={{ width: NAME_WIDTH }}>
+              <Text style={styles.nameHeaderCell}>Name</Text>
+            </View>
+            {displayStats.map((stat) => (
+              <View key={stat.key} style={{ width: CELL_WIDTH }}>
+                <Text style={styles.headerCell}>{stat.display}</Text>
+              </View>
+            ))}
+          </View>
+          {/* Data rows */}
+          {boxScore[team].map((player, index) => (
+            <View
+              key={player.id}
+              style={[
+                index % 2 === 1 && {
+                  backgroundColor: isDark
+                    ? "rgba(255, 255, 255, 0.05)"
+                    : "rgba(0, 0, 0, 0.05)",
+                },
+              ]}
+              className="flex flex-row items-center"
+            >
+              <View style={{ width: NAME_WIDTH }}>
+                <Text style={styles.nameCell}>
+                  {player.player.first_initial_and_last_name}
                 </Text>
               </View>
-            )}
-          />
-          <FlatList
-            scrollEnabled={false}
-            data={boxScore[team]}
-            keyExtractor={(item) => String(item.id)}
-            ItemSeparatorComponent={() => <View className="h-6" />}
-            renderItem={({ item }) => (
-              <View className="flex flex-row">
-                <View style={{ width: 100 }}>
-                  <Text>{item.player.first_initial_and_last_name}</Text>
+              {displayStats.map((stat) => (
+                <View key={stat.key} style={{ width: CELL_WIDTH }}>
+                  <Text style={styles.cell}>{getStatValue(player, stat)}</Text>
                 </View>
-                {displayStats.slice(1).map((stat) => (
-                  <View style={{ width: 40 }}>
-                    <Text
-                      className="text-center"
-                      key={`${item.id}-${stat.key}`}
-                    >
-                      {stat.key === "spacer" ? null : item[stat.key]}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
-          />
+              ))}
+            </View>
+          ))}
         </View>
       </ScrollView>
+
+      {teamRecords && <TeamStats teamRecord={teamRecords[team]} />}
     </View>
   )
 }
+
+function TeamStats({ teamRecord }: { teamRecord: BasketballTeamRecord }) {
+  const stats = [
+    { label: "FG%", value: teamRecord.field_goals_percentage },
+    { label: "3PT%", value: teamRecord.three_point_field_goals_percentage ?? "-" },
+    { label: "FT%", value: teamRecord.free_throws_percentage },
+    { label: "REB", value: teamRecord.rebounds_total },
+    { label: "AST", value: teamRecord.assists },
+    { label: "STL", value: teamRecord.steals },
+    { label: "BLK", value: teamRecord.blocked_shots },
+    { label: "TO", value: teamRecord.turnovers },
+    { label: "PF", value: teamRecord.personal_fouls },
+  ]
+
+  return (
+    <View className="mt-6">
+      <Text className="text-base font-semibold mb-3">Team Stats</Text>
+      <View className="flex flex-row flex-wrap">
+        {stats.map((stat) => (
+          <View key={stat.label} className="w-1/3 py-2">
+            <Text className="text-zinc-500 text-xs">{stat.label}</Text>
+            <Text className="text-lg font-medium">{stat.value}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  nameHeaderCell: {
+    fontWeight: "bold",
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+    fontSize: 12,
+    textAlign: "left",
+  },
+  nameCell: {
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+    fontSize: 12,
+    textAlign: "left",
+  },
+  headerCell: {
+    fontWeight: "bold",
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    fontSize: 12,
+    textAlign: "center",
+  },
+  cell: {
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    fontSize: 12,
+    textAlign: "center",
+  },
+})

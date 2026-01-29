@@ -13,6 +13,7 @@ import { Text } from "@/components/text"
 import { API_URL } from "@/lib/hooks"
 import {
   BasketballPlayerRecord,
+  BasketballTeamRecord,
   FootballPlayerRecord,
   Game,
   NcaaBBEvent,
@@ -96,6 +97,24 @@ export function GameDetails({ route }: Props) {
       })
 
       return { home: homeTeam, away: awayTeam }
+    },
+  })
+
+  let { data: teamRecords } = useQuery({
+    queryKey: ["teamRecords", gameQuery?.game?.box_score?.id],
+    enabled:
+      !!gameQuery?.game &&
+      gameQuery.game.status !== "pre_game" &&
+      isBasketballEvent(gameQuery.game),
+    queryFn: async () => {
+      if (!gameQuery?.game.box_score.id) return null
+      let res = await fetch(
+        `${API_URL}/${route.params.sport}/box_scores/${gameQuery?.game.box_score.id}`,
+      )
+      if (!res.ok) return null
+      let data: { team_records: { home: BasketballTeamRecord; away: BasketballTeamRecord } } =
+        await res.json()
+      return data.team_records
     },
   })
 
@@ -312,6 +331,7 @@ export function GameDetails({ route }: Props) {
                   }
                 }
                 game={gameQuery.game}
+                teamRecords={teamRecords}
               />
             </View>
           )}

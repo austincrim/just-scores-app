@@ -158,7 +158,13 @@ export function FootballBoxScore({
                   {playersByPosition[type].map((player, index) => (
                     <View
                       key={player.id}
-                      style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
+                      style={[
+                        index % 2 === 1 && {
+                          backgroundColor: isDark
+                            ? "rgba(255, 255, 255, 0.05)"
+                            : "rgba(0, 0, 0, 0.05)",
+                        },
+                      ]}
                       className="flex flex-row items-center"
                     >
                       <View style={{ width: NAME_WIDTH }}>
@@ -222,11 +228,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     fontSize: 12,
     textAlign: "center",
-  },
-  evenRow: {
-    backgroundColor: "transparent",
-  },
-  oddRow: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
   },
 })

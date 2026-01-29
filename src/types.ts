@@ -418,6 +418,34 @@ export type NcaaFBEvent = {
 // BASKETBALL-SPECIFIC TYPES (NBA & NCAAB)
 // ============================================================================
 
+export type BasketballTeamRecord = {
+  id: number
+  api_uri: string
+  assists: number
+  blocked_shots: number
+  field_goals_attempted: number
+  field_goals_made: number
+  field_goals_percentage: string
+  free_throws_attempted: number
+  free_throws_made: number
+  free_throws_percentage: string
+  three_point_field_goals_attempted: number
+  three_point_field_goals_made: number
+  three_point_field_goals_percentage: string | null
+  personal_fouls: number
+  points: number
+  rebounds_defensive: number
+  rebounds_offensive: number
+  rebounds_total: number
+  steals: number
+  turnovers: number
+  fast_break_points: number | null
+  points_in_paint: number | null
+  points_off_turnovers: number | null
+  second_change_points: number | null
+  updated_at: string
+}
+
 export type BasketballBoxScore = {
   api_uri: string
   id: number
@@ -461,14 +489,8 @@ export type BasketballBoxScore = {
   }
   share_url: string
   team_records: {
-    home: {
-      wins: number
-      losses: number
-    }
-    away: {
-      wins: number
-      losses: number
-    }
+    home: BasketballTeamRecord
+    away: BasketballTeamRecord
   }
   last_play?: {
     api_uri: string
