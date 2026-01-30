@@ -4,8 +4,6 @@
 
 - **Start dev server**: `pnpm start` (Expo)
 - **Type check**: `pnpm check` (tsc --noEmit)
-- **Run iOS**: `pnpm ios` (on device)
-- **Clean rebuild**: `pnpm clean` (expo prebuild --clean -p ios)
 
 ## Architecture
 
@@ -33,3 +31,5 @@
 - **Styling**: TailwindCSS classes via nativewind
 - **Error handling**: Fetch errors logged via console.error, graceful fallbacks (return [] or null)
 - **Types**: Exhaustive type definitions in types.ts; union types for multi-sport (Game, BoxScore, PlayerRecord)
+- Attempt to fetch a little data as possible from the API using filtering, sorting, specific endpoint. Fetching large amounts of events can cause UI lag.
+- Ensure all UI changes work in light/dark mode

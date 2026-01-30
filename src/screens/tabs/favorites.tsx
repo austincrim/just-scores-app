@@ -4,7 +4,7 @@ import { format, isToday, isTomorrow } from "date-fns"
 import { useMMKVObject } from "react-native-mmkv"
 import { GamePreview } from "@/components/game-preview"
 import { Text } from "@/components/text"
-import { useFavoritesGames } from "@/lib/hooks"
+import { useFavoriteTeamSchedules } from "@/lib/hooks"
 import { FAVORITES_KEY, storage } from "@/lib/storage"
 import { FavoriteTeam, Game } from "@/types"
 import { TabScreenProps } from "../types"
@@ -15,9 +15,7 @@ export function Favorites({}: Props) {
   let navigation = useNavigation()
   let [favoriteTeams] = useMMKVObject<FavoriteTeam[]>(FAVORITES_KEY, storage) ?? [[]]
 
-  let { data: favoritesData } = useFavoritesGames(
-    favoriteTeams?.map((t) => t.id) ?? [],
-  )
+  let { games } = useFavoriteTeamSchedules(favoriteTeams ?? [])
 
   if (!favoriteTeams || favoriteTeams.length === 0) {
     return (
@@ -33,7 +31,7 @@ export function Favorites({}: Props) {
     )
   }
 
-  const games = favoritesData?.games ?? []
+  const favoriteTeamIds = new Set(favoriteTeams?.map((t) => t.id) ?? [])
 
   return (
     <ScrollView className="flex-1 px-2 py-4">
@@ -65,9 +63,9 @@ export function Favorites({}: Props) {
         <View className="px-3">
           {games.map((game, index) => {
             const sport = detectSport(game)
-            const isFavoriteTeamPlaying = favoriteTeams.some((t) =>
-              [game.home_team?.id, game.away_team?.id].includes(t.id),
-            )
+            const isFavoriteTeamPlaying =
+              favoriteTeamIds.has(game.home_team?.id) ||
+              favoriteTeamIds.has(game.away_team?.id)
 
             if (!isFavoriteTeamPlaying) return null
 

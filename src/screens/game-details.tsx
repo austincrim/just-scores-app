@@ -234,64 +234,67 @@ export function GameDetails({ route }: Props) {
           />
         </View>
         {gameQuery.game.status === "pre_game" && (
-          <View className="w-full mt-6 gap-4">
-            {(gameQuery.game.odd?.line || gameQuery.game.odd?.over_under) && (
-              <View className="flex-row mx-auto items-center gap-16 pb-4 border-b dark:border-zinc-700 border-zinc-300">
-                {gameQuery.game.odd?.line && (
-                  <View className="items-center">
-                    <Text className="text-zinc-500 text-sm">Spread</Text>
-                    <Text className="text-lg font-semibold">
-                      {gameQuery.game.odd.line}
-                    </Text>
-                  </View>
-                )}
-                {gameQuery.game.odd?.over_under && (
-                  <View className="items-center">
-                    <Text className="text-zinc-500 text-sm">O/U</Text>
-                    <Text className="text-lg font-semibold">
-                      {gameQuery.game.odd.over_under}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            )}
-            {(standings?.away?.awayRecord || standings?.home?.homeRecord) && (
-              <View className="flex-row mx-auto gap-16">
-                {standings?.away?.awayRecord && (
-                  <View className="items-center">
-                    <Text className="text-zinc-500 text-sm">
-                      {gameQuery.game.away_team.abbreviation} Away
-                    </Text>
-                    <Text className="text-lg font-semibold">
-                      {standings.away.awayRecord}
-                    </Text>
-                  </View>
-                )}
-                {standings?.home?.homeRecord && (
-                  <View className="items-center">
-                    <Text className="text-zinc-500 text-sm">
-                      {gameQuery.game.home_team.abbreviation} Home
-                    </Text>
-                    <Text className="text-lg font-semibold">
-                      {standings.home.homeRecord}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            )}
+          <View className="w-full mt-8 gap-6">
+            <View className="flex-row justify-around">
+              {gameQuery.game.odd?.line && (
+                <View className="items-center flex-1">
+                  <Text className="text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wide mb-1">
+                    Spread
+                  </Text>
+                  <Text className="text-xl font-semibold">
+                    {gameQuery.game.odd.line}
+                  </Text>
+                </View>
+              )}
+              {gameQuery.game.odd?.over_under && (
+                <View className="items-center flex-1">
+                  <Text className="text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wide mb-1">
+                    O/U
+                  </Text>
+                  <Text className="text-xl font-semibold">
+                    {gameQuery.game.odd.over_under}
+                  </Text>
+                </View>
+              )}
+              {standings?.away?.awayRecord && (
+                <View className="items-center flex-1">
+                  <Text className="text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wide mb-1">
+                    {gameQuery.game.away_team.abbreviation} Away
+                  </Text>
+                  <Text className="text-xl font-semibold">
+                    {standings.away.awayRecord}
+                  </Text>
+                </View>
+              )}
+              {standings?.home?.homeRecord && (
+                <View className="items-center flex-1">
+                  <Text className="text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wide mb-1">
+                    {gameQuery.game.home_team.abbreviation} Home
+                  </Text>
+                  <Text className="text-xl font-semibold">
+                    {standings.home.homeRecord}
+                  </Text>
+                </View>
+              )}
+            </View>
             {(("stadium" in gameQuery.game && gameQuery.game.stadium) ||
               gameQuery.game.location) && (
-              <View className="items-center border-t border-zinc-300 dark:border-zinc-700 pt-4">
-                <Text className="text-center font-semibold">
+              <View className="items-center pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                <Text className="text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-wide mb-1">
+                  Venue
+                </Text>
+                <Text className="text-center font-medium">
                   {"stadium" in gameQuery.game && gameQuery.game.stadium
-                    ? `${gameQuery.game.stadium}`
+                    ? gameQuery.game.stadium
                     : gameQuery.game.location}
                 </Text>
-                {"stadium" in gameQuery.game && gameQuery.game.location && (
-                  <Text className="text-zinc-500 text-sm">
-                    {gameQuery.game.location}
-                  </Text>
-                )}
+                {"stadium" in gameQuery.game &&
+                  gameQuery.game.stadium &&
+                  gameQuery.game.location && (
+                    <Text className="text-zinc-500 dark:text-zinc-400 text-sm">
+                      {gameQuery.game.location}
+                    </Text>
+                  )}
               </View>
             )}
           </View>

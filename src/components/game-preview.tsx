@@ -1,7 +1,9 @@
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
+import { useQuery } from "@tanstack/react-query"
 import { Game } from "@/types"
+import { API_URL } from "@/lib/hooks"
 import TeamLine from "./team-line"
 import { Text } from "./text"
 
@@ -15,6 +17,16 @@ export function GamePreview({
   disabled?: boolean
 }) {
   let navigation = useNavigation()
+  let { data: gameDetails } = useQuery({
+    queryKey: ["game", String(game.id)],
+    staleTime: 1000 * 60,
+    queryFn: async () => {
+      let res = await fetch(`${API_URL}/${sport}/events/${game.id}`)
+      if (!res.ok) throw new Error(await res.text())
+      return { game: (await res.json()) as Game }
+    },
+  })
+  let cachedGame = gameDetails?.game ?? game
 
   function renderGameStatus() {
     if (game.status !== "pre_game") {
@@ -29,6 +41,14 @@ export function GamePreview({
       })
       return <Text className="text-lg text-right">{gameTime}</Text>
     }
+  }
+
+  function renderChannel() {
+    let channel = cachedGame.tv_listings_by_country_code?.us?.[0]?.long_name
+    if (game.status === "pre_game" && channel) {
+      return <Text className="text-sm text-right">{channel}</Text>
+    }
+    return <></>
   }
 
   return (
@@ -56,7 +76,12 @@ export function GamePreview({
             game={game}
             renderStatus={renderGameStatus}
           />
-          <TeamLine team={game.home_team} type="home" game={game} />
+          <TeamLine
+            team={game.home_team}
+            type="home"
+            game={game}
+            renderStatus={renderChannel}
+          />
         </View>
       </View>
     </TouchableOpacity>

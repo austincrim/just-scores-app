@@ -11,12 +11,14 @@ import * as Haptics from "expo-haptics"
 import { TrueSheet } from "@lodev09/react-native-true-sheet"
 import { useNavigation } from "@react-navigation/native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
+import { useMMKVObject } from "react-native-mmkv"
 import colors from "tailwindcss/colors"
 import { GamePreview } from "@/components/game-preview"
 import { Text } from "@/components/text"
 import { Sport, SPORTS, useAllSportsGames } from "@/lib/hooks"
+import { FAVORITES_KEY, storage } from "@/lib/storage"
 import { generateDays, getTodayId } from "@/lib/weeks"
-import { Game } from "@/types"
+import { FavoriteTeam, Game } from "@/types"
 
 const SPORT_LABELS: Record<Sport, string> = {
   nfl: "NFL",
@@ -24,8 +26,15 @@ const SPORT_LABELS: Record<Sport, string> = {
   ncaab: "NCAA Basketball",
 }
 
+function getSportFromGame(game: Game): Sport {
+  if (game.api_uri.includes("nfl")) return "nfl"
+  if (game.api_uri.includes("ncaaf")) return "ncaaf"
+  if (game.api_uri.includes("ncaab")) return "ncaab"
+  return "nfl"
+}
+
 type SectionData = {
-  sport: Sport
+  sport: Sport | "favorites"
   title: string
   data: Game[]
 }
@@ -35,6 +44,8 @@ export function AllSportsView() {
   const navigation = useNavigation()
   const scheduleSheetRef = useRef<TrueSheet>(null)
   const [isRefetching, setIsRefetching] = useState(false)
+  const [favoriteTeams] =
+    useMMKVObject<FavoriteTeam[]>(FAVORITES_KEY, storage) ?? []
 
   const days = useMemo(() => generateDays(), [])
   const [selectedDayId, setSelectedDayId] = useState(getTodayId())
@@ -46,15 +57,58 @@ export function AllSportsView() {
 
   const { data: games, refetch } = useAllSportsGames(selectedDay.date)
 
+  const favoriteTeamIds = useMemo(
+    () => new Set(favoriteTeams?.map((t) => t.id) ?? []),
+    [favoriteTeams],
+  )
+
   const sections: SectionData[] = useMemo(() => {
     if (!games) return []
 
-    return SPORTS.map((sport) => ({
-      sport,
-      title: SPORT_LABELS[sport],
-      data: games[sport],
-    })).filter((section) => section.data.length > 0)
-  }, [games])
+    const allGames = SPORTS.flatMap((sport) =>
+      games[sport].map((game) => ({ game, sport })),
+    )
+
+    const favoriteGames: { game: Game; sport: Sport }[] = []
+    const remainingBySport: Record<Sport, Game[]> = {
+      nfl: [],
+      ncaaf: [],
+      ncaab: [],
+    }
+
+    for (const { game, sport } of allGames) {
+      const isFavorite =
+        favoriteTeamIds.has(game.home_team.id) ||
+        favoriteTeamIds.has(game.away_team.id)
+      if (isFavorite) {
+        favoriteGames.push({ game, sport })
+      } else {
+        remainingBySport[sport].push(game)
+      }
+    }
+
+    const result: SectionData[] = []
+
+    if (favoriteGames.length > 0) {
+      result.push({
+        sport: "favorites",
+        title: "Favorites",
+        data: favoriteGames.map((fg) => fg.game),
+      })
+    }
+
+    for (const sport of SPORTS) {
+      if (remainingBySport[sport].length > 0) {
+        result.push({
+          sport,
+          title: SPORT_LABELS[sport],
+          data: remainingBySport[sport],
+        })
+      }
+    }
+
+    return result
+  }, [games, favoriteTeamIds])
 
   const changeScheduleGesture = Gesture.Pan()
     .activeOffsetX([-10, 10])
@@ -117,9 +171,6 @@ export function AllSportsView() {
           renderSectionHeader={({ section }) => (
             <View className="mb-2 mt-6 flex-row items-center gap-2">
               <Text className="text-lg font-bold">{section.title}</Text>
-              <Text className="text-zinc-500 dark:text-zinc-400">
-                {section.data.length} game{section.data.length !== 1 ? "s" : ""}
-              </Text>
             </View>
           )}
           ItemSeparatorComponent={() => (
@@ -128,13 +179,19 @@ export function AllSportsView() {
               style={{ borderBottomWidth: StyleSheet.hairlineWidth }}
             />
           )}
-          renderItem={({ item, section }) => (
-            <View
-              className={`relative flex flex-col gap-2 ${item.status === "in_progress" ? "active" : ""}`}
-            >
-              <GamePreview game={item} sport={section.sport} />
-            </View>
-          )}
+          renderItem={({ item, section }) => {
+            const sport =
+              section.sport === "favorites"
+                ? getSportFromGame(item)
+                : section.sport
+            return (
+              <View
+                className={`relative flex flex-col gap-2 ${item.status === "in_progress" ? "active" : ""}`}
+              >
+                <GamePreview game={item} sport={sport} />
+              </View>
+            )
+          }}
         />
 
         <TrueSheet scrollable ref={scheduleSheetRef} detents={[0.5]}>

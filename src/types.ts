@@ -599,6 +599,7 @@ export type TvListing = {
   channel?: string
   provider?: string
   long_name: string
+  short_name?: string
 }
 
 export type TvListingsByCountryCode = {

@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query"
-import { Game, LiveLeaguesResponse } from "@/types"
+import { useMemo } from "react"
+import { useQueries, useQuery } from "@tanstack/react-query"
+import { FavoriteTeam, Game, LiveLeaguesResponse } from "@/types"
 
 export const API_URL = "https://api.thescore.com"
 export const SPORTS = ["nfl", "ncaaf", "ncaab"] as const
@@ -323,59 +324,58 @@ export function useTeamStanding(
   })
 }
 
-export function useFavoritesGames(teamIds: number[]) {
-  return useQuery({
-    queryKey: ["multisport", "favorites", teamIds],
-    refetchInterval: 5000,
-    enabled: teamIds.length > 0,
-    queryFn: async () => {
-      if (!teamIds.length) return { games: [] as Game[], teamIds: [] }
-
-      const now = new Date()
-      const startDate = new Date(now)
-      const endDate = new Date(now)
-      endDate.setUTCDate(endDate.getUTCDate() + 7)
-
-      const startDateStr = startDate.toISOString().split("T")[0]
-      const endDateStr = endDate.toISOString().split("T")[0]
-      const dateParam = `${startDateStr},${endDateStr}`
-
-      try {
+export function useFavoriteTeamSchedules(teams: FavoriteTeam[]) {
+  const queries = useQueries({
+    queries: teams.map((team) => ({
+      queryKey: [team.sport, "team", team.id],
+      queryFn: async () => {
         let res = await fetch(
-          `${API_URL}/multisport/events?leagues=nfl,ncaaf,ncaab&game_date.in=${dateParam}`,
+          `${API_URL}/${team.sport}/teams/${team.id}/events/full_schedule`,
         )
         if (!res.ok) {
           console.error(await res.text())
-          return { games: [] as Game[], teamIds }
+          return []
         }
-
-        let data = (await res.json()) as Record<string, { events: Game[] }>
-        let allGames: Game[] = []
-        Object.values(data).forEach((league) => {
-          if (league.events) {
-            allGames.push(...league.events)
-          }
-        })
-
-        // Filter to only games where a favorite team is playing
-        const filteredGames = allGames.filter(
-          (game) =>
-            teamIds.includes(game.home_team?.id) ||
-            teamIds.includes(game.away_team?.id),
-        )
-
-        filteredGames.sort(
-          (a, b) =>
-            new Date(a.game_date).valueOf() - new Date(b.game_date).valueOf(),
-        )
-
-        return { games: filteredGames, teamIds }
-      } catch (e) {
-        console.error(e)
-        return { games: [] as Game[], teamIds }
-      }
-    },
+        return (await res.json()) as Game[]
+      },
+    })),
   })
+
+  const isLoading = queries.some((q) => q.isLoading)
+  const teamIds = new Set(teams.map((t) => t.id))
+
+  const games = useMemo(() => {
+    const allGames: Game[] = []
+    const seenIds = new Set<number>()
+    const now = new Date()
+
+    for (const query of queries) {
+      if (query.data) {
+        for (const game of query.data) {
+          if (!seenIds.has(game.id)) {
+            const isFavorite =
+              teamIds.has(game.home_team?.id) ||
+              teamIds.has(game.away_team?.id)
+            const isUpcoming =
+              game.status !== "final" && new Date(game.game_date) >= now
+            if (isFavorite && isUpcoming) {
+              seenIds.add(game.id)
+              allGames.push(game)
+            }
+          }
+        }
+      }
+    }
+
+    allGames.sort(
+      (a, b) =>
+        new Date(a.game_date).valueOf() - new Date(b.game_date).valueOf(),
+    )
+
+    return allGames
+  }, [queries, teamIds])
+
+  return { games, isLoading }
 }
 
 export function useLiveLeagues() {
