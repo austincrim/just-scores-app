@@ -13,6 +13,10 @@ import { useNavigation } from "@react-navigation/native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import { useMMKVObject } from "react-native-mmkv"
 import colors from "tailwindcss/colors"
+import {
+  GameListSkeleton,
+  SkeletonLine,
+} from "@/components/game-details-skeleton"
 import { GamePreview } from "@/components/game-preview"
 import { Text } from "@/components/text"
 import { Sport, SPORTS, useAllSportsGames } from "@/lib/hooks"
@@ -55,7 +59,7 @@ export function AllSportsView() {
     [days, selectedDayId],
   )
 
-  const { data: games, refetch } = useAllSportsGames(selectedDay.date)
+  const { data: games, refetch, isLoading } = useAllSportsGames(selectedDay.date)
 
   const favoriteTeamIds = useMemo(
     () => new Set(favoriteTeams?.map((t) => t.id) ?? []),
@@ -153,6 +157,21 @@ export function AllSportsView() {
       ),
     })
   }, [selectedDay, isDark, navigation])
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 p-2 px-4">
+        <View className="mt-6 mb-2">
+          <SkeletonLine width="w-24" height="h-6" />
+        </View>
+        <GameListSkeleton count={4} />
+        <View className="mt-6 mb-2">
+          <SkeletonLine width="w-32" height="h-6" />
+        </View>
+        <GameListSkeleton count={3} />
+      </View>
+    )
+  }
 
   return (
     <GestureDetector gesture={changeScheduleGesture}>

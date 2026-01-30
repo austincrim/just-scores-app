@@ -44,9 +44,10 @@ Fetches current season schedule for a specific team. Only returns regular season
 - **Sports**: `nfl`, `ncaaf`, `ncaab`
 - **Preferred over**: `/events?team_id=X` for season filtering
 
-### GET `/{sport}/events/{eventId}/play_records`
+### GET `/{sport}/events/{eventId}/play_by_play_records`
 Fetches play-by-play records for an event.
-- **Response**: Array of play objects
+- **Response**: Array of play record objects with description, progress, segment, team info
+- **Note**: Check `game.has_play_by_play_records` before fetching
 
 ### GET `/{sport}/events/conferences`
 Lists all conferences for a sport.

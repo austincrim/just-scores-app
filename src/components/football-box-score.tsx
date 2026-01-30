@@ -117,9 +117,13 @@ export function FootballBoxScore({
           setTeam(e === game.home_team.abbreviation ? "home" : "away")
         }
         tintColor={"#" + game[`${team}_team`].colour_1}
-        backgroundColor={isDark ? colors.zinc[800] : colors.zinc["100"]}
-        fontStyle={{ color: isDark ? colors.zinc[100] : colors.zinc["800"] }}
-        activeFontStyle={{ color: colors.zinc["100"] }}
+        backgroundColor={isDark ? colors.zinc[800] : colors.zinc[100]}
+        fontStyle={{
+          color: isDark ? colors.zinc[100] : colors.zinc[800],
+          fontSize: 13,
+        }}
+        activeFontStyle={{ color: colors.zinc[100], fontSize: 13 }}
+        style={{ height: 28, width: 140, alignSelf: "center" }}
       />
       <View className="my-4" />
       <FlatList

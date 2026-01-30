@@ -12,6 +12,7 @@ import { SymbolView } from "expo-symbols"
 import { useNavigation } from "@react-navigation/native"
 import { useMMKVObject } from "react-native-mmkv"
 import colors from "tailwindcss/colors"
+import { TeamDetailsSkeleton } from "@/components/game-details-skeleton"
 import { Text } from "@/components/text"
 import { useTeamSchedule, useTeamStanding } from "@/lib/hooks"
 import { FAVORITES_KEY, storage } from "@/lib/storage"
@@ -87,7 +88,7 @@ export function TeamDetail({ route }: Props) {
     confWins + confLosses > 0 ? `${confWins}-${confLosses}` : null
 
   if (status === "pending") {
-    return <Text>loading...</Text>
+    return <TeamDetailsSkeleton />
   }
 
   if (status === "error") {

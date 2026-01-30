@@ -638,6 +638,53 @@ export type LiveLeague = {
 export type LiveLeaguesResponse = LiveLeague[]
 
 // ============================================================================
+// PLAY-BY-PLAY TYPES
+// ============================================================================
+
+export type BasketballPlayRecord = {
+  api_uri: string
+  description: string
+  event: string
+  id: number
+  minutes: number
+  progress: Progress
+  seconds: number
+  segment: number
+  team: string
+}
+
+export type FootballPlayRecord = {
+  api_uri: string
+  id: number
+  minutes: number
+  seconds: number
+  segment: number
+  quarter: number
+  progress: Progress
+  play_type: string
+  header: string
+  down: number | null
+  distance: number | null
+  direction: string | null
+  continuation: boolean
+  home_score_before: number
+  home_score_after: number
+  away_score_before: number
+  away_score_after: number
+  updated_at: string
+  score: {
+    away: number
+    home: number
+    short_summary: string
+    string: string
+  }
+  player1?: Player
+  player2?: Player
+}
+
+export type PlayRecord = BasketballPlayRecord | FootballPlayRecord
+
+// ============================================================================
 // UNION TYPES
 // ============================================================================
 

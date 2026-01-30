@@ -1,14 +1,26 @@
-import React, { useEffect } from "react"
-import { Image, ScrollView, TouchableOpacity, View } from "react-native"
+import React, { useEffect, useState } from "react"
+import {
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native"
 import { openURL } from "expo-linking"
 import { SymbolView } from "expo-symbols"
+import SegmentedControl from "@react-native-segmented-control/segmented-control"
 import { useNavigation } from "@react-navigation/native"
 import { useQuery } from "@tanstack/react-query"
+import colors from "tailwindcss/colors"
 import { BasketballBoxScore } from "@/components/basketball-box-score"
 import { BasketballScore } from "@/components/basketball-score"
 import { FootballBoxScore } from "@/components/football-box-score"
 import { FootballScore } from "@/components/football-score"
-import { GameDetailsSkeleton } from "@/components/game-details-skeleton"
+import {
+  GameDetailsSkeleton,
+  PlaysListSkeleton,
+} from "@/components/game-details-skeleton"
+import { PlayByPlayList } from "@/components/play-by-play-list"
 import { Text } from "@/components/text"
 import { API_URL } from "@/lib/hooks"
 import {
@@ -19,6 +31,7 @@ import {
   NcaaBBEvent,
   NcaaFBEvent,
   NFLEvent,
+  PlayRecord,
 } from "@/types"
 import { RootStackScreenProps } from "./types"
 
@@ -45,8 +58,12 @@ const channelIds = new Map([
 
 type Props = RootStackScreenProps<"details">
 
+type TabType = "game" | "plays"
+
 export function GameDetails({ route }: Props) {
   let navigation = useNavigation()
+  let isDark = useColorScheme() === "dark"
+  let [activeTab, setActiveTab] = useState<TabType>("game")
   let {
     data: gameQuery,
     status,
@@ -161,6 +178,24 @@ export function GameDetails({ route }: Props) {
     },
   })
 
+  let { data: plays, isLoading: playsLoading } = useQuery({
+    queryKey: ["plays", route.params.id],
+    enabled:
+      activeTab === "plays" &&
+      gameQuery?.game.status !== "pre_game" &&
+      gameQuery?.game.has_play_by_play_records === true,
+    refetchInterval: activeTab === "plays" ? 10000 : false,
+    queryFn: async () => {
+      let res = await fetch(
+        `${API_URL}/${route.params.sport}/events/${route.params.id}/play_by_play_records`,
+      )
+      if (!res.ok) {
+        throw new Error(await res.text())
+      }
+      return (await res.json()) as PlayRecord[]
+    },
+  })
+
   useEffect(() => {
     if (gameQuery?.game) {
       navigation?.setOptions({
@@ -233,6 +268,28 @@ export function GameDetails({ route }: Props) {
             record={standings?.home?.record ?? undefined}
           />
         </View>
+
+        {gameQuery.game.status !== "pre_game" &&
+          gameQuery.game.has_play_by_play_records && (
+            <View className="w-full mt-2">
+              <SegmentedControl
+                values={["Game", "Plays"]}
+                selectedIndex={activeTab === "game" ? 0 : 1}
+                onValueChange={(value) =>
+                  setActiveTab(value === "Game" ? "game" : "plays")
+                }
+                tintColor={isDark ? colors.zinc[700] : colors.white}
+                backgroundColor={isDark ? colors.zinc[800] : colors.zinc[100]}
+                fontStyle={{
+                  color: isDark ? colors.zinc[400] : colors.zinc[500],
+                }}
+                activeFontStyle={{
+                  color: isDark ? colors.white : colors.black,
+                }}
+              />
+            </View>
+          )}
+
         {gameQuery.game.status === "pre_game" && (
           <View className="w-full mt-8 gap-6">
             <View className="flex-row justify-around">
@@ -300,45 +357,68 @@ export function GameDetails({ route }: Props) {
           </View>
         )}
       </View>
-      <View>
-        {isFootballEvent(gameQuery.game) && (
-          <FootballScore game={gameQuery.game} />
-        )}
-        {isBasketballEvent(gameQuery.game) && (
-          <BasketballScore game={gameQuery.game} />
-        )}
-      </View>
-      <View className="pb-12">
-        {isFootballEvent(gameQuery.game) &&
-          boxScore &&
-          gameQuery.game.status !== "pre_game" && (
-            <FootballBoxScore
-              boxScore={
-                boxScore as {
-                  home: FootballPlayerRecord[]
-                  away: FootballPlayerRecord[]
-                }
-              }
-              game={gameQuery.game}
-            />
-          )}
-        {isBasketballEvent(gameQuery.game) &&
-          boxScore &&
-          gameQuery.game.status !== "pre_game" && (
-            <View className="mt-8">
-              <BasketballBoxScore
-                boxScore={
-                  boxScore as {
-                    home: BasketballPlayerRecord[]
-                    away: BasketballPlayerRecord[]
+
+      {activeTab === "game" && (
+        <>
+          <View>
+            {isFootballEvent(gameQuery.game) && (
+              <FootballScore game={gameQuery.game} />
+            )}
+            {isBasketballEvent(gameQuery.game) && (
+              <BasketballScore game={gameQuery.game} />
+            )}
+          </View>
+          <View className="pb-12">
+            {isFootballEvent(gameQuery.game) &&
+              boxScore &&
+              gameQuery.game.status !== "pre_game" && (
+                <FootballBoxScore
+                  boxScore={
+                    boxScore as {
+                      home: FootballPlayerRecord[]
+                      away: FootballPlayerRecord[]
+                    }
                   }
-                }
-                game={gameQuery.game}
-                teamRecords={teamRecords}
-              />
-            </View>
+                  game={gameQuery.game}
+                />
+              )}
+            {isBasketballEvent(gameQuery.game) &&
+              boxScore &&
+              gameQuery.game.status !== "pre_game" && (
+                <View className="mt-8">
+                  <BasketballBoxScore
+                    boxScore={
+                      boxScore as {
+                        home: BasketballPlayerRecord[]
+                        away: BasketballPlayerRecord[]
+                      }
+                    }
+                    game={gameQuery.game}
+                    teamRecords={teamRecords}
+                  />
+                </View>
+              )}
+          </View>
+        </>
+      )}
+
+      {activeTab === "plays" && (
+        <View className="pb-12">
+          {playsLoading ? (
+            <PlaysListSkeleton />
+          ) : plays && plays.length > 0 ? (
+            <PlayByPlayList
+              plays={plays}
+              game={gameQuery.game}
+              isBasketball={isBasketballEvent(gameQuery.game)}
+            />
+          ) : (
+            <Text className="text-center text-zinc-500 dark:text-zinc-400 mt-8">
+              No plays available yet
+            </Text>
           )}
-      </View>
+        </View>
+      )}
     </ScrollView>
   )
 }
