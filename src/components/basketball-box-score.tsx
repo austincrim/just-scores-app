@@ -72,46 +72,49 @@ export function BasketballBoxScore({
         activeFontStyle={{ color: colors.zinc[100], fontSize: 13 }}
         style={{ height: 28, width: 140, alignSelf: "center" }}
       />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View>
-          {/* Header row */}
-          <View className="flex flex-row border-b border-zinc-600">
-            <View style={{ width: NAME_WIDTH }}>
-              <Text style={styles.nameHeaderCell}>Name</Text>
-            </View>
-            {displayStats.map((stat) => (
-              <View key={stat.key} style={{ width: CELL_WIDTH }}>
-                <Text style={styles.headerCell}>{stat.display}</Text>
-              </View>
-            ))}
-          </View>
-          {/* Data rows */}
-          {boxScore[team].map((player, index) => (
-            <View
-              key={player.id}
-              style={[
-                index % 2 === 1 && {
-                  backgroundColor: isDark
-                    ? "rgba(255, 255, 255, 0.05)"
-                    : "rgba(0, 0, 0, 0.05)",
-                },
-              ]}
-              className="flex flex-row items-center"
-            >
+      <View className="-mx-4">
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View className="px-4">
+            {/* Header row */}
+            <View className="flex flex-row border-b border-zinc-600">
               <View style={{ width: NAME_WIDTH }}>
-                <Text style={styles.nameCell}>
-                  {player.player.first_initial_and_last_name}
-                </Text>
+                <Text style={styles.nameHeaderCell}>Name</Text>
               </View>
               {displayStats.map((stat) => (
                 <View key={stat.key} style={{ width: CELL_WIDTH }}>
-                  <Text style={styles.cell}>{getStatValue(player, stat)}</Text>
+                  <Text style={styles.headerCell}>{stat.display}</Text>
                 </View>
               ))}
             </View>
-          ))}
-        </View>
-      </ScrollView>
+            {/* Data rows */}
+            {boxScore[team].map((player, index) => (
+              <View
+                key={player.id}
+                style={[
+                  { marginLeft: -16, paddingLeft: 16, marginRight: -16, paddingRight: 16 },
+                  index % 2 === 1 && {
+                    backgroundColor: isDark
+                      ? "rgba(255, 255, 255, 0.05)"
+                      : "rgba(0, 0, 0, 0.05)",
+                  },
+                ]}
+                className="flex flex-row items-center"
+              >
+                <View style={{ width: NAME_WIDTH }}>
+                  <Text style={styles.nameCell}>
+                    {player.player.first_initial_and_last_name}
+                  </Text>
+                </View>
+                {displayStats.map((stat) => (
+                  <View key={stat.key} style={{ width: CELL_WIDTH }}>
+                    <Text style={styles.cell}>{getStatValue(player, stat)}</Text>
+                  </View>
+                ))}
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
 
       {teamRecords && <TeamStats teamRecord={teamRecords[team]} />}
     </View>

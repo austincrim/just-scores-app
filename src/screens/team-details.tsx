@@ -1,7 +1,8 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   Image,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -23,6 +24,7 @@ type Props = RootStackScreenProps<"team">
 
 export function TeamDetail({ route }: Props) {
   let navigation = useNavigation()
+  let [isRefetching, setIsRefetching] = useState(false)
   let [favoriteTeams, setFavoriteTeams] = useMMKVObject<FavoriteTeam[]>(
     FAVORITES_KEY,
     storage,
@@ -31,6 +33,7 @@ export function TeamDetail({ route }: Props) {
     data: games,
     status,
     error,
+    refetch,
   } = useTeamSchedule(route.params.sport, route.params.teamId)
   let { data: standing } = useTeamStanding(
     route.params.sport,
@@ -51,41 +54,7 @@ export function TeamDetail({ route }: Props) {
         )
     : []
 
-  // Calculate conference record from completed games
-  let confWins = 0
-  let confLosses = 0
-  if (games) {
-    const now = new Date()
-    games.forEach((game) => {
-      if (!game.home_team || !game.away_team) return
 
-      const gameDate = new Date(game.game_date)
-      const isTeamHome = game.home_team.id === route.params.teamId
-      const team = isTeamHome ? game.home_team : game.away_team
-      const opponent = isTeamHome ? game.away_team : game.home_team
-
-      if (gameDate < now && game.status !== "pre_game") {
-        const teamScore = isTeamHome
-          ? game.box_score?.score?.home?.score
-          : game.box_score?.score?.away?.score
-        const opponentScore = isTeamHome
-          ? game.box_score?.score?.away?.score
-          : game.box_score?.score?.home?.score
-
-        if (teamScore !== undefined && opponentScore !== undefined) {
-          if (opponent.conference === team.conference) {
-            if (teamScore > opponentScore) {
-              confWins++
-            } else if (opponentScore > teamScore) {
-              confLosses++
-            }
-          }
-        }
-      }
-    })
-  }
-  const confRecord =
-    confWins + confLosses > 0 ? `${confWins}-${confLosses}` : null
 
   if (status === "pending") {
     return <TeamDetailsSkeleton />
@@ -123,8 +92,19 @@ export function TeamDetail({ route }: Props) {
     }
   }
 
+  const handleRefresh = async () => {
+    setIsRefetching(true)
+    await refetch()
+    setIsRefetching(false)
+  }
+
   return (
-    <ScrollView className="flex-1 px-4 py-4">
+    <ScrollView
+      className="flex-1 px-4 py-4"
+      refreshControl={
+        <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
+      }
+    >
       <View className="items-center gap-3 mb-6">
         <Image
           source={{ uri: team.logos.large || team.logos.small }}
@@ -150,7 +130,8 @@ export function TeamDetail({ route }: Props) {
           <View className="items-center">
             <Text className="text-xl">
               {standing.short_record}
-              {confRecord && ` (${confRecord})`}
+              {standing.short_conference_record &&
+                ` (${standing.short_conference_record})`}
             </Text>
             <Text className="text-sm">
               {standing.division ?? standing.conference}

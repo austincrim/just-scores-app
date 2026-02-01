@@ -288,7 +288,9 @@ export type TeamStanding = {
   losses: number
   ties?: number
   short_record: string
+  short_conference_record?: string
   conference?: string
+  division?: string
 }
 
 export function useTeamStanding(
@@ -299,27 +301,49 @@ export function useTeamStanding(
     queryKey: [sport, "standing", teamId],
     refetchInterval: 30000,
     queryFn: async () => {
-      // Only NFL supports team_id filter reliably
-      if (sport === "nfl") {
-        let standingsRes = await fetch(
-          `${API_URL}/${sport}/standings?team_id=${teamId}`,
-        )
-        if (!standingsRes.ok) {
-          console.error(await standingsRes.text())
-          return null
+      // Try team endpoint first (works for NFL with full data)
+      let teamRes = await fetch(`${API_URL}/${sport}/teams/${teamId}`)
+      if (teamRes.ok) {
+        let team = (await teamRes.json()) as { standing?: TeamStanding }
+        // Only use if it has conference record (NFL has it, NCAA doesn't)
+        if (team.standing?.short_conference_record) {
+          return team.standing
         }
-        let standings = (await standingsRes.json()) as TeamStanding[]
-        return standings[0] || null
       }
 
-      // For NCAA, fetch all and filter
-      let standingsRes = await fetch(`${API_URL}/${sport}/standings`)
+      // Use standings endpoint which has conference_wins/losses for NCAA
+      let standingsRes = await fetch(
+        `${API_URL}/${sport}/standings?team_id=${teamId}`,
+      )
       if (!standingsRes.ok) {
         console.error(await standingsRes.text())
         return null
       }
-      let standings = (await standingsRes.json()) as any[]
-      return standings.find((s) => s.team?.id === teamId) || null
+      let standings = (await standingsRes.json()) as Array<{
+        short_record: string
+        conference?: string
+        division?: string
+        conference_wins?: number
+        conference_losses?: number
+      }>
+      let standing = standings[0]
+      if (!standing) return null
+
+      // Build conference record from wins/losses if available
+      let short_conference_record: string | undefined
+      if (
+        standing.conference_wins != null &&
+        standing.conference_losses != null
+      ) {
+        short_conference_record = `${standing.conference_wins}-${standing.conference_losses}`
+      }
+
+      return {
+        short_record: standing.short_record,
+        short_conference_record,
+        conference: standing.conference,
+        division: standing.division,
+      } as TeamStanding
     },
   })
 }
@@ -343,6 +367,10 @@ export function useFavoriteTeamSchedules(teams: FavoriteTeam[]) {
 
   const isLoading = queries.some((q) => q.isLoading)
   const teamIds = new Set(teams.map((t) => t.id))
+
+  const refetch = async () => {
+    await Promise.all(queries.map((q) => q.refetch()))
+  }
 
   const games = useMemo(() => {
     const allGames: Game[] = []
@@ -375,7 +403,7 @@ export function useFavoriteTeamSchedules(teams: FavoriteTeam[]) {
     return allGames
   }, [queries, teamIds])
 
-  return { games, isLoading }
+  return { games, isLoading, refetch }
 }
 
 export function useLiveLeagues() {

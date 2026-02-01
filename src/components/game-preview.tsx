@@ -1,9 +1,9 @@
 import React from "react"
-import { TouchableOpacity, View } from "react-native"
+import { Pressable, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useQuery } from "@tanstack/react-query"
-import { Game } from "@/types"
 import { API_URL } from "@/lib/hooks"
+import { Game } from "@/types"
 import TeamLine from "./team-line"
 import { Text } from "./text"
 
@@ -52,7 +52,7 @@ export function GamePreview({
   }
 
   return (
-    <TouchableOpacity
+    <Pressable
       className="text-lg active flex flex-row items-center gap-2 py-4"
       disabled={disabled}
       onPress={() => {
@@ -84,6 +84,6 @@ export function GamePreview({
           />
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   )
 }

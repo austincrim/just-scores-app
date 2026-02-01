@@ -137,61 +137,64 @@ export function FootballBoxScore({
               <Text style={styles.positionHeader}>
                 {type.replaceAll("_", " ")}
               </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View>
-                  {/* Header row */}
-                  <View className="flex flex-row border-b border-zinc-600">
-                    <View style={{ width: NAME_WIDTH }}>
-                      <Text style={styles.nameHeaderCell}>Name</Text>
-                    </View>
-                    {stats.map((stat) => (
-                      <View
-                        key={typeof stat === "string" ? stat : stat.key}
-                        style={{ width: CELL_WIDTH }}
-                      >
-                        <Text style={styles.headerCell}>
-                          {(typeof stat === "string"
-                            ? stat
-                            : stat.display
-                          ).replaceAll("_", " ")}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                  {/* Data rows */}
-                  {playersByPosition[type].map((player, index) => (
-                    <View
-                      key={player.id}
-                      style={[
-                        index % 2 === 1 && {
-                          backgroundColor: isDark
-                            ? "rgba(255, 255, 255, 0.05)"
-                            : "rgba(0, 0, 0, 0.05)",
-                        },
-                      ]}
-                      className="flex flex-row items-center"
-                    >
+              <View className="-mx-4">
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View className="px-4">
+                    {/* Header row */}
+                    <View className="flex flex-row border-b border-zinc-600">
                       <View style={{ width: NAME_WIDTH }}>
-                        <Text style={styles.nameCell}>
-                          {player.player.first_initial_and_last_name}
-                        </Text>
+                        <Text style={styles.nameHeaderCell}>Name</Text>
                       </View>
                       {stats.map((stat) => (
                         <View
                           key={typeof stat === "string" ? stat : stat.key}
                           style={{ width: CELL_WIDTH }}
                         >
-                          <Text style={styles.cell}>
-                            {player[typeof stat === "string" ? stat : stat.key]
-                              ?.toString()
-                              .replaceAll("_", " ") ?? "-"}
+                          <Text style={styles.headerCell}>
+                            {(typeof stat === "string"
+                              ? stat
+                              : stat.display
+                            ).replaceAll("_", " ")}
                           </Text>
                         </View>
                       ))}
                     </View>
-                  ))}
-                </View>
-              </ScrollView>
+                    {/* Data rows */}
+                    {playersByPosition[type].map((player, index) => (
+                      <View
+                        key={player.id}
+                        style={[
+                          { marginLeft: -16, paddingLeft: 16, marginRight: -16, paddingRight: 16 },
+                          index % 2 === 1 && {
+                            backgroundColor: isDark
+                              ? "rgba(255, 255, 255, 0.05)"
+                              : "rgba(0, 0, 0, 0.05)",
+                          },
+                        ]}
+                        className="flex flex-row items-center"
+                      >
+                        <View style={{ width: NAME_WIDTH }}>
+                          <Text style={styles.nameCell}>
+                            {player.player.first_initial_and_last_name}
+                          </Text>
+                        </View>
+                        {stats.map((stat) => (
+                          <View
+                            key={typeof stat === "string" ? stat : stat.key}
+                            style={{ width: CELL_WIDTH }}
+                          >
+                            <Text style={styles.cell}>
+                              {player[typeof stat === "string" ? stat : stat.key]
+                                ?.toString()
+                                .replaceAll("_", " ") ?? "-"}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
             </View>
           ) : null
         }

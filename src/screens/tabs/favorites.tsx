@@ -1,6 +1,7 @@
-import { Image, ScrollView, TouchableOpacity, View } from "react-native"
+import { Image, RefreshControl, ScrollView, TouchableOpacity, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { format, isToday, isTomorrow } from "date-fns"
+import { useState } from "react"
 import { useMMKVObject } from "react-native-mmkv"
 import { GamePreview } from "@/components/game-preview"
 import { Text } from "@/components/text"
@@ -13,9 +14,10 @@ type Props = TabScreenProps<"favorites">
 
 export function Favorites({}: Props) {
   let navigation = useNavigation()
+  let [isRefetching, setIsRefetching] = useState(false)
   let [favoriteTeams] = useMMKVObject<FavoriteTeam[]>(FAVORITES_KEY, storage) ?? [[]]
 
-  let { games } = useFavoriteTeamSchedules(favoriteTeams ?? [])
+  let { games, refetch } = useFavoriteTeamSchedules(favoriteTeams ?? [])
 
   if (!favoriteTeams || favoriteTeams.length === 0) {
     return (
@@ -33,8 +35,19 @@ export function Favorites({}: Props) {
 
   const favoriteTeamIds = new Set(favoriteTeams?.map((t) => t.id) ?? [])
 
+  const handleRefresh = async () => {
+    setIsRefetching(true)
+    await refetch()
+    setIsRefetching(false)
+  }
+
   return (
-    <ScrollView className="flex-1 px-2 py-4">
+    <ScrollView
+      className="flex-1 px-2 py-4"
+      refreshControl={
+        <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
+      }
+    >
       <View className="mb-4">
         <View className="flex-row flex-wrap gap-2">
           {favoriteTeams.map((team) => (

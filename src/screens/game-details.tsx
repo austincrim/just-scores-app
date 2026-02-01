@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import {
   Image,
+  RefreshControl,
   ScrollView,
   TouchableOpacity,
   useColorScheme,
@@ -64,10 +65,12 @@ export function GameDetails({ route }: Props) {
   let navigation = useNavigation()
   let isDark = useColorScheme() === "dark"
   let [activeTab, setActiveTab] = useState<TabType>("game")
+  let [isRefetching, setIsRefetching] = useState(false)
   let {
     data: gameQuery,
     status,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["game", route.params.id],
     refetchInterval: 5000,
@@ -216,8 +219,19 @@ export function GameDetails({ route }: Props) {
     return <Text>nothing here</Text>
   }
 
+  const handleRefresh = async () => {
+    setIsRefetching(true)
+    await refetch()
+    setIsRefetching(false)
+  }
+
   return (
-    <ScrollView className="px-4 py-4">
+    <ScrollView
+      className="px-4 py-4"
+      refreshControl={
+        <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
+      }
+    >
       <View className="flex items-center gap-4">
         <View className="flex self-start flex-row justify-between w-full items-center gap-2">
           {gameQuery.game.status !== "pre_game" ? (

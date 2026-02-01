@@ -102,5 +102,5 @@ Returns live event counts across all leagues and conferences.
 - `/{sport}/teams/{teamId}/rosters` - Returns 404 error
 - `/{sport}/teams/{teamId}/standing` - Returns 404 error (use `/standings` with `team_id` filter instead)
 - `/{sport}/teams/{teamId}/stats` - Returns 404 error
-- `/{sport}/standings?team_id=X` - Works for NFL, but NOT for NCAA sports
+- `/{sport}/standings?team_id=X` - Works for all sports (NFL, NCAAB, NCAAF)
 - Events endpoint does not support `season_id` query parameter for filtering

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import {
+  AppState,
   Pressable,
   ScrollView,
   SectionList,
@@ -51,8 +52,23 @@ export function AllSportsView() {
   const [favoriteTeams] =
     useMMKVObject<FavoriteTeam[]>(FAVORITES_KEY, storage) ?? []
 
-  const days = useMemo(() => generateDays(), [])
-  const [selectedDayId, setSelectedDayId] = useState(getTodayId())
+  const [todayId, setTodayId] = useState(getTodayId)
+  const days = useMemo(() => generateDays(), [todayId])
+  const [selectedDayId, setSelectedDayId] = useState(getTodayId)
+
+  // Update today's date when app comes back from background
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        const newTodayId = getTodayId()
+        if (newTodayId !== todayId) {
+          setTodayId(newTodayId)
+          setSelectedDayId(newTodayId)
+        }
+      }
+    })
+    return () => subscription.remove()
+  }, [todayId])
 
   const selectedDay = useMemo(
     () => days.find((d) => d.id === selectedDayId) ?? days[0],
