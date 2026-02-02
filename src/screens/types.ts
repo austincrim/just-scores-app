@@ -9,6 +9,7 @@ export type RootStackParamList = {
   tabs: NavigatorScreenParams<TabsParamList>
   details: { sport: "ncaaf" | "nfl" | "ncaab"; id: string }
   team: { sport: "ncaaf" | "nfl" | "ncaab"; teamId: number; teamName: string }
+  conference: { sport: "ncaaf" | "ncaab"; conference: string }
 }
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

@@ -147,35 +147,37 @@ export function GameDetails({ route }: Props) {
     ],
     enabled: gameQuery?.game.status === "pre_game",
     queryFn: async () => {
-      type TeamStanding = {
+      type StandingRecord = {
         short_record: string
         short_home_record?: string
         short_away_record?: string
       }
       let [homeRes, awayRes] = await Promise.all([
         fetch(
-          `${API_URL}/${route.params.sport}/teams/${gameQuery?.game.home_team.id}`,
+          `${API_URL}/${route.params.sport}/standings?team_id=${gameQuery?.game.home_team.id}`,
         ),
         fetch(
-          `${API_URL}/${route.params.sport}/teams/${gameQuery?.game.away_team.id}`,
+          `${API_URL}/${route.params.sport}/standings?team_id=${gameQuery?.game.away_team.id}`,
         ),
       ])
-      let home: { standing?: TeamStanding } | null = homeRes.ok
+      let homeStandings: StandingRecord[] | null = homeRes.ok
         ? await homeRes.json()
         : null
-      let away: { standing?: TeamStanding } | null = awayRes.ok
+      let awayStandings: StandingRecord[] | null = awayRes.ok
         ? await awayRes.json()
         : null
+      let home = homeStandings?.[0] ?? null
+      let away = awayStandings?.[0] ?? null
       return {
         home: {
-          record: home?.standing?.short_record ?? null,
-          homeRecord: home?.standing?.short_home_record ?? null,
-          awayRecord: home?.standing?.short_away_record ?? null,
+          record: home?.short_record ?? null,
+          homeRecord: home?.short_home_record ?? null,
+          awayRecord: home?.short_away_record ?? null,
         },
         away: {
-          record: away?.standing?.short_record ?? null,
-          homeRecord: away?.standing?.short_home_record ?? null,
-          awayRecord: away?.standing?.short_away_record ?? null,
+          record: away?.short_record ?? null,
+          homeRecord: away?.short_home_record ?? null,
+          awayRecord: away?.short_away_record ?? null,
         },
       }
     },

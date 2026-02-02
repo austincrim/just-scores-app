@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import colors from "tailwindcss/colors"
 import { persister } from "@/lib/storage"
+import { ConferenceStandings } from "@/screens/conference-standings"
 import { GameDetails } from "@/screens/game-details"
 import { Tabs } from "@/screens/tabs"
 import { TeamDetail } from "@/screens/team-details"
@@ -24,6 +25,10 @@ let Stack = createNativeStackNavigator<RootStackParamList>({
     },
     details: { screen: GameDetails, options: { title: "" } },
     team: { screen: TeamDetail, options: { title: "" } },
+    conference: {
+      screen: ConferenceStandings,
+      options: ({ route }) => ({ title: route.params.conference }),
+    },
   },
 })
 let lightTheme = {

@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native"
 import * as Haptics from "expo-haptics"
@@ -24,6 +25,7 @@ type Props = RootStackScreenProps<"team">
 
 export function TeamDetail({ route }: Props) {
   let navigation = useNavigation()
+  let isDark = useColorScheme() === "dark"
   let [isRefetching, setIsRefetching] = useState(false)
   let [favoriteTeams, setFavoriteTeams] = useMMKVObject<FavoriteTeam[]>(
     FAVORITES_KEY,
@@ -53,8 +55,6 @@ export function TeamDetail({ route }: Props) {
             new Date(a.game_date).getTime() - new Date(b.game_date).getTime(),
         )
     : []
-
-
 
   if (status === "pending") {
     return <TeamDetailsSkeleton />
@@ -127,15 +127,34 @@ export function TeamDetail({ route }: Props) {
           </Pressable>
         </View>
         {standing && (
-          <View className="items-center">
+          <View className="items-center gap-2">
             <Text className="text-xl">
               {standing.short_record}
               {standing.short_conference_record &&
                 ` (${standing.short_conference_record})`}
             </Text>
-            <Text className="text-sm">
-              {standing.division ?? standing.conference}
-            </Text>
+            {route.params.sport !== "nfl" && standing.conference ? (
+              <Pressable
+                className="border-b-hairline"
+                onPress={() =>
+                  navigation.navigate("conference", {
+                    sport: route.params.sport as "ncaaf" | "ncaab",
+                    conference: standing.conference!,
+                  })
+                }
+              >
+                <Text
+                  style={{ color: isDark ? colors.sky[400] : colors.sky[700] }}
+                  className="text-sm"
+                >
+                  {standing.division ?? standing.conference}
+                </Text>
+              </Pressable>
+            ) : (
+              <Text className="text-sm">
+                {standing.division ?? standing.conference}
+              </Text>
+            )}
           </View>
         )}
       </View>
@@ -212,7 +231,10 @@ function GameRow({
               {isTeamHome ? "vs" : "@"}
             </Text>
             <View className="flex-row items-center gap-1">
-              <Image source={{ uri: opponent.logos.small }} className="w-8 h-8" />
+              <Image
+                source={{ uri: opponent.logos.small }}
+                className="w-8 h-8"
+              />
               <Text className="flex-1">{opponent.name}</Text>
             </View>
           </View>

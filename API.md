@@ -76,9 +76,11 @@ Fetches detailed info for a single team.
 
 ### GET `/{sport}/standings`
 Fetches all standings entries for a sport.
-- **Params**: `team_id` (optional, filter by team - NFL supports this)
+- **Params**:
+  - `team_id` (optional, filter by team)
+  - `conference` (optional, filter by conference name, e.g. `Big Ten`)
 - **Response**: Array of standing objects with W-L record, conference info, division rank, etc.
-- **Note**: NCAA standings endpoint does NOT support `team_id` filter
+- **Sports**: `nfl`, `ncaaf`, `ncaab`
 
 ## Team Info
 
@@ -102,5 +104,5 @@ Returns live event counts across all leagues and conferences.
 - `/{sport}/teams/{teamId}/rosters` - Returns 404 error
 - `/{sport}/teams/{teamId}/standing` - Returns 404 error (use `/standings` with `team_id` filter instead)
 - `/{sport}/teams/{teamId}/stats` - Returns 404 error
-- `/{sport}/standings?team_id=X` - Works for all sports (NFL, NCAAB, NCAAF)
+
 - Events endpoint does not support `season_id` query parameter for filtering

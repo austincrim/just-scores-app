@@ -375,7 +375,8 @@ export function useFavoriteTeamSchedules(teams: FavoriteTeam[]) {
   const games = useMemo(() => {
     const allGames: Game[] = []
     const seenIds = new Set<number>()
-    const now = new Date()
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
     for (const query of queries) {
       if (query.data) {
@@ -384,9 +385,10 @@ export function useFavoriteTeamSchedules(teams: FavoriteTeam[]) {
             const isFavorite =
               teamIds.has(game.home_team?.id) ||
               teamIds.has(game.away_team?.id)
-            const isUpcoming =
-              game.status !== "final" && new Date(game.game_date) >= now
-            if (isFavorite && isUpcoming) {
+            const gameDate = new Date(game.game_date)
+            gameDate.setHours(0, 0, 0, 0)
+            const isTodayOrFuture = gameDate >= today
+            if (isFavorite && isTodayOrFuture) {
               seenIds.add(game.id)
               allGames.push(game)
             }
