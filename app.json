@@ -14,6 +14,22 @@
       "backgroundColor": "#ffffff"
     },
     "platforms": ["ios"],
+    "plugins": [
+      [
+        "expo-widgets",
+        {
+          "groupIdentifier": "group.com.austincrim.justscores",
+          "widgets": [
+            {
+              "name": "GameScoreActivity",
+              "displayName": "Live Score",
+              "description": "Track live game scores in real-time",
+              "supportedFamilies": ["accessoryRectangular", "accessoryInline"]
+            }
+          ]
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.austincrim.justscores",

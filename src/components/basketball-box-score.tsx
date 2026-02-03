@@ -50,7 +50,10 @@ export function BasketballBoxScore({
 }: {
   boxScore: { home: BasketballPlayerRecord[]; away: BasketballPlayerRecord[] }
   game: Game
-  teamRecords?: { home: BasketballTeamRecord; away: BasketballTeamRecord } | null
+  teamRecords?: {
+    home: BasketballTeamRecord
+    away: BasketballTeamRecord
+  } | null
 }) {
   let [team, setTeam] = useState<"home" | "away">("home")
   let isDark = useColorScheme() === "dark"
@@ -91,7 +94,12 @@ export function BasketballBoxScore({
               <View
                 key={player.id}
                 style={[
-                  { marginLeft: -16, paddingLeft: 16, marginRight: -16, paddingRight: 16 },
+                  {
+                    marginLeft: -16,
+                    paddingLeft: 16,
+                    marginRight: -16,
+                    paddingRight: 16,
+                  },
                   index % 2 === 1 && {
                     backgroundColor: isDark
                       ? "rgba(255, 255, 255, 0.05)"
@@ -107,7 +115,9 @@ export function BasketballBoxScore({
                 </View>
                 {displayStats.map((stat) => (
                   <View key={stat.key} style={{ width: CELL_WIDTH }}>
-                    <Text style={styles.cell}>{getStatValue(player, stat)}</Text>
+                    <Text style={styles.cell}>
+                      {getStatValue(player, stat)}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -116,7 +126,9 @@ export function BasketballBoxScore({
         </ScrollView>
       </View>
 
-      {teamRecords && <TeamStats teamRecord={teamRecords[team]} />}
+      {teamRecords && teamRecords[team] && (
+        <TeamStats teamRecord={teamRecords[team]} />
+      )}
     </View>
   )
 }
@@ -155,9 +167,13 @@ function TeamStats({ teamRecord }: { teamRecord: BasketballTeamRecord }) {
             key={stat.label}
             className="flex-row justify-between items-center py-3 border-b border-zinc-200 dark:border-zinc-700"
           >
-            <Text className="text-zinc-500 dark:text-zinc-400">{stat.label}</Text>
+            <Text className="text-zinc-500 dark:text-zinc-400">
+              {stat.label}
+            </Text>
             <View className="flex-row items-center gap-2">
-              <Text className="text-base font-medium tabular-nums">{stat.value}</Text>
+              <Text className="text-base font-medium tabular-nums">
+                {stat.value}
+              </Text>
               {"pct" in stat && (
                 <Text className="text-zinc-500 dark:text-zinc-400 text-sm w-12 text-right tabular-nums">
                   {stat.pct}%

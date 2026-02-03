@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import {
   Image,
+  Pressable,
   RefreshControl,
   ScrollView,
   TouchableOpacity,
@@ -24,6 +25,7 @@ import {
 import { PlayByPlayList } from "@/components/play-by-play-list"
 import { Text } from "@/components/text"
 import { API_URL } from "@/lib/hooks"
+import { useGameLiveActivity } from "@/lib/useGameLiveActivity"
 import {
   BasketballPlayerRecord,
   BasketballTeamRecord,
@@ -87,6 +89,10 @@ export function GameDetails({ route }: Props) {
       return { game }
     },
   })
+
+  let { isTracking, startTracking, stopTracking } = useGameLiveActivity(
+    gameQuery?.game,
+  )
   let { data: boxScore, refetch: refetchBoxScore } = useQuery({
     queryKey: ["boxScore", gameQuery?.game?.box_score?.id],
     enabled: gameQuery?.game.status !== "pre_game",
@@ -292,6 +298,22 @@ export function GameDetails({ route }: Props) {
             record={standings?.home?.record ?? undefined}
           />
         </View>
+
+        {gameQuery.game.status === "in_progress" && (
+          <Pressable
+            onPress={isTracking ? stopTracking : startTracking}
+            className="flex-row items-center gap-2 px-4 py-2 rounded-full bg-zinc-100 dark:bg-zinc-800 active:opacity-70"
+          >
+            <SymbolView
+              name={isTracking ? "stop.fill" : "play.fill"}
+              size={14}
+              tintColor={isDark ? "#fff" : "#000"}
+            />
+            <Text className="font-medium">
+              {isTracking ? "Stop Live Activity" : "Track Live"}
+            </Text>
+          </Pressable>
+        )}
 
         {gameQuery.game.status !== "pre_game" &&
           gameQuery.game.box_score?.last_play &&
