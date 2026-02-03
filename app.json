@@ -33,6 +33,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.austincrim.justscores",
+      "appleTeamId": "5YQ2CG7528",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
