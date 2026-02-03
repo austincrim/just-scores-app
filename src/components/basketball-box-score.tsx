@@ -123,9 +123,21 @@ export function BasketballBoxScore({
 
 function TeamStats({ teamRecord }: { teamRecord: BasketballTeamRecord }) {
   const stats = [
-    { label: "FG%", value: teamRecord.field_goals_percentage },
-    { label: "3PT%", value: teamRecord.three_point_field_goals_percentage ?? "-" },
-    { label: "FT%", value: teamRecord.free_throws_percentage },
+    {
+      label: "FG",
+      value: `${teamRecord.field_goals_made}/${teamRecord.field_goals_attempted}`,
+      pct: teamRecord.field_goals_percentage,
+    },
+    {
+      label: "3PT",
+      value: `${teamRecord.three_point_field_goals_made}/${teamRecord.three_point_field_goals_attempted}`,
+      pct: teamRecord.three_point_field_goals_percentage ?? "-",
+    },
+    {
+      label: "FT",
+      value: `${teamRecord.free_throws_made}/${teamRecord.free_throws_attempted}`,
+      pct: teamRecord.free_throws_percentage,
+    },
     { label: "REB", value: teamRecord.rebounds_total },
     { label: "AST", value: teamRecord.assists },
     { label: "STL", value: teamRecord.steals },
@@ -137,11 +149,21 @@ function TeamStats({ teamRecord }: { teamRecord: BasketballTeamRecord }) {
   return (
     <View className="mt-6">
       <Text className="text-base font-semibold mb-3">Team Stats</Text>
-      <View className="flex flex-row flex-wrap">
+      <View className="border-t border-zinc-200 dark:border-zinc-700">
         {stats.map((stat) => (
-          <View key={stat.label} className="w-1/3 py-2">
-            <Text className="text-zinc-500 text-xs">{stat.label}</Text>
-            <Text className="text-lg font-medium">{stat.value}</Text>
+          <View
+            key={stat.label}
+            className="flex-row justify-between items-center py-3 border-b border-zinc-200 dark:border-zinc-700"
+          >
+            <Text className="text-zinc-500 dark:text-zinc-400">{stat.label}</Text>
+            <View className="flex-row items-center gap-2">
+              <Text className="text-base font-medium tabular-nums">{stat.value}</Text>
+              {"pct" in stat && (
+                <Text className="text-zinc-500 dark:text-zinc-400 text-sm w-12 text-right tabular-nums">
+                  {stat.pct}%
+                </Text>
+              )}
+            </View>
           </View>
         ))}
       </View>

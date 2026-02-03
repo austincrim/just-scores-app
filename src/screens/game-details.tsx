@@ -87,9 +87,10 @@ export function GameDetails({ route }: Props) {
       return { game }
     },
   })
-  let { data: boxScore } = useQuery({
+  let { data: boxScore, refetch: refetchBoxScore } = useQuery({
     queryKey: ["boxScore", gameQuery?.game?.box_score?.id],
     enabled: gameQuery?.game.status !== "pre_game",
+    refetchInterval: 5000,
     queryFn: async () => {
       if (!gameQuery?.game.box_score.id) return []
       let res = await fetch(
@@ -120,12 +121,13 @@ export function GameDetails({ route }: Props) {
     },
   })
 
-  let { data: teamRecords } = useQuery({
+  let { data: teamRecords, refetch: refetchTeamRecords } = useQuery({
     queryKey: ["teamRecords", gameQuery?.game?.box_score?.id],
     enabled:
       !!gameQuery?.game &&
       gameQuery.game.status !== "pre_game" &&
       isBasketballEvent(gameQuery.game),
+    refetchInterval: 5000,
     queryFn: async () => {
       if (!gameQuery?.game.box_score.id) return null
       let res = await fetch(
@@ -138,7 +140,7 @@ export function GameDetails({ route }: Props) {
     },
   })
 
-  let { data: standings } = useQuery({
+  let { data: standings, refetch: refetchStandings } = useQuery({
     queryKey: [
       "standings",
       route.params.sport,
@@ -183,7 +185,7 @@ export function GameDetails({ route }: Props) {
     },
   })
 
-  let { data: plays, isLoading: playsLoading } = useQuery({
+  let { data: plays, isLoading: playsLoading, refetch: refetchPlays } = useQuery({
     queryKey: ["plays", route.params.id],
     enabled:
       activeTab === "plays" &&
@@ -223,7 +225,13 @@ export function GameDetails({ route }: Props) {
 
   const handleRefresh = async () => {
     setIsRefetching(true)
-    await refetch()
+    await Promise.all([
+      refetch(),
+      refetchBoxScore(),
+      refetchTeamRecords(),
+      refetchStandings(),
+      refetchPlays(),
+    ])
     setIsRefetching(false)
   }
 
@@ -284,6 +292,21 @@ export function GameDetails({ route }: Props) {
             record={standings?.home?.record ?? undefined}
           />
         </View>
+
+        {gameQuery.game.status !== "pre_game" &&
+          gameQuery.game.box_score?.last_play &&
+          (gameQuery.game.box_score.last_play.description ||
+            ("details" in gameQuery.game.box_score.last_play &&
+              gameQuery.game.box_score.last_play.details)) && (
+            <View className="w-full mt-4">
+              <Text className="text-xl">Last Play</Text>
+              <Text className="mt-2">
+                {gameQuery.game.box_score.last_play.description ||
+                  ("details" in gameQuery.game.box_score.last_play &&
+                    gameQuery.game.box_score.last_play.details)}
+              </Text>
+            </View>
+          )}
 
         {gameQuery.game.status !== "pre_game" &&
           gameQuery.game.has_play_by_play_records && (

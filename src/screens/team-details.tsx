@@ -37,7 +37,7 @@ export function TeamDetail({ route }: Props) {
     error,
     refetch,
   } = useTeamSchedule(route.params.sport, route.params.teamId)
-  let { data: standing } = useTeamStanding(
+  let { data: standing, refetch: refetchStanding } = useTeamStanding(
     route.params.sport,
     route.params.teamId,
   )
@@ -94,7 +94,7 @@ export function TeamDetail({ route }: Props) {
 
   const handleRefresh = async () => {
     setIsRefetching(true)
-    await refetch()
+    await Promise.all([refetch(), refetchStanding()])
     setIsRefetching(false)
   }
 

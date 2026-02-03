@@ -14,13 +14,6 @@ export function FootballScore({ game }: { game: NcaaFBEvent | NFLEvent }) {
         </Text>
       )}
 
-      {game.box_score?.last_play?.details && (
-        <View className="mt-4 text-sm">
-          <Text className="text-xl">Last Play</Text>
-          <Text className="mt-2">{game.box_score.last_play.details}</Text>
-        </View>
-      )}
-
       {game.box_score?.scoring_summary && (
         <View className="flex gap-6 my-8 text-xs">
           <Text className="text-xl">Scoring Summary</Text>

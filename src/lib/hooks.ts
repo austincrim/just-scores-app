@@ -80,7 +80,14 @@ type NcaaSport = "ncaaf" | "ncaab"
 export function useAllSportsGames(date: string) {
   return useQuery({
     queryKey: ["multisport", "all", date],
-    refetchInterval: 5000,
+    refetchInterval: (query) => {
+      const data = query.state.data
+      if (!data) return 5000
+      const hasLiveGames = SPORTS.some((sport) =>
+        data[sport].some((g) => g.status === "in_progress"),
+      )
+      return hasLiveGames ? 5000 : 60000
+    },
     queryFn: async () => {
       try {
         const startDate = new Date(`${date}T06:00:00.000Z`)
@@ -267,6 +274,7 @@ export function useTeamSchedule(
 ) {
   return useQuery({
     queryKey: [sport, "team", teamId],
+    refetchInterval: 30000,
     queryFn: async () => {
       let scheduleRes = await fetch(
         `${API_URL}/${sport}/teams/${teamId}/events/full_schedule`,
@@ -352,6 +360,7 @@ export function useFavoriteTeamSchedules(teams: FavoriteTeam[]) {
   const queries = useQueries({
     queries: teams.map((team) => ({
       queryKey: [team.sport, "team", team.id],
+      refetchInterval: 30000,
       queryFn: async () => {
         let res = await fetch(
           `${API_URL}/${team.sport}/teams/${team.id}/events/full_schedule`,

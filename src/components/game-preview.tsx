@@ -20,6 +20,7 @@ export function GamePreview({
   let { data: gameDetails } = useQuery({
     queryKey: ["game", String(game.id)],
     staleTime: 1000 * 60,
+    enabled: game.status === "pre_game",
     queryFn: async () => {
       let res = await fetch(`${API_URL}/${sport}/events/${game.id}`)
       if (!res.ok) throw new Error(await res.text())
