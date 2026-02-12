@@ -34,7 +34,8 @@
           ]
         }
       ],
-      "expo-font"
+      "expo-font",
+      "./plugins/withWidgetOverrides"
     ],
     "ios": {
       "supportsTablet": true,

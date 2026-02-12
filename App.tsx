@@ -7,6 +7,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 import colors from "tailwindcss/colors"
+import { LiveActivityProvider } from "@/lib/LiveActivityProvider"
 import { persister } from "@/lib/storage"
 import { ConferenceStandings } from "@/screens/conference-standings"
 import { GameDetails } from "@/screens/game-details"
@@ -86,7 +87,9 @@ export default function App() {
           client={queryClient}
           persistOptions={{ persister }}
         >
-          <Navigator theme={scheme === "dark" ? darkTheme : lightTheme} />
+          <LiveActivityProvider>
+            <Navigator theme={scheme === "dark" ? darkTheme : lightTheme} />
+          </LiveActivityProvider>
         </PersistQueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

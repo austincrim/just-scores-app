@@ -218,11 +218,10 @@ export function GameDetails({ route }: Props) {
       navigation?.setOptions({
         headerTitle: `${gameQuery.game.away_team.abbreviation} @ ${gameQuery.game.home_team.abbreviation}`,
         headerRight: () =>
-          // gameQuery.game.status === "in_progress" ? (
-          true ? (
+          gameQuery.game.status === "in_progress" ? (
             <Pressable
               onPress={isTracking ? stopTracking : startTracking}
-              className="flex-row items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 active:opacity-70"
+              className="flex-row items-center gap-1.5 px-3 py-1.5"
             >
               <SymbolView
                 name={isTracking ? "stop.fill" : "play.fill"}
