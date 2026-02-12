@@ -1,7 +1,14 @@
-import { Image, RefreshControl, ScrollView, TouchableOpacity, View } from "react-native"
+import { useState } from "react"
+import {
+  Image,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { format, isToday, isTomorrow } from "date-fns"
-import { useState } from "react"
 import { useMMKVObject } from "react-native-mmkv"
 import { GamePreview } from "@/components/game-preview"
 import { Text } from "@/components/text"
@@ -15,7 +22,10 @@ type Props = TabScreenProps<"favorites">
 export function Favorites({}: Props) {
   let navigation = useNavigation()
   let [isRefetching, setIsRefetching] = useState(false)
-  let [favoriteTeams] = useMMKVObject<FavoriteTeam[]>(FAVORITES_KEY, storage) ?? [[]]
+  let [favoriteTeams] = useMMKVObject<FavoriteTeam[]>(
+    FAVORITES_KEY,
+    storage,
+  ) ?? [[]]
 
   let { games, refetch } = useFavoriteTeamSchedules(favoriteTeams ?? [])
 
@@ -51,7 +61,7 @@ export function Favorites({}: Props) {
       <View className="mb-4">
         <View className="flex-row flex-wrap gap-2">
           {favoriteTeams.map((team) => (
-            <TouchableOpacity
+            <Pressable
               key={team.id}
               onPress={() =>
                 navigation.navigate("team", {
@@ -67,7 +77,7 @@ export function Favorites({}: Props) {
                 className="w-10 h-10"
               />
               <Text className="text-xs text-center">{team.abbreviation}</Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
       </View>

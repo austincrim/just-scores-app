@@ -1,5 +1,6 @@
 import {
   Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -86,7 +87,7 @@ export function ConferenceStandings({ route }: Props) {
           <Text className="w-16 text-sm font-bold text-center">Overall</Text>
         </View>
         {standings.map((entry) => (
-          <TouchableOpacity
+          <Pressable
             key={entry.id}
             onPress={() =>
               navigation.navigate("team", {
@@ -120,7 +121,7 @@ export function ConferenceStandings({ route }: Props) {
                 {entry.short_record}
               </Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
     </ScrollView>

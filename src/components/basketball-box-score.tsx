@@ -126,60 +126,83 @@ export function BasketballBoxScore({
         </ScrollView>
       </View>
 
-      {teamRecords && teamRecords[team] && (
-        <TeamStats teamRecord={teamRecords[team]} />
+      {teamRecords && teamRecords.home && teamRecords.away && (
+        <TeamStats
+          home={teamRecords.home}
+          away={teamRecords.away}
+          game={game}
+        />
       )}
     </View>
   )
 }
 
-function TeamStats({ teamRecord }: { teamRecord: BasketballTeamRecord }) {
-  const stats = [
+function getTeamStats(record: BasketballTeamRecord) {
+  return [
     {
       label: "FG",
-      value: `${teamRecord.field_goals_made}/${teamRecord.field_goals_attempted}`,
-      pct: teamRecord.field_goals_percentage,
+      value: `${record.field_goals_made}/${record.field_goals_attempted}`,
+      pct: record.field_goals_percentage,
     },
     {
       label: "3PT",
-      value: `${teamRecord.three_point_field_goals_made}/${teamRecord.three_point_field_goals_attempted}`,
-      pct: teamRecord.three_point_field_goals_percentage ?? "-",
+      value: `${record.three_point_field_goals_made}/${record.three_point_field_goals_attempted}`,
+      pct: record.three_point_field_goals_percentage ?? "-",
     },
     {
       label: "FT",
-      value: `${teamRecord.free_throws_made}/${teamRecord.free_throws_attempted}`,
-      pct: teamRecord.free_throws_percentage,
+      value: `${record.free_throws_made}/${record.free_throws_attempted}`,
+      pct: record.free_throws_percentage,
     },
-    { label: "REB", value: teamRecord.rebounds_total },
-    { label: "AST", value: teamRecord.assists },
-    { label: "STL", value: teamRecord.steals },
-    { label: "BLK", value: teamRecord.blocked_shots },
-    { label: "TO", value: teamRecord.turnovers },
-    { label: "PF", value: teamRecord.personal_fouls },
+    { label: "REB", value: record.rebounds_total },
+    { label: "AST", value: record.assists },
+    { label: "STL", value: record.steals },
+    { label: "BLK", value: record.blocked_shots },
+    { label: "TO", value: record.turnovers },
+    { label: "PF", value: record.personal_fouls },
   ]
+}
+
+function TeamStats({
+  home,
+  away,
+  game,
+}: {
+  home: BasketballTeamRecord
+  away: BasketballTeamRecord
+  game: Game
+}) {
+  const homeStats = getTeamStats(home)
+  const awayStats = getTeamStats(away)
 
   return (
     <View className="mt-6">
       <Text className="text-base font-semibold mb-3">Team Stats</Text>
       <View className="border-t border-zinc-200 dark:border-zinc-700">
-        {stats.map((stat) => (
+        {/* Column headers */}
+        <View className="flex-row items-center py-3 border-b border-zinc-200 dark:border-zinc-700">
+          <View className="flex-1" />
+          <Text className="w-20 text-center text-sm font-bold">
+            {game.away_team.abbreviation}
+          </Text>
+          <Text className="w-20 text-center text-sm font-bold">
+            {game.home_team.abbreviation}
+          </Text>
+        </View>
+        {homeStats.map((stat, i) => (
           <View
             key={stat.label}
-            className="flex-row justify-between items-center py-3 border-b border-zinc-200 dark:border-zinc-700"
+            className="flex-row items-center py-3 border-b border-zinc-200 dark:border-zinc-700"
           >
-            <Text className="text-zinc-500 dark:text-zinc-400">
+            <Text className="flex-1 text-zinc-500 dark:text-zinc-400">
               {stat.label}
             </Text>
-            <View className="flex-row items-center gap-2">
-              <Text className="text-base font-medium tabular-nums">
-                {stat.value}
-              </Text>
-              {"pct" in stat && (
-                <Text className="text-zinc-500 dark:text-zinc-400 text-sm w-12 text-right tabular-nums">
-                  {stat.pct}%
-                </Text>
-              )}
-            </View>
+            <Text className="w-20 text-center text-base font-medium tabular-nums">
+              {awayStats[i].value}
+            </Text>
+            <Text className="w-20 text-center text-base font-medium tabular-nums">
+              {stat.value}
+            </Text>
           </View>
         ))}
       </View>

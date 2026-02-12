@@ -48,7 +48,7 @@ export function AllSportsView() {
   const isDark = useColorScheme() === "dark"
   const navigation = useNavigation()
   const scheduleSheetRef = useRef<TrueSheet>(null)
-  const [isRefetching, setIsRefetching] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [favoriteTeams] =
     useMMKVObject<FavoriteTeam[]>(FAVORITES_KEY, storage) ?? []
 
@@ -192,16 +192,27 @@ export function AllSportsView() {
   return (
     <GestureDetector gesture={changeScheduleGesture}>
       <View className="flex-1 p-2 px-4">
+        {sections.length === 0 ? (
+          <View className="flex-1 items-center justify-center px-8">
+            <Text className="text-lg font-bold text-center mb-2">
+              No games scheduled
+            </Text>
+            <Text className="text-center text-zinc-500 dark:text-zinc-400">
+              No tracked games {selectedDay.id === getTodayId() ? "today" : `on ${selectedDay.label}`}{" "}
+              (NFL and NCAA Power 4 games)
+            </Text>
+          </View>
+        ) : (
         <SectionList
           sections={sections}
           showsVerticalScrollIndicator={false}
           stickySectionHeadersEnabled={false}
-          onRefresh={() => {
-            setIsRefetching(true)
-            refetch()
-            setTimeout(() => setIsRefetching(false), 1500)
+          onRefresh={async () => {
+            setIsRefreshing(true)
+            await refetch()
+            setIsRefreshing(false)
           }}
-          refreshing={isRefetching}
+          refreshing={isRefreshing}
           keyExtractor={(item) => `${item.id}-${selectedDayId}`}
           renderSectionHeader={({ section }) => (
             <View className="mb-2 mt-6 flex-row items-center gap-2">
@@ -228,6 +239,7 @@ export function AllSportsView() {
             )
           }}
         />
+        )}
 
         <TrueSheet scrollable ref={scheduleSheetRef} detents={[0.5]}>
           <ScrollView className="py-4" nestedScrollEnabled>

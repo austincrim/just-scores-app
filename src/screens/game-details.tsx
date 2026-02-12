@@ -4,7 +4,6 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
-  TouchableOpacity,
   useColorScheme,
   View,
 } from "react-native"
@@ -140,8 +139,9 @@ export function GameDetails({ route }: Props) {
         `${API_URL}/${route.params.sport}/box_scores/${gameQuery?.game.box_score.id}`,
       )
       if (!res.ok) return null
-      let data: { team_records: { home: BasketballTeamRecord; away: BasketballTeamRecord } } =
-        await res.json()
+      let data: {
+        team_records: { home: BasketballTeamRecord; away: BasketballTeamRecord }
+      } = await res.json()
       return data.team_records
     },
   })
@@ -191,7 +191,11 @@ export function GameDetails({ route }: Props) {
     },
   })
 
-  let { data: plays, isLoading: playsLoading, refetch: refetchPlays } = useQuery({
+  let {
+    data: plays,
+    isLoading: playsLoading,
+    refetch: refetchPlays,
+  } = useQuery({
     queryKey: ["plays", route.params.id],
     enabled:
       activeTab === "plays" &&
@@ -213,9 +217,26 @@ export function GameDetails({ route }: Props) {
     if (gameQuery?.game) {
       navigation?.setOptions({
         headerTitle: `${gameQuery.game.away_team.abbreviation} @ ${gameQuery.game.home_team.abbreviation}`,
+        headerRight: () =>
+          // gameQuery.game.status === "in_progress" ? (
+          true ? (
+            <Pressable
+              onPress={isTracking ? stopTracking : startTracking}
+              className="flex-row items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 active:opacity-70"
+            >
+              <SymbolView
+                name={isTracking ? "stop.fill" : "play.fill"}
+                size={10}
+                tintColor={isDark ? "#fff" : "#000"}
+              />
+              <Text className="text-sm font-medium">
+                {isTracking ? "Stop Tracking" : "Track Live"}
+              </Text>
+            </Pressable>
+          ) : null,
       })
     }
-  }, [gameQuery?.game])
+  }, [gameQuery?.game, isTracking])
 
   if (status === "pending") {
     return <GameDetailsSkeleton />
@@ -263,7 +284,7 @@ export function GameDetails({ route }: Props) {
             </Text>
           )}
           {gameQuery.game.tv_listings_by_country_code?.us?.[0] && (
-            <TouchableOpacity
+            <Pressable
               className="text-center"
               onPress={async () => {
                 try {
@@ -283,7 +304,7 @@ export function GameDetails({ route }: Props) {
                   {gameQuery.game.tv_listings_by_country_code.us![0].long_name}
                 </Text>
               </View>
-            </TouchableOpacity>
+            </Pressable>
           )}
         </View>
         <View className="flex flex-col w-full gap-2">
@@ -298,22 +319,6 @@ export function GameDetails({ route }: Props) {
             record={standings?.home?.record ?? undefined}
           />
         </View>
-
-        {gameQuery.game.status === "in_progress" && (
-          <Pressable
-            onPress={isTracking ? stopTracking : startTracking}
-            className="flex-row items-center gap-2 px-4 py-2 rounded-full bg-zinc-100 dark:bg-zinc-800 active:opacity-70"
-          >
-            <SymbolView
-              name={isTracking ? "stop.fill" : "play.fill"}
-              size={14}
-              tintColor={isDark ? "#fff" : "#000"}
-            />
-            <Text className="font-medium">
-              {isTracking ? "Stop Live Activity" : "Track Live"}
-            </Text>
-          </Pressable>
-        )}
 
         {gameQuery.game.status !== "pre_game" &&
           gameQuery.game.box_score?.last_play &&
@@ -512,7 +517,7 @@ function TeamLine({
       : "ncaab"
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={() =>
         navigation.navigate("team", {
           sport,
@@ -553,7 +558,7 @@ function TeamLine({
           <Text className="text-5xl tabular-nums">{score}</Text>
         )}
       </View>
-    </TouchableOpacity>
+    </Pressable>
   )
 }
 

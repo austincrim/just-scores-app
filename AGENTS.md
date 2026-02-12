@@ -22,6 +22,24 @@
 
 **Key types**: Game (NFLEvent | NcaaFBEvent | NcaaBBEvent), BoxScore (Football | Basketball), PlayerRecord
 
+## Live Activities (expo-widgets)
+
+**Setup**: `expo-widgets` config plugin in `app.json` with widget name `GameScoreActivity`
+
+**Files**:
+- `src/lib/live-activity.tsx` - Live Activity component layout + start/update helpers
+- `src/lib/useGameLiveActivity.ts` - Hook managing activity lifecycle (start, update on score change, stop, error recovery)
+- `src/types/expo-widgets.d.ts` - Type declarations for expo-widgets (no bundled types)
+
+**Key constraints**:
+- `@expo/ui` `Image` only supports SF Symbols (`systemName`), NOT remote URLs or bundled assets
+- `@expo/ui` `Text` modifiers must use **named colors** (`"white"`, `"gray"`) not hex colors (`"#FFFFFF"`) — hex silently breaks rendering
+- Use `font({ size, weight })`, `bold()`, `foregroundStyle()` as modifiers, not as Text props
+- Live Activity layouts: `banner` (lock screen), `compactLeading`/`compactTrailing`/`minimal` (Dynamic Island), `expandedLeading`/`expandedTrailing`/`expandedBottom` (long-press Dynamic Island)
+- Updates triggered by primitive value deps (`awayScore`, `homeScore`, `progressString`) not object references
+- Activity ID persisted in MMKV for recovery across app restarts; cleared on update failure (dismissed externally)
+- `HStack`/`VStack` support `spacing` and `alignment` props for layout control; use `Spacer` to push content to edges
+
 ## Code Style
 
 - **Language**: TypeScript (strict: true)

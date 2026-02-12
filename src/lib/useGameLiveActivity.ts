@@ -1,4 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react"
+import {
+  cacheTeamLogo,
+  endActivity,
+} from "../../modules/live-activity-module"
 import { Game } from "@/types"
 import { startGameLiveActivity, updateGameLiveActivity } from "./live-activity"
 import { storage } from "./storage"
@@ -73,11 +77,22 @@ export function useGameLiveActivity(game: Game | undefined) {
     }
   }, [game, game?.status, safeUpdate, resetTracking])
 
-  const startTracking = useCallback(() => {
+  const startTracking = useCallback(async () => {
     if (!game) return
     if (activityIdRef.current) return
 
     try {
+      const sport = game.api_uri.includes("nfl")
+        ? "nfl"
+        : game.api_uri.includes("ncaaf")
+          ? "ncaaf"
+          : "ncaab"
+
+      await Promise.all([
+        cacheTeamLogo(game.away_team.logos.small, sport, game.away_team.id),
+        cacheTeamLogo(game.home_team.logos.small, sport, game.home_team.id),
+      ])
+
       const activityId = startGameLiveActivity(game)
       activityIdRef.current = activityId
       setIsTracking(true)
@@ -88,12 +103,16 @@ export function useGameLiveActivity(game: Game | undefined) {
     }
   }, [game])
 
-  const stopTracking = useCallback(() => {
-    if (activityIdRef.current && game) {
-      safeUpdate(activityIdRef.current, game)
+  const stopTracking = useCallback(async () => {
+    if (activityIdRef.current) {
+      try {
+        await endActivity(activityIdRef.current)
+      } catch (error) {
+        console.error("Failed to end Live Activity:", error)
+      }
     }
     resetTracking()
-  }, [game, safeUpdate, resetTracking])
+  }, [resetTracking])
 
   return {
     isTracking,

@@ -209,7 +209,7 @@ function GameRow({
   })
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={() =>
         navigation.navigate("details", {
           sport,
@@ -257,6 +257,6 @@ function GameRow({
           </Text>
         )}
       </View>
-    </TouchableOpacity>
+    </Pressable>
   )
 }
