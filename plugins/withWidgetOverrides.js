@@ -36,6 +36,18 @@ function withWidgetOverrides(config) {
       }
     }
 
+    // Sync widget extension version with main app
+    const widgetPlist = path.join(widgetTargetDir, "Info.plist")
+    if (fs.existsSync(widgetPlist)) {
+      let plistContent = fs.readFileSync(widgetPlist, "utf-8")
+      const buildNumber = config.ios?.buildNumber || config.version || "1"
+      plistContent = plistContent.replace(
+        /(<key>CFBundleVersion<\/key>\s*<string>)[^<]*(<\/string>)/,
+        `$1${buildNumber}$2`,
+      )
+      fs.writeFileSync(widgetPlist, plistContent)
+    }
+
     return config
   })
 }
