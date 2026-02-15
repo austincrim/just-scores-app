@@ -13,23 +13,19 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "platforms": [
-      "ios"
-    ],
+    "platforms": ["ios"],
     "plugins": [
       [
         "expo-widgets",
         {
           "groupIdentifier": "group.com.austincrim.justscores",
+          "bundleIdentifier": "com.austincrim.justscores.ExpoWidgetsTarget",
           "widgets": [
             {
               "name": "GameScoreActivity",
               "displayName": "Live Score",
               "description": "Track live game scores in real-time",
-              "supportedFamilies": [
-                "accessoryRectangular",
-                "accessoryInline"
-              ]
+              "supportedFamilies": ["accessoryRectangular", "accessoryInline"]
             }
           ]
         }

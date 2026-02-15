@@ -1,29 +1,40 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import {
-  cacheTeamLogo,
-  endActivity,
-} from "../../modules/live-activity-module"
+import { endActivity } from "../../modules/live-activity-module"
 import { Game } from "@/types"
 import { startGameLiveActivity, updateGameLiveActivity } from "./live-activity"
 import { storage } from "./storage"
 
-const ACTIVITY_STORAGE_KEY = "live_activity_id"
-const ACTIVITY_GAME_ID_KEY = "live_activity_game_id"
+const ACTIVITIES_STORAGE_KEY = "live_activities"
 
-function clearStoredActivity() {
-  storage.remove(ACTIVITY_STORAGE_KEY)
-  storage.remove(ACTIVITY_GAME_ID_KEY)
+type ActivityMap = Record<string, string>
+
+function getStoredActivities(): ActivityMap {
+  const json = storage.getString(ACTIVITIES_STORAGE_KEY)
+  return json ? JSON.parse(json) : {}
+}
+
+function storeActivity(gameId: string, activityId: string) {
+  const activities = getStoredActivities()
+  activities[gameId] = activityId
+  storage.set(ACTIVITIES_STORAGE_KEY, JSON.stringify(activities))
+}
+
+function removeStoredActivity(gameId: string) {
+  const activities = getStoredActivities()
+  delete activities[gameId]
+  storage.set(ACTIVITIES_STORAGE_KEY, JSON.stringify(activities))
 }
 
 export function useGameLiveActivity(game: Game | undefined) {
   const activityIdRef = useRef<string | null>(null)
   const [isTracking, setIsTracking] = useState(false)
+  const gameId = game ? String(game.id) : null
 
   const resetTracking = useCallback(() => {
-    clearStoredActivity()
+    if (gameId) removeStoredActivity(gameId)
     activityIdRef.current = null
     setIsTracking(false)
-  }, [])
+  }, [gameId])
 
   const safeUpdate = useCallback(
     (activityId: string, gameData: Game) => {
@@ -37,26 +48,19 @@ export function useGameLiveActivity(game: Game | undefined) {
   )
 
   useEffect(() => {
-    const storedActivityId = storage.getString(ACTIVITY_STORAGE_KEY)
-    const storedGameId = storage.getString(ACTIVITY_GAME_ID_KEY)
+    if (!game || !gameId) return
 
-    if (
-      storedActivityId &&
-      storedGameId &&
-      game &&
-      storedGameId === String(game.id)
-    ) {
+    const storedActivityId = getStoredActivities()[gameId]
+    if (storedActivityId) {
       const success = updateGameLiveActivity(storedActivityId, game)
       if (success) {
         activityIdRef.current = storedActivityId
         setIsTracking(true)
       } else {
-        clearStoredActivity()
+        removeStoredActivity(gameId)
       }
-    } else if (storedActivityId && game && storedGameId !== String(game.id)) {
-      clearStoredActivity()
     }
-  }, [game?.id])
+  }, [gameId])
 
   const awayScore = game?.box_score?.score?.away?.score
   const homeScore = game?.box_score?.score?.home?.score
@@ -78,30 +82,18 @@ export function useGameLiveActivity(game: Game | undefined) {
   }, [game, game?.status, safeUpdate, resetTracking])
 
   const startTracking = useCallback(async () => {
-    if (!game) return
+    if (!game || !gameId) return
     if (activityIdRef.current) return
 
     try {
-      const sport = game.api_uri.includes("nfl")
-        ? "nfl"
-        : game.api_uri.includes("ncaaf")
-          ? "ncaaf"
-          : "ncaab"
-
-      await Promise.all([
-        cacheTeamLogo(game.away_team.logos.small, sport, game.away_team.id),
-        cacheTeamLogo(game.home_team.logos.small, sport, game.home_team.id),
-      ])
-
       const activityId = startGameLiveActivity(game)
       activityIdRef.current = activityId
       setIsTracking(true)
-      storage.set(ACTIVITY_STORAGE_KEY, activityId)
-      storage.set(ACTIVITY_GAME_ID_KEY, String(game.id))
+      storeActivity(gameId, activityId)
     } catch (error) {
       console.error("Failed to start Live Activity:", error)
     }
-  }, [game])
+  }, [game, gameId])
 
   const stopTracking = useCallback(async () => {
     if (activityIdRef.current) {

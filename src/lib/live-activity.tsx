@@ -21,6 +21,7 @@ type GameActivityProps = {
   progressString: string
   isFootball: boolean
   hasPossession?: "home" | "away" | null
+  lastPlay?: string | null
 }
 
 function createGameActivity(props: GameActivityProps): LiveActivityComponent {
@@ -32,6 +33,7 @@ function createGameActivity(props: GameActivityProps): LiveActivityComponent {
     progressString,
     isFootball,
     hasPossession,
+    lastPlay,
   } = props
 
   const awayWinning = awayScore > homeScore
@@ -40,26 +42,33 @@ function createGameActivity(props: GameActivityProps): LiveActivityComponent {
 
   return () => ({
     banner: (
-      <HStack alignment="center" modifiers={[padding({ all: 16 })]}>
-        <VStack spacing={4} alignment="leading">
-          <Text modifiers={[bold(), foregroundStyle("white")]}>{awayTeamAbbr}</Text>
-          <Text modifiers={[font({ size: 32 }), bold(), foregroundStyle(awayWinning ? "white" : "gray")]}>
-            {`${awayScore}`}
+      <VStack spacing={8} modifiers={[padding({ all: 16 })]}>
+        <HStack alignment="center">
+          <VStack spacing={4} alignment="leading">
+            <Text modifiers={[bold(), foregroundStyle("white")]}>{awayTeamAbbr}</Text>
+            <Text modifiers={[font({ size: 32 }), bold(), foregroundStyle(awayWinning ? "white" : "gray")]}>
+              {`${awayScore}`}
+            </Text>
+          </VStack>
+          <Spacer />
+          <VStack spacing={4} alignment="center">
+            <Image systemName={sportIcon} size={24} color="gray" />
+            <Text modifiers={[foregroundStyle("gray")]}>{progressString}</Text>
+          </VStack>
+          <Spacer />
+          <VStack spacing={4} alignment="trailing">
+            <Text modifiers={[bold(), foregroundStyle("white")]}>{homeTeamAbbr}</Text>
+            <Text modifiers={[font({ size: 32 }), bold(), foregroundStyle(homeWinning ? "white" : "gray")]}>
+              {`${homeScore}`}
+            </Text>
+          </VStack>
+        </HStack>
+        {lastPlay ? (
+          <Text modifiers={[font({ size: 13 }), foregroundStyle("gray")]}>
+            {lastPlay}
           </Text>
-        </VStack>
-        <Spacer />
-        <VStack spacing={4} alignment="center">
-          <Image systemName={sportIcon} size={24} color="gray" />
-          <Text modifiers={[foregroundStyle("gray")]}>{progressString}</Text>
-        </VStack>
-        <Spacer />
-        <VStack spacing={4} alignment="trailing">
-          <Text modifiers={[bold(), foregroundStyle("white")]}>{homeTeamAbbr}</Text>
-          <Text modifiers={[font({ size: 32 }), bold(), foregroundStyle(homeWinning ? "white" : "gray")]}>
-            {`${homeScore}`}
-          </Text>
-        </VStack>
-      </HStack>
+        ) : null}
+      </VStack>
     ),
     compactLeading: (
       <HStack spacing={4} alignment="center">
@@ -128,12 +137,16 @@ function createGameActivity(props: GameActivityProps): LiveActivityComponent {
       </VStack>
     ),
     expandedBottom: (
-      <VStack modifiers={[padding({ horizontal: 12, top: 8, bottom: 12 })]}>
+      <VStack spacing={6} modifiers={[padding({ horizontal: 12, top: 8, bottom: 12 })]}>
         <HStack spacing={6} alignment="center">
           <Image systemName={sportIcon} size={14} color="gray" />
           <Text modifiers={[foregroundStyle("gray")]}>{progressString}</Text>
         </HStack>
-        <Spacer />
+        {lastPlay ? (
+          <Text modifiers={[font({ size: 13 }), foregroundStyle("gray")]}>
+            {lastPlay}
+          </Text>
+        ) : null}
       </VStack>
     ),
   })
@@ -159,6 +172,8 @@ export function extractGameActivityProps(game: Game): GameActivityProps {
     }
   }
 
+  const lastPlay = game.box_score?.last_play?.description ?? null
+
   return {
     awayTeamAbbr: game.away_team.abbreviation,
     awayScore,
@@ -167,6 +182,7 @@ export function extractGameActivityProps(game: Game): GameActivityProps {
     progressString,
     isFootball,
     hasPossession,
+    lastPlay,
   }
 }
 
