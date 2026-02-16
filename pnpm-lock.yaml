@@ -74,9 +74,6 @@ importers:
       expo-updates:
         specifier: ~55.0.5
         version: 55.0.5(expo@55.0.0-preview.7)(react-native@0.83.1(@babel/core@7.27.4)(@types/react@19.2.10)(react@19.2.0))(react@19.2.0)
-      expo-widgets:
-        specifier: 55.0.0-alpha.4
-        version: 55.0.0-alpha.4(expo@55.0.0-preview.7)(react-native@0.83.1(@babel/core@7.27.4)(@types/react@19.2.10)(react@19.2.0))(react@19.2.0)
       nativewind:
         specifier: ^4.1.23
         version: 4.1.23(react-native-reanimated@4.2.1(react-native-worklets@0.7.1(@babel/core@7.27.4)(react-native@0.83.1(@babel/core@7.27.4)(@types/react@19.2.10)(react@19.2.0))(react@19.2.0))(react-native@0.83.1(@babel/core@7.27.4)(@types/react@19.2.10)(react@19.2.0))(react@19.2.0))(react-native-safe-area-context@5.6.2(react-native@0.83.1(@babel/core@7.27.4)(@types/react@19.2.10)(react@19.2.0))(react@19.2.0))(react-native@0.83.1(@babel/core@7.27.4)(@types/react@19.2.10)(react@19.2.0))(react@19.2.0)(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.30)(typescript@5.9.3)))
@@ -2182,12 +2179,6 @@ packages:
       expo: '*'
       react: '*'
       react-native: '*'
-
-  expo-widgets@55.0.0-alpha.4:
-    resolution: {integrity: sha512-bQ/gzkLL2dTeG1II1IW6pbK+vRfwz/2bS71ZhCwaeDh9oHTxloCYmeFHmLX1D/B3AkPXnk/C1ksi7ZZSq5QMfA==}
-    peerDependencies:
-      expo: '*'
-      react: '*'
 
   expo@55.0.0-preview.7:
     resolution: {integrity: sha512-2oZijjq1ZmJBDha4wRG97CyUPNe45W+xrZa359F+NSj6p1TOCS3qtKuIEdHLmJiP3P9yQ5eXdywTnpCfWRMNdQ==}
@@ -6342,15 +6333,6 @@ snapshots:
       resolve-from: 5.0.0
     transitivePeerDependencies:
       - supports-color
-
-  expo-widgets@55.0.0-alpha.4(expo@55.0.0-preview.7)(react-native@0.83.1(@babel/core@7.27.4)(@types/react@19.2.10)(react@19.2.0))(react@19.2.0):
-    dependencies:
-      '@expo/plist': 0.5.2
-      '@expo/ui': 55.0.0-beta.3(expo@55.0.0-preview.7)(react-native@0.83.1(@babel/core@7.27.4)(@types/react@19.2.10)(react@19.2.0))(react@19.2.0)
-      expo: 55.0.0-preview.7(@babel/core@7.27.4)(@expo/dom-webview@0.2.8)(@expo/metro-runtime@55.0.3)(expo-router@55.0.0-beta.4)(graphql@16.8.1)(react-dom@19.2.0(react@19.2.0))(react-native-web@0.21.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-native@0.83.1(@babel/core@7.27.4)(@types/react@19.2.10)(react@19.2.0))(react@19.2.0)
-      react: 19.2.0
-    transitivePeerDependencies:
-      - react-native
 
   expo@55.0.0-preview.7(@babel/core@7.27.4)(@expo/dom-webview@0.2.8)(@expo/metro-runtime@55.0.3)(expo-router@55.0.0-beta.4)(graphql@16.8.1)(react-dom@19.2.0(react@19.2.0))(react-native-web@0.21.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-native@0.83.1(@babel/core@7.27.4)(@types/react@19.2.10)(react@19.2.0))(react@19.2.0):
     dependencies:

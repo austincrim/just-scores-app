@@ -24,7 +24,6 @@ import {
 import { PlayByPlayList } from "@/components/play-by-play-list"
 import { Text } from "@/components/text"
 import { API_URL } from "@/lib/hooks"
-import { useGameLiveActivity } from "@/lib/useGameLiveActivity"
 import {
   BasketballPlayerRecord,
   BasketballTeamRecord,
@@ -89,9 +88,6 @@ export function GameDetails({ route }: Props) {
     },
   })
 
-  let { isTracking, startTracking, stopTracking } = useGameLiveActivity(
-    gameQuery?.game,
-  )
   let { data: boxScore, refetch: refetchBoxScore } = useQuery({
     queryKey: ["boxScore", gameQuery?.game?.box_score?.id],
     enabled: gameQuery?.game.status !== "pre_game",
@@ -217,20 +213,9 @@ export function GameDetails({ route }: Props) {
     if (gameQuery?.game) {
       navigation?.setOptions({
         headerTitle: `${gameQuery.game.away_team.abbreviation} @ ${gameQuery.game.home_team.abbreviation}`,
-        headerRight: () =>
-          gameQuery.game.status === "in_progress" ? (
-            <Pressable
-              onPress={isTracking ? stopTracking : startTracking}
-              className="flex-row items-center gap-1.5 px-3 py-1.5"
-            >
-              <Text className="text-sm font-medium">
-                {isTracking ? "Stop Tracking" : "Track Live"}
-              </Text>
-            </Pressable>
-          ) : null,
       })
     }
-  }, [gameQuery?.game, isTracking])
+  }, [gameQuery?.game])
 
   if (status === "pending") {
     return <GameDetailsSkeleton />
