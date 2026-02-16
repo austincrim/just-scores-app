@@ -16,10 +16,7 @@
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production",
-      "ios": {
-        "config": "production.yml"
-      }
+      "channel": "production"
     }
   },
   "submit": {
