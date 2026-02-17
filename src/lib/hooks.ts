@@ -19,6 +19,8 @@ const POWER_4_CONFERENCES = [
   "Southeastern",
 ]
 
+const NCAAB_EXTRA_CONFERENCES = ["Big East"]
+
 type TeamInfo = { id: number; conference: string }
 type Power4TeamIds = { ncaaf: Set<number>; ncaab: Set<number> }
 let power4TeamIds: Power4TeamIds | null = null
@@ -44,7 +46,10 @@ async function fetchPower4TeamIds(): Promise<Power4TeamIds> {
       }
     }
     for (const team of ncaabTeams) {
-      if (POWER_4_CONFERENCES.includes(team.conference)) {
+      if (
+        POWER_4_CONFERENCES.includes(team.conference) ||
+        NCAAB_EXTRA_CONFERENCES.includes(team.conference)
+      ) {
         ncaabIds.add(team.id)
       }
     }

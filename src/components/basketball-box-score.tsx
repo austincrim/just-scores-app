@@ -19,12 +19,13 @@ const displayStats = [
   { key: "points", display: "PTS" },
   { key: "rebounds_total", display: "REB" },
   { key: "assists", display: "AST" },
-  { key: "steals", display: "STL" },
-  { key: "blocked_shots", display: "BLK" },
-  { key: "turnovers", display: "TO" },
   { key: "fg", display: "FG", isCombined: true },
   { key: "3pt", display: "3PT", isCombined: true },
   { key: "ft", display: "FT", isCombined: true },
+  { key: "steals", display: "STL" },
+  { key: "blocked_shots", display: "BLK" },
+  { key: "turnovers", display: "TO" },
+  { key: "personal_fouls", display: "PF" },
 ] as const
 
 function getStatValue(
@@ -182,10 +183,10 @@ function TeamStats({
         {/* Column headers */}
         <View className="flex-row items-center py-3 border-b border-zinc-200 dark:border-zinc-700">
           <View className="flex-1" />
-          <Text className="w-20 text-center text-sm font-bold">
+          <Text className="w-20 text-right text-sm font-bold">
             {game.away_team.abbreviation}
           </Text>
-          <Text className="w-20 text-center text-sm font-bold">
+          <Text className="w-20 text-right text-sm font-bold">
             {game.home_team.abbreviation}
           </Text>
         </View>
@@ -197,10 +198,10 @@ function TeamStats({
             <Text className="flex-1 text-zinc-500 dark:text-zinc-400">
               {stat.label}
             </Text>
-            <Text className="w-20 text-center text-base font-medium tabular-nums">
+            <Text className="w-20 text-right text-base font-medium tabular-nums">
               {awayStats[i].value}
             </Text>
-            <Text className="w-20 text-center text-base font-medium tabular-nums">
+            <Text className="w-20 text-right text-base font-medium tabular-nums">
               {stat.value}
             </Text>
           </View>

@@ -27,7 +27,7 @@ export function SportSchedule({ route }: Props) {
   let conferenceSheetRef = useRef<TrueSheet>(null)
   let navigation = useNavigation()
   let [selectedConference, setSelectedConference] = useState(
-    isCollege ? "Top 25" : undefined,
+    route.params.conference ?? (isCollege ? "Top 25" : undefined),
   )
   let [selectedWeek, setSelectedWeek] = useState("")
   let [isRefetching, setIsRefetching] = useState(false)

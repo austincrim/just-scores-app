@@ -16,7 +16,7 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
   NativeStackScreenProps<RootStackParamList, T>
 
 export type TabsParamList = {
-  scores: { sport: "ncaaf" | "nfl" | "ncaab" }
+  scores: { sport: "ncaaf" | "nfl" | "ncaab"; conference?: string }
   favorites: undefined
 }
 

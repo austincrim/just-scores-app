@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import {
   Image,
   Pressable,
@@ -38,6 +39,24 @@ export function ConferenceStandings({ route }: Props) {
   let isDark = useColorScheme() === "dark"
   let { sport, conference } = route.params
   let borderColor = isDark ? colors.zinc[700] : colors.zinc[300]
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          className="px-2"
+          onPress={() =>
+            navigation.navigate("tabs", {
+              screen: "scores",
+              params: { sport, conference },
+            })
+          }
+        >
+          <Text>Schedule</Text>
+        </Pressable>
+      ),
+    })
+  }, [navigation, sport, conference, isDark])
 
   let { data: standings, status } = useQuery({
     queryKey: [sport, "standings", "conference", conference],

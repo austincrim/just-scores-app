@@ -135,7 +135,7 @@ export function TeamDetail({ route }: Props) {
             </Text>
             {route.params.sport !== "nfl" && standing.conference ? (
               <Pressable
-                className="border-b-hairline"
+                className="border-b-hairline border-b-sky-700 dark:border-b-sky-400"
                 onPress={() =>
                   navigation.navigate("conference", {
                     sport: route.params.sport as "ncaaf" | "ncaab",

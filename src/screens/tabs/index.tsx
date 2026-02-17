@@ -1,4 +1,4 @@
-import { forwardRef, useRef, useState } from "react"
+import { forwardRef, useEffect, useRef, useState } from "react"
 import { Pressable, useColorScheme, View } from "react-native"
 import * as Haptics from "expo-haptics"
 import { SymbolView } from "expo-symbols"
@@ -7,11 +7,11 @@ import {
   BottomTabBarButtonProps,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs"
-import { useNavigationState } from "@react-navigation/native"
+import { useNavigationState, useRoute } from "@react-navigation/native"
 import colors from "tailwindcss/colors"
 import { Text } from "@/components/text"
 import { useLiveLeagues } from "@/lib/hooks"
-import { TabsParamList } from "../types"
+import { RootStackScreenProps, TabsParamList } from "../types"
 import { AllSportsView } from "./all-sports"
 import { Favorites } from "./favorites"
 import { SportSchedule } from "./sport"
@@ -25,6 +25,19 @@ export function Tabs() {
   let iconColor = isDark ? colors.zinc[300] : colors.zinc[800]
   let sheetRef = useRef<TrueSheet>(null)
   let [sport, setSport] = useState<SportOption>("all")
+  let [incomingConference, setIncomingConference] = useState<string>()
+  let route = useRoute<RootStackScreenProps<"tabs">["route"]>()
+
+  useEffect(() => {
+    let params = route.params as
+      | { params?: { sport?: SportOption; conference?: string } }
+      | undefined
+    if (params?.params?.sport) {
+      setSport(params.params.sport)
+      setIncomingConference(params.params.conference)
+    }
+  }, [route.params])
+
   let currentRouteName = useNavigationState((state) => {
     const route = state.routes[state.index]
 
@@ -52,7 +65,7 @@ export function Tabs() {
         <Screen
           name="scores"
           component={sport === "all" ? AllSportsView : SportSchedule}
-          initialParams={{ sport: sport === "all" ? "nfl" : sport }}
+          initialParams={{ sport: sport === "all" ? "nfl" : sport, conference: incomingConference }}
           navigationKey={sport}
           options={{
             headerTitle: () => (
