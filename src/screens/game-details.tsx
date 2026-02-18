@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import {
   Image,
   Pressable,
@@ -7,8 +7,15 @@ import {
   useColorScheme,
   View,
 } from "react-native"
+import * as Haptics from "expo-haptics"
 import { openURL } from "expo-linking"
 import { SymbolView } from "expo-symbols"
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated"
 import SegmentedControl from "@react-native-segmented-control/segmented-control"
 import { useNavigation } from "@react-navigation/native"
 import { useQuery } from "@tanstack/react-query"
@@ -478,6 +485,7 @@ function TeamLine({
   record?: string
 }) {
   let navigation = useNavigation()
+  let isDark = useColorScheme() === "dark"
   let team = type === "home" ? game.home_team : game.away_team
   let score =
     type === "home"
@@ -488,6 +496,26 @@ function TeamLine({
     isFootballEvent(game) &&
     game.box_score?.team_in_possession?.name === team?.name
   let isPreGame = game.status === "pre_game"
+
+  let prevScore = useRef(score)
+  let pulseOpacity = useSharedValue(0)
+
+  useEffect(() => {
+    if (prevScore.current != null && score != null && score !== prevScore.current) {
+      pulseOpacity.value = withSequence(
+        withTiming(1, { duration: 150 }),
+        withTiming(0, { duration: 450 }),
+      )
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+    }
+    prevScore.current = score
+  }, [score])
+
+  let pulseStyle = useAnimatedStyle(() => ({
+    backgroundColor: isDark
+      ? `rgba(161, 161, 170, ${pulseOpacity.value * 0.25})`
+      : `rgba(113, 113, 122, ${pulseOpacity.value * 0.15})`,
+  }))
 
   const sport = game.api_uri.includes("nfl")
     ? "nfl"
@@ -534,7 +562,12 @@ function TeamLine({
         {isPreGame && record ? (
           <Text className="text-2xl text-zinc-500">{record}</Text>
         ) : (
-          <Text className="text-5xl tabular-nums">{score}</Text>
+          <Animated.View
+            style={pulseStyle}
+            className="rounded-lg px-2 py-1 -mx-2 -my-1"
+          >
+            <Text className="text-5xl tabular-nums">{score}</Text>
+          </Animated.View>
         )}
       </View>
     </Pressable>

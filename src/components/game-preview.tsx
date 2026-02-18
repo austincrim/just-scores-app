@@ -1,7 +1,7 @@
 import React from "react"
 import { Pressable, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { useQuery } from "@tanstack/react-query"
+import { useQueryClient, useQuery } from "@tanstack/react-query"
 import { API_URL } from "@/lib/hooks"
 import { Game } from "@/types"
 import TeamLine from "./team-line"
@@ -17,6 +17,7 @@ export function GamePreview({
   disabled?: boolean
 }) {
   let navigation = useNavigation()
+  let queryClient = useQueryClient()
   let { data: gameDetails } = useQuery({
     queryKey: ["game", String(game.id)],
     staleTime: 1000 * 60,
@@ -60,6 +61,7 @@ export function GamePreview({
         if (sport !== "nfl" && sport !== "ncaab" && sport !== "ncaaf") {
           throw new Error(`invalid route name: ${sport}`)
         }
+        queryClient.setQueryData(["game", String(game.id)], (old: unknown) => old ?? { game })
         navigation.navigate("details", {
           sport,
           id: String(game.id),
