@@ -10,7 +10,11 @@ import {
 } from "react-native"
 import * as Haptics from "expo-haptics"
 import { TrueSheet } from "@lodev09/react-native-true-sheet"
-import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import { useMMKVObject } from "react-native-mmkv"
 import colors from "tailwindcss/colors"
@@ -46,6 +50,7 @@ type SectionData = {
 
 export function AllSportsView() {
   const isDark = useColorScheme() === "dark"
+  const isFocused = useIsFocused()
   const navigation = useNavigation()
   const scheduleSheetRef = useRef<TrueSheet>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -79,13 +84,13 @@ export function AllSportsView() {
 
   const initialFetchRef = useRef(true)
   useEffect(() => {
-    if (!dataUpdatedAt) return
+    if (!dataUpdatedAt || !isFocused) return
     if (initialFetchRef.current) {
       initialFetchRef.current = false
       return
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-  }, [dataUpdatedAt])
+  }, [dataUpdatedAt, isFocused])
 
   useFocusEffect(
     useCallback(() => {
