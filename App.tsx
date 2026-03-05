@@ -95,6 +95,9 @@ export default function App() {
         <PersistQueryClientProvider
           client={queryClient}
           persistOptions={{ persister }}
+          onSuccess={() => {
+            queryClient.invalidateQueries()
+          }}
         >
           <Navigator theme={scheme === "dark" ? darkTheme : lightTheme} />
         </PersistQueryClientProvider>
