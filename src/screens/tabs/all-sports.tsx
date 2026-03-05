@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   AppState,
   Pressable,
@@ -10,7 +10,7 @@ import {
 } from "react-native"
 import * as Haptics from "expo-haptics"
 import { TrueSheet } from "@lodev09/react-native-true-sheet"
-import { useNavigation } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import { useMMKVObject } from "react-native-mmkv"
 import colors from "tailwindcss/colors"
@@ -75,7 +75,23 @@ export function AllSportsView() {
     [days, selectedDayId],
   )
 
-  const { data: games, refetch, isLoading } = useAllSportsGames(selectedDay.date)
+  const { data: games, refetch, isLoading, dataUpdatedAt } = useAllSportsGames(selectedDay.date)
+
+  const initialFetchRef = useRef(true)
+  useEffect(() => {
+    if (!dataUpdatedAt) return
+    if (initialFetchRef.current) {
+      initialFetchRef.current = false
+      return
+    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+  }, [dataUpdatedAt])
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch()
+    }, [refetch]),
+  )
 
   const favoriteTeamIds = useMemo(
     () => new Set(favoriteTeams?.map((t) => t.id) ?? []),

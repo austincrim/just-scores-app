@@ -1,8 +1,9 @@
 import "./global.css"
-import { useColorScheme } from "react-native"
+import { useEffect } from "react"
+import { AppState, Platform, useColorScheme } from "react-native"
 import { createStaticNavigation, DarkTheme } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import { QueryClient } from "@tanstack/react-query"
+import { focusManager, QueryClient } from "@tanstack/react-query"
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { SafeAreaProvider } from "react-native-safe-area-context"
@@ -78,6 +79,15 @@ let queryClient = new QueryClient({
 
 export default function App() {
   let scheme = useColorScheme()
+
+  useEffect(() => {
+    let subscription = AppState.addEventListener("change", (status) => {
+      if (Platform.OS !== "web") {
+        focusManager.setFocused(status === "active")
+      }
+    })
+    return () => subscription.remove()
+  }, [])
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
