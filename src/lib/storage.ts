@@ -29,11 +29,12 @@ export const FAVORITES_KEY = "favorites_teams"
  */
 function detectSportFromUri(
   apiUri: string,
-): "nfl" | "ncaab" | "ncaaf" {
+): "nfl" | "ncaab" | "ncaaf" | "nba" {
   if (apiUri.includes("nfl")) return "nfl"
+  if (apiUri.includes("nba")) return "nba"
   if (apiUri.includes("ncaab")) return "ncaab"
   if (apiUri.includes("ncaaf")) return "ncaaf"
-  return "nfl" // fallback
+  return "nfl"
 }
 
 /**

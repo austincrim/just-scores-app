@@ -18,7 +18,7 @@ import { SportSchedule } from "./sport"
 
 let { Navigator, Screen } = createBottomTabNavigator<TabsParamList>()
 
-type SportOption = "all" | "ncaaf" | "ncaab" | "nfl"
+type SportOption = "all" | "ncaaf" | "ncaab" | "nfl" | "nba"
 
 export function Tabs() {
   let isDark = useColorScheme() === "dark"
@@ -57,7 +57,9 @@ export function Tabs() {
         ? "NCAA Football"
         : sport === "ncaab"
           ? "NCAA Basketball"
-          : "NFL"
+          : sport === "nba"
+            ? "NBA"
+            : "NFL"
 
   return (
     <>
@@ -79,7 +81,7 @@ export function Tabs() {
                     name={focused ? "sportscourt.fill" : "sportscourt"}
                     tintColor={color}
                   />
-                ) : sport === "ncaab" ? (
+                ) : sport === "ncaab" || sport === "nba" ? (
                   <SymbolView
                     name={focused ? "basketball.fill" : "basketball"}
                     tintColor={color}
@@ -152,7 +154,8 @@ export function Tabs() {
             count={
               (liveCounts?.nfl ?? 0) +
               (liveCounts?.ncaaf ?? 0) +
-              (liveCounts?.ncaab ?? 0)
+              (liveCounts?.ncaab ?? 0) +
+              (liveCounts?.nba ?? 0)
             }
             iconColor={iconColor}
           />
@@ -201,6 +204,20 @@ export function Tabs() {
             {sport === "ncaab" && <SymbolView size={16} name="checkmark" />}
           </View>
           <LiveBadge count={liveCounts?.ncaab ?? 0} iconColor={iconColor} />
+        </Pressable>
+        <Pressable
+          className="flex-row px-4 py-4 items-center justify-between"
+          onPress={() => {
+            setSport("nba")
+            sheetRef.current?.dismiss()
+          }}
+        >
+          <View className="flex-row items-center gap-1">
+            <SymbolView tintColor={iconColor} name="basketball" />
+            <Text className="text-xl">NBA</Text>
+            {sport === "nba" && <SymbolView size={16} name="checkmark" />}
+          </View>
+          <LiveBadge count={liveCounts?.nba ?? 0} iconColor={iconColor} />
         </Pressable>
       </TrueSheet>
     </>

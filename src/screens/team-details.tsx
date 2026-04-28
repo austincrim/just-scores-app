@@ -182,7 +182,7 @@ function GameRow({
 }: {
   game: Game
   teamId: number
-  sport: "ncaaf" | "nfl" | "ncaab"
+  sport: "ncaaf" | "nfl" | "ncaab" | "nba"
 }) {
   let navigation = useNavigation()
 

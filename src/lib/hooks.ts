@@ -3,13 +3,14 @@ import { useQueries, useQuery } from "@tanstack/react-query"
 import { FavoriteTeam, Game, LiveLeaguesResponse } from "@/types"
 
 export const API_URL = "https://api.thescore.com"
-export const SPORTS = ["nfl", "ncaaf", "ncaab"] as const
+export const SPORTS = ["nfl", "ncaaf", "ncaab", "nba"] as const
 export type Sport = (typeof SPORTS)[number]
 
 export type AllSportsGames = {
   nfl: Game[]
   ncaaf: Game[]
   ncaab: Game[]
+  nba: Game[]
 }
 
 const POWER_4_CONFERENCES = [
@@ -103,21 +104,26 @@ export function useAllSportsGames(date: string) {
 
         const [gamesRes, teamIds] = await Promise.all([
           fetch(
-            `${API_URL}/multisport/events?leagues=nfl,ncaaf,ncaab&game_date.in=${dateParam}`,
+            `${API_URL}/multisport/events?leagues=nfl,ncaaf,ncaab,nba&game_date.in=${dateParam}`,
           ),
           fetchPower4TeamIds(),
         ])
 
         if (!gamesRes.ok) {
           console.error("multisport fetch failed:", await gamesRes.text())
-          return { nfl: [], ncaaf: [], ncaab: [] } as AllSportsGames
+          return { nfl: [], ncaaf: [], ncaab: [], nba: [] } as AllSportsGames
         }
 
         const data = (await gamesRes.json()) as Record<
           string,
           { events: Game[] }
         >
-        const result: AllSportsGames = { nfl: [], ncaaf: [], ncaab: [] }
+        const result: AllSportsGames = {
+          nfl: [],
+          ncaaf: [],
+          ncaab: [],
+          nba: [],
+        }
 
         for (const sport of SPORTS) {
           let events = data[sport]?.events ?? []
@@ -137,7 +143,7 @@ export function useAllSportsGames(date: string) {
         return result
       } catch (e) {
         console.error("useAllSportsGames error:", e)
-        return { nfl: [], ncaaf: [], ncaab: [] } as AllSportsGames
+        return { nfl: [], ncaaf: [], ncaab: [], nba: [] } as AllSportsGames
       }
     },
   })
@@ -154,7 +160,7 @@ export const POWER = [
 const POWER_ORDER = new Map(POWER.map((item, index) => [item, index]))
 
 export function useSchedule(
-  sport: "ncaaf" | "ncaab" | "nfl",
+  sport: "ncaaf" | "ncaab" | "nfl" | "nba",
   conference?: string,
 ) {
   return useQuery({
@@ -182,7 +188,7 @@ export function useSchedule(
   })
 }
 
-export function useConferences(sport: "ncaaf" | "ncaab" | "nfl") {
+export function useConferences(sport: "ncaaf" | "ncaab" | "nfl" | "nba") {
   return useQuery({
     queryKey: [sport, "conferences"],
     select: (data) => {
@@ -274,7 +280,7 @@ export type Season = {
 }
 
 export function useTeamSchedule(
-  sport: "ncaaf" | "ncaab" | "nfl",
+  sport: "ncaaf" | "ncaab" | "nfl" | "nba",
   teamId: number,
 ) {
   return useQuery({
@@ -307,7 +313,7 @@ export type TeamStanding = {
 }
 
 export function useTeamStanding(
-  sport: "ncaaf" | "ncaab" | "nfl",
+  sport: "ncaaf" | "ncaab" | "nfl" | "nba",
   teamId: number,
 ) {
   return useQuery({
@@ -435,7 +441,7 @@ export function useLiveLeagues() {
       return (await res.json()) as LiveLeaguesResponse
     },
     select: (data) => {
-      const sports = ["nfl", "ncaaf", "ncaab"] as const
+      const sports = ["nfl", "ncaaf", "ncaab", "nba"] as const
       return Object.fromEntries(
         sports.map((sport) => [
           sport,

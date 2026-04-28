@@ -519,9 +519,11 @@ function TeamLine({
 
   const sport = game.api_uri.includes("nfl")
     ? "nfl"
-    : game.api_uri.includes("ncaaf")
-      ? "ncaaf"
-      : "ncaab"
+    : game.api_uri.includes("nba")
+      ? "nba"
+      : game.api_uri.includes("ncaaf")
+        ? "ncaaf"
+        : "ncaab"
 
   return (
     <Pressable
@@ -579,5 +581,5 @@ function isFootballEvent(game: Game): game is NcaaFBEvent | NFLEvent {
 }
 
 function isBasketballEvent(game: Game): game is NcaaBBEvent {
-  return game.api_uri.includes("ncaab")
+  return game.api_uri.includes("ncaab") || game.api_uri.includes("nba")
 }

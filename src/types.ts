@@ -147,7 +147,7 @@ export type Team = {
 }
 
 export type FavoriteTeam = Team & {
-   sport: "nfl" | "ncaab" | "ncaaf"
+   sport: "nfl" | "ncaab" | "ncaaf" | "nba"
 }
 
 // ============================================================================
@@ -586,6 +586,43 @@ export type NcaaBBEvent = {
   updated_at: string
 }
 
+export type NBAEvent = {
+  api_uri: string
+  away_conference: string
+  away_ranking?: null
+  away_team: Team
+  betradar_id: string
+  bet_works_id: null
+  box_score: BasketballBoxScore
+  colours?: Colours
+  event_status: string
+  game_date: string
+  game_description: string | null
+  game_type: string
+  has_play_by_play_records: boolean
+  has_team_twitter_handles: boolean
+  home_conference: string
+  home_ranking?: null
+  home_team: Team
+  id: number
+  if_necessary: boolean
+  important: boolean
+  league: League
+  location: string
+  odd: Odd | null
+  resource_uri: string
+  stadium?: string
+  standings?: Standing
+  status: string
+  station?: string
+  stubhub_url: null
+  subscribable_alerts: SubscribableAlert[]
+  tba: boolean
+  top_match: null
+  tv_listings_by_country_code: TvListingsByCountryCode
+  updated_at: string
+}
+
 // ============================================================================
 // MISC SHARED TYPES
 // ============================================================================
@@ -688,6 +725,6 @@ export type PlayRecord = BasketballPlayRecord | FootballPlayRecord
 // UNION TYPES
 // ============================================================================
 
-export type Game = NcaaBBEvent | NcaaFBEvent | NFLEvent
+export type Game = NcaaBBEvent | NcaaFBEvent | NFLEvent | NBAEvent
 export type BoxScore = FootballBoxScore | BasketballBoxScore
 export type PlayerRecord = FootballPlayerRecord | BasketballPlayerRecord

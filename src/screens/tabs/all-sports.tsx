@@ -29,10 +29,12 @@ const SPORT_LABELS: Record<Sport, string> = {
   nfl: "NFL",
   ncaaf: "NCAA Football",
   ncaab: "NCAA Basketball",
+  nba: "NBA",
 }
 
 function getSportFromGame(game: Game): Sport {
   if (game.api_uri.includes("nfl")) return "nfl"
+  if (game.api_uri.includes("nba")) return "nba"
   if (game.api_uri.includes("ncaaf")) return "ncaaf"
   if (game.api_uri.includes("ncaab")) return "ncaab"
   return "nfl"
@@ -100,6 +102,7 @@ export function AllSportsView() {
       nfl: [],
       ncaaf: [],
       ncaab: [],
+      nba: [],
     }
 
     for (const { game, sport } of allGames) {
