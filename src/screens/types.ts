@@ -7,9 +7,9 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 
 export type RootStackParamList = {
   tabs: NavigatorScreenParams<TabsParamList>
-  details: { sport: "ncaaf" | "nfl" | "ncaab" | "nba"; id: string }
+  details: { sport: "ncaaf" | "nfl" | "ncaab" | "nba" | "nhl"; id: string }
   team: {
-    sport: "ncaaf" | "nfl" | "ncaab" | "nba"
+    sport: "ncaaf" | "nfl" | "ncaab" | "nba" | "nhl"
     teamId: number
     teamName: string
   }
@@ -21,7 +21,7 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
 
 export type TabsParamList = {
   scores: {
-    sport: "ncaaf" | "nfl" | "ncaab" | "nba"
+    sport: "ncaaf" | "nfl" | "ncaab" | "nba" | "nhl"
     conference?: string
   }
   favorites: undefined

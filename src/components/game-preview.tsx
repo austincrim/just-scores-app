@@ -13,7 +13,7 @@ export function GamePreview({
   disabled = false,
 }: {
   game: Game
-  sport: "ncaaf" | "ncaab" | "nfl" | "nba"
+  sport: "ncaaf" | "ncaab" | "nfl" | "nba" | "nhl"
   disabled?: boolean
 }) {
   let navigation = useNavigation()
@@ -58,7 +58,13 @@ export function GamePreview({
       className="text-lg active flex flex-row items-center gap-2 py-4"
       disabled={disabled}
       onPress={() => {
-        if (sport !== "nfl" && sport !== "ncaab" && sport !== "ncaaf" && sport !== "nba") {
+        if (
+          sport !== "nfl" &&
+          sport !== "ncaab" &&
+          sport !== "ncaaf" &&
+          sport !== "nba" &&
+          sport !== "nhl"
+        ) {
           throw new Error(`invalid route name: ${sport}`)
         }
         queryClient.setQueryData(["game", String(game.id)], (old: unknown) => old ?? { game })

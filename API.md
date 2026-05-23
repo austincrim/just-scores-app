@@ -8,7 +8,7 @@ Base URL: `https://api.thescore.com`
 Returns current season info with weeks/groups and all season types (preseason, regular, postseason).
 - **Params**: `utc_offset` (optional)
 - **Response**: Object with `current_season` (array) and `current_group` (current week)
-- **Sports**: `nfl`, `ncaaf`, `ncaab`
+- **Sports**: `nfl`, `ncaaf`, `ncaab`, `nba`, `nhl`
 
 ## Events (Games)
 
@@ -41,7 +41,7 @@ Fetches multiple events with filtering.
 ### GET `/{sport}/teams/{teamId}/events/full_schedule`
 Fetches current season schedule for a specific team. Only returns regular season + preseason (typically 17-21 games for NFL).
 - **Response**: Array of event objects for current season only
-- **Sports**: `nfl`, `ncaaf`, `ncaab`
+- **Sports**: `nfl`, `ncaaf`, `ncaab`, `nba`, `nhl`
 - **Preferred over**: `/events?team_id=X` for season filtering
 
 ### GET `/{sport}/events/{eventId}/play_by_play_records`
@@ -52,7 +52,7 @@ Fetches play-by-play records for an event.
 ### GET `/{sport}/events/conferences`
 Lists all conferences for a sport.
 - **Response**: Array of conference objects with `name` and `conferences` array
-- **Sports**: `ncaaf`, `ncaab` (NFL returns 404)
+- **Sports**: `ncaaf`, `ncaab` (`nfl`, `nba`, and `nhl` return 404)
 
 ## Box Scores
 
@@ -60,6 +60,7 @@ Lists all conferences for a sport.
 Fetches individual player stats for a game.
 - **Response**: Array of player record objects with stats
 - **Note**: Use `game.box_score.id` from event data
+- **NHL note**: Same endpoint works for NHL, but player record shape differs significantly from football/basketball (e.g., `shots_on_goal`, `time_on_ice_full`, `faceoffs_won`, `shootout_attempts`)
 
 ## Teams
 
@@ -80,7 +81,7 @@ Fetches all standings entries for a sport.
   - `team_id` (optional, filter by team)
   - `conference` (optional, filter by conference name, e.g. `Big Ten`)
 - **Response**: Array of standing objects with W-L record, conference info, division rank, etc.
-- **Sports**: `nfl`, `ncaaf`, `ncaab`
+- **Sports**: `nfl`, `ncaaf`, `ncaab`, `nba`, `nhl`
 
 ## Team Info
 
@@ -104,5 +105,6 @@ Returns live event counts across all leagues and conferences.
 - `/{sport}/teams/{teamId}/rosters` - Returns 404 error
 - `/{sport}/teams/{teamId}/standing` - Returns 404 error (use `/standings` with `team_id` filter instead)
 - `/{sport}/teams/{teamId}/stats` - Returns 404 error
+- `/{sport}/events/conferences` - Returns 404 for pro leagues (`nfl`, `nba`, `nhl`)
 
 - Events endpoint does not support `season_id` query parameter for filtering

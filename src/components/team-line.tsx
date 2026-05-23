@@ -12,7 +12,14 @@ type Props = {
 
 function TeamLine({ team, game, type, renderStatus }: Props) {
   let score = game.box_score?.score[type].score
-  let ranking = game[`${type}_ranking`]
+  let ranking =
+    type === "home"
+      ? "home_ranking" in game
+        ? game.home_ranking
+        : null
+      : "away_ranking" in game
+        ? game.away_ranking
+        : null
 
   function renderScore() {
     if (game.status === "pre_game") {

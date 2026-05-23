@@ -18,7 +18,7 @@ import { SportSchedule } from "./sport"
 
 let { Navigator, Screen } = createBottomTabNavigator<TabsParamList>()
 
-type SportOption = "all" | "ncaaf" | "ncaab" | "nfl" | "nba"
+type SportOption = "all" | "ncaaf" | "ncaab" | "nfl" | "nba" | "nhl"
 
 export function Tabs() {
   let isDark = useColorScheme() === "dark"
@@ -59,7 +59,9 @@ export function Tabs() {
           ? "NCAA Basketball"
           : sport === "nba"
             ? "NBA"
-            : "NFL"
+            : sport === "nhl"
+              ? "NHL"
+              : "NFL"
 
   return (
     <>
@@ -84,6 +86,11 @@ export function Tabs() {
                 ) : sport === "ncaab" || sport === "nba" ? (
                   <SymbolView
                     name={focused ? "basketball.fill" : "basketball"}
+                    tintColor={color}
+                  />
+                ) : sport === "nhl" ? (
+                  <SymbolView
+                    name={focused ? "hockey.puck.fill" : "hockey.puck"}
                     tintColor={color}
                   />
                 ) : sport === "nfl" ? (
@@ -155,7 +162,8 @@ export function Tabs() {
               (liveCounts?.nfl ?? 0) +
               (liveCounts?.ncaaf ?? 0) +
               (liveCounts?.ncaab ?? 0) +
-              (liveCounts?.nba ?? 0)
+              (liveCounts?.nba ?? 0) +
+              (liveCounts?.nhl ?? 0)
             }
             iconColor={iconColor}
           />
@@ -218,6 +226,20 @@ export function Tabs() {
             {sport === "nba" && <SymbolView size={16} name="checkmark" />}
           </View>
           <LiveBadge count={liveCounts?.nba ?? 0} iconColor={iconColor} />
+        </Pressable>
+        <Pressable
+          className="flex-row px-4 py-4 items-center justify-between"
+          onPress={() => {
+            setSport("nhl")
+            sheetRef.current?.dismiss()
+          }}
+        >
+          <View className="flex-row items-center gap-1">
+            <SymbolView tintColor={iconColor} name="hockey.puck" />
+            <Text className="text-xl">NHL</Text>
+            {sport === "nhl" && <SymbolView size={16} name="checkmark" />}
+          </View>
+          <LiveBadge count={liveCounts?.nhl ?? 0} iconColor={iconColor} />
         </Pressable>
       </TrueSheet>
     </>

@@ -30,12 +30,15 @@ import {
 } from "@/components/game-details-skeleton"
 import { PlayByPlayList } from "@/components/play-by-play-list"
 import { Text } from "@/components/text"
+import { HockeyBoxScore } from "@/components/hockey-box-score"
+import { HockeyScore } from "@/components/hockey-score"
 import { API_URL } from "@/lib/hooks"
 import {
   BasketballPlayerRecord,
   BasketballTeamRecord,
   FootballPlayerRecord,
   Game,
+  NHLEvent,
   NcaaBBEvent,
   NcaaFBEvent,
   NFLEvent,
@@ -419,6 +422,7 @@ export function GameDetails({ route }: Props) {
             {isBasketballEvent(gameQuery.game) && (
               <BasketballScore game={gameQuery.game} />
             )}
+            {isHockeyEvent(gameQuery.game) && <HockeyScore game={gameQuery.game} />}
           </View>
           <View className="pb-12">
             {isFootballEvent(gameQuery.game) &&
@@ -450,6 +454,14 @@ export function GameDetails({ route }: Props) {
                   />
                 </View>
               )}
+            {isHockeyEvent(gameQuery.game) &&
+              boxScore &&
+              gameQuery.game.status !== "pre_game" && (
+                <HockeyBoxScore
+                  boxScore={boxScore as { home: any[]; away: any[] }}
+                  game={gameQuery.game}
+                />
+              )}
           </View>
         </>
       )}
@@ -463,6 +475,7 @@ export function GameDetails({ route }: Props) {
               plays={plays}
               game={gameQuery.game}
               isBasketball={isBasketballEvent(gameQuery.game)}
+              isFootball={isFootballEvent(gameQuery.game)}
             />
           ) : (
             <Text className="text-center text-zinc-500 dark:text-zinc-400 mt-8">
@@ -491,7 +504,14 @@ function TeamLine({
     type === "home"
       ? game.box_score?.score?.home?.score
       : game.box_score?.score?.away?.score
-  let ranking = type === "home" ? game.home_ranking : game.away_ranking
+  let ranking =
+    type === "home"
+      ? "home_ranking" in game
+        ? game.home_ranking
+        : null
+      : "away_ranking" in game
+        ? game.away_ranking
+        : null
   let hasPossession =
     isFootballEvent(game) &&
     game.box_score?.team_in_possession?.name === team?.name
@@ -521,6 +541,8 @@ function TeamLine({
     ? "nfl"
     : game.api_uri.includes("nba")
       ? "nba"
+      : game.api_uri.includes("nhl")
+        ? "nhl"
       : game.api_uri.includes("ncaaf")
         ? "ncaaf"
         : "ncaab"
@@ -582,4 +604,8 @@ function isFootballEvent(game: Game): game is NcaaFBEvent | NFLEvent {
 
 function isBasketballEvent(game: Game): game is NcaaBBEvent {
   return game.api_uri.includes("ncaab") || game.api_uri.includes("nba")
+}
+
+function isHockeyEvent(game: Game): game is NHLEvent {
+  return game.api_uri.includes("nhl")
 }

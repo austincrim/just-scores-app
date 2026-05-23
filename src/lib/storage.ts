@@ -29,9 +29,10 @@ export const FAVORITES_KEY = "favorites_teams"
  */
 function detectSportFromUri(
   apiUri: string,
-): "nfl" | "ncaab" | "ncaaf" | "nba" {
+): "nfl" | "ncaab" | "ncaaf" | "nba" | "nhl" {
   if (apiUri.includes("nfl")) return "nfl"
   if (apiUri.includes("nba")) return "nba"
+  if (apiUri.includes("nhl")) return "nhl"
   if (apiUri.includes("ncaab")) return "ncaab"
   if (apiUri.includes("ncaaf")) return "ncaaf"
   return "nfl"

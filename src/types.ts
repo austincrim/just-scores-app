@@ -147,7 +147,7 @@ export type Team = {
 }
 
 export type FavoriteTeam = Team & {
-   sport: "nfl" | "ncaab" | "ncaaf" | "nba"
+   sport: "nfl" | "ncaab" | "ncaaf" | "nba" | "nhl"
 }
 
 // ============================================================================
@@ -623,6 +623,59 @@ export type NBAEvent = {
   updated_at: string
 }
 
+export type NHLBoxScore = {
+  id: number
+  api_uri: string
+  progress: Progress
+  score: {
+    home: { score: number }
+    away: { score: number }
+    winning_team: string
+    losing_team: string
+    tie_game: boolean
+  }
+  has_statistics: boolean
+  line_scores?: {
+    home: Array<{ score: number; segment: number; segment_string: string }>
+    away: Array<{ score: number; segment: number; segment_string: string }>
+  }
+  last_play?: {
+    description?: string
+    details?: string
+  }
+  updated_at: string
+}
+
+export type NHLEvent = {
+  api_uri: string
+  away_team: Team
+  home_team: Team
+  box_score: NHLBoxScore
+  colours?: Colours
+  event_status: string
+  game_date: string
+  game_description: string | null
+  game_type: string
+  has_play_by_play_records: boolean
+  has_team_twitter_handles?: boolean
+  id: number
+  if_necessary?: boolean
+  league: League
+  location: string
+  odd: Odd | null
+  resource_uri: string
+  stadium?: string
+  standings?: Standing | null
+  status: string
+  station?: string
+  stubhub_url: null
+  subscribable_alerts: SubscribableAlert[]
+  tba: boolean
+  top_match: null
+  tv_listings_by_country_code: TvListingsByCountryCode
+  updated_at: string
+}
+
 // ============================================================================
 // MISC SHARED TYPES
 // ============================================================================
@@ -719,12 +772,34 @@ export type FootballPlayRecord = {
   player2?: Player
 }
 
-export type PlayRecord = BasketballPlayRecord | FootballPlayRecord
+export type HockeyPlayRecord = {
+  api_uri: string
+  id: number
+  event: string
+  event_type?: string
+  description: string
+  detail?: string | null
+  alignment?: "home" | "away" | null
+  minutes: number
+  seconds: number
+  segment: number
+  progress: Progress
+  home_score_before?: number
+  home_score_after?: number
+  away_score_before?: number
+  away_score_after?: number
+  team?: string
+}
+
+export type PlayRecord =
+  | BasketballPlayRecord
+  | FootballPlayRecord
+  | HockeyPlayRecord
 
 // ============================================================================
 // UNION TYPES
 // ============================================================================
 
-export type Game = NcaaBBEvent | NcaaFBEvent | NFLEvent | NBAEvent
-export type BoxScore = FootballBoxScore | BasketballBoxScore
+export type Game = NcaaBBEvent | NcaaFBEvent | NFLEvent | NBAEvent | NHLEvent
+export type BoxScore = FootballBoxScore | BasketballBoxScore | NHLBoxScore
 export type PlayerRecord = FootballPlayerRecord | BasketballPlayerRecord

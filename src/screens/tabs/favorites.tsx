@@ -125,9 +125,10 @@ export function Favorites({}: Props) {
   )
 }
 
-function detectSport(game: Game): "nfl" | "ncaaf" | "ncaab" | "nba" {
+function detectSport(game: Game): "nfl" | "ncaaf" | "ncaab" | "nba" | "nhl" {
   if (game.api_uri.includes("nfl")) return "nfl"
   if (game.api_uri.includes("nba")) return "nba"
+  if (game.api_uri.includes("nhl")) return "nhl"
   if (game.api_uri.includes("ncaaf")) return "ncaaf"
   if (game.api_uri.includes("ncaab")) return "ncaab"
   throw new Error(`unsupported sport ${game.api_uri}`)

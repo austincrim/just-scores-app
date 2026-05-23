@@ -5,6 +5,7 @@ import {
   BasketballPlayRecord,
   FootballPlayRecord,
   Game,
+  HockeyPlayRecord,
   PlayRecord,
 } from "@/types"
 
@@ -12,9 +13,15 @@ type Props = {
   plays: PlayRecord[]
   game: Game
   isBasketball: boolean
+  isFootball: boolean
 }
 
-export function PlayByPlayList({ plays, game, isBasketball }: Props) {
+export function PlayByPlayList({
+  plays,
+  game,
+  isBasketball,
+  isFootball,
+}: Props) {
   const groupedPlays = groupPlaysBySegment(plays, isBasketball)
   const runningScores = isBasketball
     ? calculateBasketballScores(plays as BasketballPlayRecord[], game)
@@ -35,12 +42,35 @@ export function PlayByPlayList({ plays, game, isBasketball }: Props) {
                 game={game}
                 score={runningScores?.get(play.id) ?? { home: 0, away: 0 }}
               />
-            ) : (
+            ) : isFootball ? (
               <FootballPlay key={play.id} play={play as FootballPlayRecord} />
+            ) : (
+              <HockeyPlay key={play.id} play={play as HockeyPlayRecord} />
             ),
           )}
         </View>
       ))}
+    </View>
+  )
+}
+
+function HockeyPlay({ play }: { play: HockeyPlayRecord }) {
+  const isScoring =
+    play.home_score_after != null &&
+    play.home_score_before != null &&
+    play.away_score_after != null &&
+    play.away_score_before != null &&
+    (play.home_score_after !== play.home_score_before ||
+      play.away_score_after !== play.away_score_before)
+
+  return (
+    <View
+      className={`py-2 border-b border-zinc-200 dark:border-zinc-800 ${isScoring ? "bg-amber-50 dark:bg-amber-950/30 -mx-2 px-2 rounded" : ""}`}
+    >
+      <Text className="text-base">{play.description}</Text>
+      <Text className="text-sm text-zinc-500 dark:text-zinc-400">
+        {play.progress.clock}
+      </Text>
     </View>
   )
 }

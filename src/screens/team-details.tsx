@@ -133,7 +133,8 @@ export function TeamDetail({ route }: Props) {
               {standing.short_conference_record &&
                 ` (${standing.short_conference_record})`}
             </Text>
-            {route.params.sport !== "nfl" && standing.conference ? (
+            {(route.params.sport === "ncaaf" || route.params.sport === "ncaab") &&
+            standing.conference ? (
               <Pressable
                 className="border-b-hairline border-b-sky-700 dark:border-b-sky-400"
                 onPress={() =>
@@ -182,7 +183,7 @@ function GameRow({
 }: {
   game: Game
   teamId: number
-  sport: "ncaaf" | "nfl" | "ncaab" | "nba"
+  sport: "ncaaf" | "nfl" | "ncaab" | "nba" | "nhl"
 }) {
   let navigation = useNavigation()
 
