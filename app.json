@@ -18,6 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.austincrim.justscores",
+      "buildNumber": "37",
       "appleTeamId": "5YQ2CG7528",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
