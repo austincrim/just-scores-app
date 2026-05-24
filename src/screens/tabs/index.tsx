@@ -69,7 +69,10 @@ export function Tabs() {
         <Screen
           name="scores"
           component={sport === "all" ? AllSportsView : SportSchedule}
-          initialParams={{ sport: sport === "all" ? "nfl" : sport, conference: incomingConference }}
+          initialParams={{
+            sport: sport === "all" ? "nfl" : sport,
+            conference: incomingConference,
+          }}
           navigationKey={sport}
           options={{
             headerTitle: () => (
@@ -144,7 +147,12 @@ export function Tabs() {
           }}
         />
       </Navigator>
-      <TrueSheet ref={sheetRef} detents={[0.3]} style={{ paddingVertical: 24 }}>
+      <TrueSheet
+        scrollable
+        ref={sheetRef}
+        detents={[0.5]}
+        style={{ paddingVertical: 24 }}
+      >
         <Pressable
           className="flex-row px-4 py-4 items-center justify-between"
           onPress={() => {

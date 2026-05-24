@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import { useQueries, useQuery } from "@tanstack/react-query"
 import { FavoriteTeam, Game, LiveLeaguesResponse } from "@/types"
+import { POWER_TEAM_IDS } from "./power-team-ids"
 
 export const API_URL = "https://api.thescore.com"
 export const SPORTS = ["nfl", "ncaaf", "ncaab", "nba", "nhl"] as const
@@ -14,56 +15,8 @@ export type AllSportsGames = {
   nhl: Game[]
 }
 
-const POWER_4_CONFERENCES = [
-  "Atlantic Coast",
-  "Big 12",
-  "Big Ten",
-  "Southeastern",
-]
-
-const NCAAB_EXTRA_CONFERENCES = ["Big East"]
-
-type TeamInfo = { id: number; conference: string }
 type Power4TeamIds = { ncaaf: Set<number>; ncaab: Set<number> }
-let power4TeamIds: Power4TeamIds | null = null
-
-async function fetchPower4TeamIds(): Promise<Power4TeamIds> {
-  if (power4TeamIds) return power4TeamIds
-
-  try {
-    const [ncaafRes, ncaabRes] = await Promise.all([
-      fetch(`${API_URL}/ncaaf/teams`),
-      fetch(`${API_URL}/ncaab/teams`),
-    ])
-
-    const ncaafTeams: TeamInfo[] = ncaafRes.ok ? await ncaafRes.json() : []
-    const ncaabTeams: TeamInfo[] = ncaabRes.ok ? await ncaabRes.json() : []
-
-    const ncaafIds = new Set<number>()
-    const ncaabIds = new Set<number>()
-
-    for (const team of ncaafTeams) {
-      if (POWER_4_CONFERENCES.includes(team.conference)) {
-        ncaafIds.add(team.id)
-      }
-    }
-    for (const team of ncaabTeams) {
-      if (
-        POWER_4_CONFERENCES.includes(team.conference) ||
-        NCAAB_EXTRA_CONFERENCES.includes(team.conference)
-      ) {
-        ncaabIds.add(team.id)
-      }
-    }
-
-    power4TeamIds = { ncaaf: ncaafIds, ncaab: ncaabIds }
-  } catch (e) {
-    console.error("Failed to fetch Power 4 team IDs:", e)
-    power4TeamIds = { ncaaf: new Set(), ncaab: new Set() }
-  }
-
-  return power4TeamIds
-}
+const power4TeamIds: Power4TeamIds = POWER_TEAM_IDS
 
 type GameWithRankings = Game & {
   home_ranking?: number | null
@@ -103,12 +56,9 @@ export function useAllSportsGames(date: string) {
 
         const dateParam = `${startDate.toISOString()},${endDate.toISOString()}`
 
-        const [gamesRes, teamIds] = await Promise.all([
-          fetch(
-            `${API_URL}/multisport/events?leagues=nfl,ncaaf,ncaab,nba,nhl&game_date.in=${dateParam}`,
-          ),
-          fetchPower4TeamIds(),
-        ])
+        const gamesRes = await fetch(
+          `${API_URL}/multisport/events?leagues=nfl,ncaaf,ncaab,nba,nhl&game_date.in=${dateParam}`,
+        )
 
         if (!gamesRes.ok) {
           console.error("multisport fetch failed:", await gamesRes.text())
@@ -136,7 +86,7 @@ export function useAllSportsGames(date: string) {
         for (const sport of SPORTS) {
           let events = data[sport]?.events ?? []
           if (sport === "ncaaf" || sport === "ncaab") {
-            const sportTeamIds = teamIds[sport as NcaaSport]
+            const sportTeamIds = power4TeamIds[sport as NcaaSport]
             events = events.filter((g) =>
               isPower4OrRankedGame(g as GameWithRankings, sportTeamIds),
             )
@@ -419,8 +369,7 @@ export function useFavoriteTeamSchedules(teams: FavoriteTeam[]) {
         for (const game of query.data) {
           if (!seenIds.has(game.id)) {
             const isFavorite =
-              teamIds.has(game.home_team?.id) ||
-              teamIds.has(game.away_team?.id)
+              teamIds.has(game.home_team?.id) || teamIds.has(game.away_team?.id)
             const gameDate = new Date(game.game_date)
             gameDate.setHours(0, 0, 0, 0)
             const isTodayOrFuture = gameDate >= today
