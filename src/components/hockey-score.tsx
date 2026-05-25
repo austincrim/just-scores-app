@@ -92,7 +92,7 @@ function GoalRow({ game, goal }: { game: NHLEvent; goal: HockeyPlayRecord }) {
   return (
     <View className="flex-row gap-3 py-3 border-b border-zinc-200 dark:border-zinc-800">
       <Image
-        source={{ uri: team.logos.tiny }}
+        source={{ uri: team.logos.w72xh72 ?? team.logos.small }}
         className="w-8 h-8 mt-0.5"
         accessibilityLabel={`${team.name} logo`}
       />
