@@ -10,15 +10,15 @@ import {
 import * as Haptics from "expo-haptics"
 import { openURL } from "expo-linking"
 import { SymbolView } from "expo-symbols"
+import SegmentedControl from "@react-native-segmented-control/segmented-control"
+import { useNavigation } from "@react-navigation/native"
+import { useQuery } from "@tanstack/react-query"
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSequence,
   withTiming,
 } from "react-native-reanimated"
-import SegmentedControl from "@react-native-segmented-control/segmented-control"
-import { useNavigation } from "@react-navigation/native"
-import { useQuery } from "@tanstack/react-query"
 import colors from "tailwindcss/colors"
 import { BasketballBoxScore } from "@/components/basketball-box-score"
 import { BasketballScore } from "@/components/basketball-score"
@@ -28,20 +28,21 @@ import {
   GameDetailsSkeleton,
   PlaysListSkeleton,
 } from "@/components/game-details-skeleton"
-import { PlayByPlayList } from "@/components/play-by-play-list"
-import { Text } from "@/components/text"
 import { HockeyBoxScore } from "@/components/hockey-box-score"
 import { HockeyScore } from "@/components/hockey-score"
+import { PlayByPlayList } from "@/components/play-by-play-list"
+import { Text } from "@/components/text"
 import { API_URL } from "@/lib/hooks"
 import {
   BasketballPlayerRecord,
   BasketballTeamRecord,
   FootballPlayerRecord,
   Game,
-  NHLEvent,
+  HockeyPlayRecord,
   NcaaBBEvent,
   NcaaFBEvent,
   NFLEvent,
+  NHLEvent,
   PlayRecord,
 } from "@/types"
 import { RootStackScreenProps } from "./types"
@@ -204,7 +205,8 @@ export function GameDetails({ route }: Props) {
   } = useQuery({
     queryKey: ["plays", route.params.id],
     enabled:
-      activeTab === "plays" &&
+      (activeTab === "plays" ||
+        (!!gameQuery?.game && isHockeyEvent(gameQuery.game))) &&
       gameQuery?.game.status !== "pre_game" &&
       gameQuery?.game.has_play_by_play_records === true,
     refetchInterval: activeTab === "plays" ? 10000 : false,
@@ -422,7 +424,12 @@ export function GameDetails({ route }: Props) {
             {isBasketballEvent(gameQuery.game) && (
               <BasketballScore game={gameQuery.game} />
             )}
-            {isHockeyEvent(gameQuery.game) && <HockeyScore game={gameQuery.game} />}
+            {isHockeyEvent(gameQuery.game) && (
+              <HockeyScore
+                game={gameQuery.game}
+                plays={plays as HockeyPlayRecord[] | undefined}
+              />
+            )}
           </View>
           <View className="pb-12">
             {isFootballEvent(gameQuery.game) &&
@@ -521,7 +528,11 @@ function TeamLine({
   let pulseOpacity = useSharedValue(0)
 
   useEffect(() => {
-    if (prevScore.current != null && score != null && score !== prevScore.current) {
+    if (
+      prevScore.current != null &&
+      score != null &&
+      score !== prevScore.current
+    ) {
       pulseOpacity.value = withSequence(
         withTiming(1, { duration: 150 }),
         withTiming(0, { duration: 450 }),
@@ -543,9 +554,9 @@ function TeamLine({
       ? "nba"
       : game.api_uri.includes("nhl")
         ? "nhl"
-      : game.api_uri.includes("ncaaf")
-        ? "ncaaf"
-        : "ncaab"
+        : game.api_uri.includes("ncaaf")
+          ? "ncaaf"
+          : "ncaab"
 
   return (
     <Pressable

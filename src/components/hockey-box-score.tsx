@@ -88,7 +88,6 @@ export function HockeyBoxScore({
       />
 
       <View className="mt-4">
-        <Text className="font-semibold mb-2">Skaters</Text>
         <StatsTable players={skaters} stats={skaterStats} />
       </View>
 
