@@ -1,7 +1,7 @@
 import React from "react"
 import { Pressable, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { useQueryClient, useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { API_URL } from "@/lib/hooks"
 import { Game } from "@/types"
 import TeamLine from "./team-line"
@@ -18,10 +18,12 @@ export function GamePreview({
 }) {
   let navigation = useNavigation()
   let queryClient = useQueryClient()
+  let shouldFetchSeriesDetails =
+    isProSeriesSport(sport) && isPostseasonGame(game) && !game.game_description
   let { data: gameDetails } = useQuery({
     queryKey: ["game", String(game.id)],
     staleTime: 1000 * 60,
-    enabled: game.status === "pre_game",
+    enabled: game.status === "pre_game" || shouldFetchSeriesDetails,
     queryFn: async () => {
       let res = await fetch(`${API_URL}/${sport}/events/${game.id}`)
       if (!res.ok) throw new Error(await res.text())
@@ -29,6 +31,7 @@ export function GamePreview({
     },
   })
   let cachedGame = gameDetails?.game ?? game
+  let seriesInfo = getSeriesInfo(cachedGame)
 
   function renderGameStatus() {
     if (game.status !== "pre_game") {
@@ -67,7 +70,10 @@ export function GamePreview({
         ) {
           throw new Error(`invalid route name: ${sport}`)
         }
-        queryClient.setQueryData(["game", String(game.id)], (old: unknown) => old ?? { game })
+        queryClient.setQueryData(
+          ["game", String(game.id)],
+          (old: unknown) => old ?? { game },
+        )
         navigation.navigate("details", {
           sport,
           id: String(game.id),
@@ -91,8 +97,32 @@ export function GamePreview({
             game={game}
             renderStatus={renderChannel}
           />
+          {seriesInfo && (
+            <Text className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+              {seriesInfo}
+            </Text>
+          )}
         </View>
       </View>
     </Pressable>
   )
+}
+
+function isProSeriesSport(sport: string) {
+  return sport === "nba" || sport === "nhl"
+}
+
+function isPostseasonGame(game: Game) {
+  return game.game_type?.toLowerCase().includes("postseason") ?? false
+}
+
+function getSeriesInfo(game: Game) {
+  if (!game.api_uri.includes("nba") && !game.api_uri.includes("nhl")) {
+    return null
+  }
+
+  const description = game.game_description?.trim()
+  if (!description || !isPostseasonGame(game)) return null
+
+  return description.replace(/\s*\|\s*/g, " · ")
 }
